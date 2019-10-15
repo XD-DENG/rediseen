@@ -93,3 +93,9 @@ Then you can access the service at
 | SET    | `/<redis DB>/<key>/<member>` | if `<member>` is member of the set |
 | HASH   | `/<redis DB>/<key>/<field>` | value of hash `<field>` in the hash |
 | ZSET   | `/<redis DB>/<key>/<memeber>` | index of `<member>` in the sorted set |
+
+
+
+## 3. License
+
+[Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)
