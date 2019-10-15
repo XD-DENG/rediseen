@@ -8,8 +8,8 @@ Start a REST-like API service for your Redis database, without writing a single 
 Let's assume that your Redis database URI is `redis://:@localhost:6379`, and you want to expose keys with prefix `key:` in logical database `0`.
 
 ```bash
-# installation
-go install .  # or "brew install XD-DENG/rediseen/formula"
+# build
+go build .  # or "brew install XD-DENG/rediseen/formula"
 
 # Configuration
 export REDISEEN_REDIS_URI="redis://:@localhost:6379"
@@ -17,7 +17,7 @@ export REDISEEN_DB_EXPOSED=0
 export REDISEEN_KEY_PATTERN_EXPOSED="^key:([0-9a-z]+)"
 
 # Start the service
-rediseen start
+./rediseen start
 ```
 
 Now you should be able to query against the database, like `http://localhost:8000/0/key:1`.
@@ -37,10 +37,10 @@ For more details, please refer to the rest of this README documentation.
 brew install XD-DENG/rediseen/formula
 
 ```
-- **Install from source** (with Go 1.12 or above installed)
+- **Build from source** (with Go 1.12 or above installed)
 
 ```bash
-go install .
+go build .
 ```
 
 
@@ -63,7 +63,7 @@ Configuration is done via **environment variables**.
 Run command below,
 
 ```bash
-rediseen start
+rediseen start  # or "./rediseen start"
 ```
 
 Then you can access the service at
