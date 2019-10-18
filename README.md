@@ -9,7 +9,7 @@ Let's assume that your Redis database URI is `redis://:@localhost:6379`, and you
 
 ```bash
 # build
-go build .  # or "brew install XD-DENG/rediseen/formula"
+go build .  # or "brew install XD-DENG/rediseen/rediseen"
 
 # Configuration
 export REDISEEN_REDIS_URI="redis://:@localhost:6379"
@@ -17,7 +17,7 @@ export REDISEEN_DB_EXPOSED=0
 export REDISEEN_KEY_PATTERN_EXPOSED="^key:([0-9a-z]+)"
 
 # Start the service
-./rediseen start
+./rediseen start  # or "rediseen start" if you use brew to install
 ```
 
 Now you should be able to query against the database, like `http://localhost:8000/0/key:1`.
@@ -34,7 +34,7 @@ For more details, please refer to the rest of this README documentation.
 - **Install via `Homebrew`**
 
 ```bash
-brew install XD-DENG/rediseen/formula
+brew install XD-DENG/rediseen/rediseen
 
 ```
 - **Build from source** (with Go 1.12 or above installed)
