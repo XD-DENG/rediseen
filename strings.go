@@ -11,6 +11,7 @@ const strHelpDoc = strHeader + "\n\n" +
 	"Configuration Items (via environment variables):\n" +
 	"- REDISEEN_PORT: port of the service. Default port is 8000\n" +
 	"- REDISEEN_REDIS_URI: URI of your Redis database, e.g. `redis://:@localhost:6379`\n" +
+	"- REDISEEN_DB_EXPOSED: Redis logical database(s) to expose. e.g., `0`, `0;3;9`, `0-9;15`, or `*`\n" +
 	"- REDISEEN_KEY_PATTERN_EXPOSED: Regular expression pattern, " +
 	"representing the name pattern of keys that you intend to expose\n" +
 	"- REDISEEN_KEY_PATTERN_EXPOSE_ALL: If you intend to expose *all* your keys, " +
