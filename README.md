@@ -31,7 +31,9 @@ For more details, please refer to the rest of this README documentation.
 
 ### 2.1 How to Install 
 
-- **Install via `Homebrew`**
+You can choose to install `Rediseen` either using `Homebrew` or from source.
+
+- **Install Using `Homebrew`**
 
 You can use [Homebrew](https://brew.sh/) to install `Rediseen`, no matte you are using `macOS`, or `Linux`/
 `Windows 10 Subsystem for Linux` ([how to install Homebrew](https://docs.brew.sh/Installation)).
