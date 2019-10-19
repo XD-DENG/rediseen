@@ -8,8 +8,8 @@ Start a REST-like API service for your Redis database, without writing a single 
 Let's assume that your Redis database URI is `redis://:@localhost:6379`, and you want to expose keys with prefix `key:` in logical database `0`.
 
 ```bash
-# build
-go build .  # or "brew install XD-DENG/rediseen/rediseen"
+# Install using Homebrew
+brew install XD-DENG/rediseen/rediseen
 
 # Configuration
 export REDISEEN_REDIS_URI="redis://:@localhost:6379"
@@ -17,7 +17,7 @@ export REDISEEN_DB_EXPOSED=0
 export REDISEEN_KEY_PATTERN_EXPOSED="^key:([0-9a-z]+)"
 
 # Start the service
-./rediseen start  # or "rediseen start" if you use brew to install
+rediseen start
 ```
 
 Now you should be able to query against the database, like `http://localhost:8000/0/key:1`.
@@ -31,16 +31,29 @@ For more details, please refer to the rest of this README documentation.
 
 ### 2.1 How to Install 
 
-- **Install via `Homebrew`**
+You can choose to install `Rediseen` either using `Homebrew` or from source.
+
+- **Install Using `Homebrew`**
+
+You can use [Homebrew](https://brew.sh/) to install `Rediseen`, no matte you are using `macOS`, or `Linux`/
+`Windows 10 Subsystem for Linux` ([how to install Homebrew](https://docs.brew.sh/Installation)).
 
 ```bash
 brew install XD-DENG/rediseen/rediseen
 
+rediseen help
 ```
+
 - **Build from source** (with Go 1.12 or above installed)
 
+You can also build `Rediseen` from source.
+
 ```bash
-go build .
+git clone https://github.com/XD-DENG/rediseen.git
+cd rediseen
+go build . # executable binary file "rediseen" will be created
+
+./rediseen help
 ```
 
 
@@ -63,7 +76,7 @@ Configuration is done via **environment variables**.
 Run command below,
 
 ```bash
-rediseen start  # or "./rediseen start"
+rediseen start
 ```
 
 Then you can access the service at
