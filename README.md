@@ -20,7 +20,8 @@ export REDISEEN_KEY_PATTERN_EXPOSED="^key:([0-9a-z]+)"
 rediseen start
 ```
 
-Now you should be able to query against the database, like `http://localhost:8000/0/key:1`.
+Now you should be able to query against the database, like `http://localhost:8000/0/key:1` (say you
+have a key named `key:1` set in your Redis database).
 
 For more details, please refer to the rest of this README documentation.
 

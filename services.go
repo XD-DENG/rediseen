@@ -29,7 +29,7 @@ func service(res http.ResponseWriter, req *http.Request) {
 
 	if strings.HasSuffix(req.URL.Path, "/") || len(arguments) < 3 {
 		res.WriteHeader(http.StatusBadRequest)
-		js, _ = json.Marshal(types.ErrorType{Error: "Usage: /db/key_pattern or /db/key_pattern/<index or filed>"})
+		js, _ = json.Marshal(types.ErrorType{Error: "Usage: /db/key or /db/key/<index or filed>"})
 		res.Write(js)
 		return
 	}
