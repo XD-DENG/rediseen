@@ -7,6 +7,7 @@ import (
 	"os"
 )
 
+const defaultHost = "localhost"
 const defaultPort = "8000"
 
 func main() {
@@ -34,17 +35,22 @@ func main() {
 
 		http.HandleFunc("/", service)
 
+		host := os.Getenv("REDISEEN_HOST")
+		if host == "" {
+			host = defaultHost
+		}
 		port := os.Getenv("REDISEEN_PORT")
 		if port == "" {
 			port = defaultPort
 		}
-		log.Printf("Running with port %s", port)
-		serve := http.ListenAndServe(":"+port, nil)
+		log.Printf("Serving at %s:%s", host, port)
+		serve := http.ListenAndServe(host+":"+port, nil)
 		if serve != nil {
 			panic(serve)
 		}
 	case "help":
 		fmt.Println(strLogo)
+		fmt.Println(strHeader)
 		fmt.Println(strHelpDoc)
 	case "version":
 		fmt.Println(rediseenVersion)
