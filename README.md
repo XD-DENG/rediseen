@@ -1,5 +1,9 @@
 # rediseen
 
+[![travis](https://api.travis-ci.org/XD-DENG/rediseen.svg?branch=master)](https://github.com/XD-DENG/rediseen)
+[![codecov](https://codecov.io/gh/XD-DENG/rediseen/branch/master/graph/badge.svg)](https://codecov.io/gh/XD-DENG/rediseen)
+
+
 Start a REST-like API service for your Redis database, without writing a single line of code.
 
 
