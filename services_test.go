@@ -180,6 +180,32 @@ func Test_service_string_check_by_index(t *testing.T) {
 
 	compareAndShout(t, "string", result.ValueType)
 	compareAndShout(t, "l", result.Value)
+
+	res, _ = http.Get(s.URL + "/0/`key:1`/5")
+
+	expectedCode = 200
+	compareAndShout(t, expectedCode, res.StatusCode)
+
+	resultStr, _ = ioutil.ReadAll(res.Body)
+	res.Body.Close()
+
+	json.Unmarshal([]byte(resultStr), &result)
+
+	compareAndShout(t, "string", result.ValueType)
+	compareAndShout(t, "o", result.Value)
+
+	res, _ = http.Get(s.URL + "/0/`key:1`/`6`")
+
+	expectedCode = 200
+	compareAndShout(t, expectedCode, res.StatusCode)
+
+	resultStr, _ = ioutil.ReadAll(res.Body)
+	res.Body.Close()
+
+	json.Unmarshal([]byte(resultStr), &result)
+
+	compareAndShout(t, "string", result.ValueType)
+	compareAndShout(t, "p", result.Value)
 }
 
 func Test_service_string_check_by_index_wrong_index(t *testing.T) {
