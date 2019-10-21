@@ -5,7 +5,7 @@ go:
   - 1.13.x
   
 env:
-  - REDISEEN_REDIS_URI=redis://:@localhost:6400 REDISEEN_KEY_PATTERN_EXPOSED="^key:[.]* REDISEEN_TEST_MODE=true REDISEEN_DB_EXPOSED=0-5
+  - GO111MODULE=on REDISEEN_REDIS_URI=redis://:@localhost:6400 REDISEEN_KEY_PATTERN_EXPOSED="^key:[.]* REDISEEN_TEST_MODE=true REDISEEN_DB_EXPOSED=0-5
 
 before_install:
   - go get -v -t -d ./...
