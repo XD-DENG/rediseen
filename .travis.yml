@@ -7,5 +7,8 @@ go:
 env:
   - REDISEEN_REDIS_URI=redis://:@localhost:6400 REDISEEN_KEY_PATTERN_EXPOSED="^key:[.]* REDISEEN_TEST_MODE=true REDISEEN_DB_EXPOSED=0-5
 
+before_install:
+  - go get -v -t -d ./...
+
 script:
   - go test -cover rediseen
