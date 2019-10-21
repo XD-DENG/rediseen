@@ -49,8 +49,9 @@ func service(res http.ResponseWriter, req *http.Request) {
 		countBacktick := strings.Count(restPath, "`")
 		if countBacktick > 0 && countBacktick%2 == 0 {
 			if restPath[0] == '`' && restPath[len(restPath)-1] == '`' {
-				temp, _ := regexp.MatchString("`(?P<Key>.+)`/`(?P<Index>.+)`", restPath)
-				if temp {
+				// Check case like /0/`key`/`index`
+				bothBackTickPattern, _ := regexp.MatchString("`(?P<Key>.+)`/`(?P<Index>.+)`", restPath)
+				if bothBackTickPattern {
 					p := regexp.MustCompile("`(?P<Key>.+)`/`(?P<Index>.+)`")
 					key = p.FindStringSubmatch(restPath)[1]
 					index = p.FindStringSubmatch(restPath)[2]
