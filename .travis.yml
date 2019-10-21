@@ -11,4 +11,7 @@ before_install:
   - go get -v -t -d ./...
 
 script:
-  - go test -cover rediseen
+  - go test -cover -race -coverprofile=coverage.txt -covermode=atomic rediseen
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
