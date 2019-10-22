@@ -8,7 +8,7 @@ import (
 )
 
 func Test_generateAddr(t *testing.T) {
-	if generateAddr != "localhost:8000" {
+	if generateAddr() != "localhost:8000" {
 		t.Error("generateAddr is not handling default set-up correctly.")
 	}
 }
