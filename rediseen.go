@@ -7,9 +7,6 @@ import (
 	"os"
 )
 
-const defaultHost = "localhost"
-const defaultPort = "8000"
-
 func main() {
 
 	if len(os.Args) != 2 {
