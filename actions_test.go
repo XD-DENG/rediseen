@@ -11,6 +11,12 @@ func Test_generateAddr(t *testing.T) {
 	if generateAddr() != "localhost:8000" {
 		t.Error("generateAddr is not handling default set-up correctly.")
 	}
+	
+	os.Setenv("REDISEEN_HOST", "0.0.0.0")
+	os.Setenv("REDISEEN_PORT", "80")
+	generateAddr() != "0.0.0.0:80" {
+		t.Error("generateAddr is not handling customized set-up correctly.")
+	}
 }
 
 func Test_configCheck_no_redis_uri(t *testing.T) {
