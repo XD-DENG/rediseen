@@ -1,8 +1,5 @@
 coverage:
   status:
-    project:
-      default:
-        # basic
-        target: auto
-        threshold: 5%
-        base: auto 
+    project: no
+    patch: no
+    changes: no

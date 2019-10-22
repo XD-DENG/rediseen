@@ -7,9 +7,6 @@ import (
 	"os"
 )
 
-const defaultHost = "localhost"
-const defaultPort = "8000"
-
 func main() {
 
 	if len(os.Args) != 2 {
@@ -35,16 +32,9 @@ func main() {
 
 		http.HandleFunc("/", service)
 
-		host := os.Getenv("REDISEEN_HOST")
-		if host == "" {
-			host = defaultHost
-		}
-		port := os.Getenv("REDISEEN_PORT")
-		if port == "" {
-			port = defaultPort
-		}
-		log.Printf("Serving at %s:%s", host, port)
-		serve := http.ListenAndServe(host+":"+port, nil)
+		addr := generateAddr()
+		log.Printf("Serving at %s", addr)
+		serve := http.ListenAndServe(addr, nil)
 		if serve != nil {
 			panic(serve)
 		}
