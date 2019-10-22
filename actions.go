@@ -18,6 +18,20 @@ import (
 var dbExposedMap = make(map[int]bool)
 var regexpKeyPatternAllowed *regexp.Regexp
 
+// generate the Addr to expose
+func generateAddr() string {
+	host := os.Getenv("REDISEEN_HOST")
+	if host == "" {
+		host = defaultHost
+	}
+	port := os.Getenv("REDISEEN_PORT")
+	if port == "" {
+		port = defaultPort
+	}
+
+	return host+":"+port
+}
+
 // Check Configurations, and stop proceeding if any configuration is missing or conflicting
 func configCheck() error {
 	redisUri := os.Getenv("REDISEEN_REDIS_URI")
