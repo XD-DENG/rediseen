@@ -15,6 +15,9 @@ import (
 	"strings"
 )
 
+const defaultHost = "localhost"
+const defaultPort = "8000"
+
 var dbExposedMap = make(map[int]bool)
 var regexpKeyPatternAllowed *regexp.Regexp
 
