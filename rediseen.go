@@ -35,7 +35,7 @@ func main() {
 
 		http.HandleFunc("/", service)
 
-		addr = generateAddr()
+		addr := generateAddr()
 		log.Printf("Serving at %s", addr)
 		serve := http.ListenAndServe(addr, nil)
 		if serve != nil {
