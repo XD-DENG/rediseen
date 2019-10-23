@@ -3,8 +3,7 @@ package main
 const strNotImplemented = "not implemented"
 const strWrongTypeForIndexField = "wrong type for index/field"
 
-const strUsage = "Usage: ./rediseen [start/help/version]"
-const strHeader = "rediseen " + rediseenVersion
+const strUsage = "Usage: rediseen [start/help/version]"
 
 const strHelpDoc = "\n\n" + strUsage + "\n\n" +
 	"Configuration Items (via environment variables):\n" +
@@ -23,3 +22,5 @@ const strLogo = " _____            _  _   _____\n" +
 	"|  _  / / _ \\ / _` || | \\___ \\  / _ \\ / _ \\| '_ \\\n" +
 	"| | \\ \\|  __/| (_| || | ____) ||  __/|  __/| | | |\n" +
 	"|_|  \\_\\\\___| \\__,_||_||_____/  \\___| \\___||_| |_|"
+
+const strHeader = strLogo + "\n" + "rediseen " + rediseenVersion

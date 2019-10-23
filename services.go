@@ -25,6 +25,7 @@ func service(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-Type", "application/json")
 
 	// Process URL Path into detailed information, like DB and Key
+	log.Printf("Request Path: '%s'\n", req.URL.Path)
 	arguments := strings.Split(req.URL.Path, "/")
 
 	if strings.HasSuffix(req.URL.Path, "/") || len(arguments) < 3 {
@@ -39,7 +40,6 @@ func service(res http.ResponseWriter, req *http.Request) {
 	var index string
 
 	rawDb = arguments[1]
-	db, err := strconv.Atoi(rawDb)
 
 	// deal with situation where key contains "/"
 	if len(arguments) == 3 {
@@ -74,7 +74,7 @@ func service(res http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	log.Printf("Request Path: '%s'\n", req.URL.Path)
+	db, err := strconv.Atoi(rawDb)
 	if err != nil {
 		res.WriteHeader(http.StatusBadRequest)
 		js, _ = json.Marshal(types.ErrorType{Error: "Provide an integer for DB"})
@@ -103,11 +103,7 @@ func service(res http.ResponseWriter, req *http.Request) {
 	keyExists, err := client.Exists(key).Result()
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
-		if strings.Contains(err.Error(), "connection refused") {
-			js, _ = json.Marshal(types.ErrorType{Error: "Connection to Redis is refused."})
-		} else {
-			js, _ = json.Marshal(types.ErrorType{Error: err.Error()})
-		}
+		js, _ = json.Marshal(types.ErrorType{Error: err.Error()})
 		res.Write(js)
 		return
 	}

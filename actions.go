@@ -37,23 +37,27 @@ func generateAddr() string {
 
 // Check Configurations, and stop proceeding if any configuration is missing or conflicting
 func configCheck() error {
-	redisUri := os.Getenv("REDISEEN_REDIS_URI")
+	var redisUri = os.Getenv("REDISEEN_REDIS_URI")
+	var dbExposed = os.Getenv("REDISEEN_DB_EXPOSED")
+	var keyPatternAllowed = os.Getenv("REDISEEN_KEY_PATTERN_EXPOSED")
+	var keyPatternAllowAll = os.Getenv("REDISEEN_KEY_PATTERN_EXPOSE_ALL")
+
 	if redisUri == "" {
 		return errors.New("No valid Redis URI is provided " +
 			"(via environment variable REDISEEN_REDIS_URI)")
 	}
 
-	_, err := redis.ParseURL(os.Getenv("REDISEEN_REDIS_URI"))
+	_, err := redis.ParseURL(redisUri)
 	if err != nil {
 		return errors.New(fmt.Sprintf("Redis URI provided "+
 			"(via environment variable REDISEEN_REDIS_URI)"+
 			"is not valid (details: %s)", err.Error()))
 	}
 
-	var dbExposed = os.Getenv("REDISEEN_DB_EXPOSED")
 	if dbExposed == "" {
 		return errors.New("REDISEEN_DB_EXPOSED is not configured")
 	}
+
 	dbConfigCheckResult, err := validateDbExposeConfig(dbExposed)
 	if dbConfigCheckResult == false {
 		var errMsg strings.Builder
@@ -63,10 +67,8 @@ func configCheck() error {
 		}
 		return errors.New(errMsg.String())
 	}
-	dbExposedMap = parseDbExposed(os.Getenv("REDISEEN_DB_EXPOSED"))
 
-	var keyPatternAllowed = os.Getenv("REDISEEN_KEY_PATTERN_EXPOSED")
-	var keyPatternAllowAll = os.Getenv("REDISEEN_KEY_PATTERN_EXPOSE_ALL")
+	dbExposedMap = parseDbExposed(dbExposed)
 
 	if keyPatternAllowed == "" && keyPatternAllowAll != "true" {
 		strError := "You have not specified any key pattern to allow being accessed " +
@@ -255,10 +257,7 @@ func get(client *redis.Client, res http.ResponseWriter, key string, indexOrField
 		js, _ = json.Marshal(types.ErrorType{Error: err.Error()})
 		res.Write(js)
 	} else {
-		var response types.ResponseType
-		response = types.ResponseType{ValueType: keyType, Value: value}
-
-		js, _ = json.Marshal(response)
+		js, _ = json.Marshal(types.ResponseType{ValueType: keyType, Value: value})
 		res.Write(js)
 	}
 }

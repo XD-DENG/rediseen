@@ -9,6 +9,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"rediseen/types"
+	"strings"
 	"testing"
 )
 
@@ -80,8 +81,10 @@ func Test_service_redis_conn_refused(t *testing.T) {
 	var result types.ErrorType
 	json.Unmarshal([]byte(resultStr), &result)
 
-	expectedError := "Connection to Redis is refused."
-	compareAndShout(t, expectedError, result.Error)
+	expectedError := "connection refused"
+	if !strings.Contains(result.Error, expectedError) {
+		t.Error("Expecting to contain \n", expectedError, "\ngot\n", result.Error)
+	}
 }
 
 func Test_service_non_existent_key(t *testing.T) {

@@ -8,22 +8,15 @@ import (
 )
 
 func main() {
+	fmt.Println(strHeader)
 
 	if len(os.Args) != 2 {
-		fmt.Println(strLogo)
-		fmt.Println(strHeader)
 		fmt.Println(strUsage)
 		os.Exit(0)
 	}
 
-	var command = os.Args[1]
-
-	switch command {
+	switch os.Args[1] {
 	case "start":
-
-		fmt.Println(strLogo)
-		fmt.Println(strHeader)
-
 		err := configCheck()
 		if err != nil {
 			fmt.Println("[ERROR] " + err.Error())
@@ -39,14 +32,10 @@ func main() {
 			panic(serve)
 		}
 	case "help":
-		fmt.Println(strLogo)
-		fmt.Println(strHeader)
 		fmt.Println(strHelpDoc)
 	case "version":
 		fmt.Println(rediseenVersion)
 	default:
-		fmt.Println(strLogo)
-		fmt.Println(strHeader)
 		fmt.Println(strUsage)
 	}
 }
