@@ -6,16 +6,16 @@ import (
 	"log"
 	"net/http"
 	"os"
-	//"os"
+	"os/exec"
 )
 
 func main() {
 	fmt.Println(strHeader)
 
-	var command = flag.Bool("d", false, "Run in daemon mode")
+	var daemon = flag.Bool("d", false, "Run in daemon mode")
 	flag.Parse()
 
-	fmt.Println("Daemon mode:", *command)
+	fmt.Println("Daemon mode:", *daemon)
 
 	args := flag.Args()
 	if len(args) != 1 {
@@ -29,6 +29,17 @@ func main() {
 		if err != nil {
 			fmt.Println("[ERROR] " + err.Error())
 			return
+		}
+
+		if *daemon {
+			cmd := exec.Command(os.Args[0], args...)
+			err = cmd.Start()
+			if err != nil {
+				fmt.Println("[ERROR] " + err.Error())
+				return
+			}
+			log.Println("[INFO] Running in daemon. PID:", cmd.Process.Pid)
+			os.Exit(0)
 		}
 
 		http.HandleFunc("/", service)
