@@ -1,21 +1,29 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	//"os"
 )
 
 func main() {
 	fmt.Println(strHeader)
 
-	if len(os.Args) != 2 {
+	var command = flag.Bool("d", false, "Run in daemon mode")
+	flag.Parse()
+
+	fmt.Println("Daemon mode:", *command)
+
+	args := flag.Args()
+	if len(args) != 1 {
 		fmt.Println(strUsage)
 		os.Exit(0)
 	}
 
-	switch os.Args[1] {
+	switch args[0] {
 	case "start":
 		err := configCheck()
 		if err != nil {
