@@ -88,7 +88,7 @@ func main() {
 		if *daemon {
 			// check if daemon already running.
 			if _, err := os.Stat(pidFile); err == nil {
-				fmt.Println(fmt.Sprintf("Already running or %s file exist.", pidFile))
+				fmt.Println(fmt.Sprintf("[ERROR] Already running or file %s exist.", pidFile))
 				os.Exit(1)
 			}
 
