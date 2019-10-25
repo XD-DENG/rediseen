@@ -18,7 +18,7 @@ func savePID(pid int, fileForPid string) {
 
 	file, err := os.Create(fileForPid)
 	if err != nil {
-		log.Printf("Unable to create pid file : %v\n", err)
+		log.Printf("Unable to create PID file : %v\n", err)
 		os.Exit(1)
 	}
 
@@ -26,7 +26,7 @@ func savePID(pid int, fileForPid string) {
 
 	_, err = file.WriteString(strconv.Itoa(pid))
 	if err != nil {
-		log.Printf("Unable to create PID file : %v\n", err)
+		log.Printf("Unable to write to PID file : %v\n", err)
 		os.Exit(1)
 	}
 
@@ -55,9 +55,8 @@ func stopDaemon(fileForPid string) error {
 		if err != nil {
 			return errors.New(fmt.Sprintf("Unable to kill process [%v] (error: %v)\n", pid, err.Error()))
 		} else {
-			return errors.New(fmt.Sprintf("Killed process [%v]\n", pid))
+			return nil
 		}
-
 	} else {
 		return errors.New(fmt.Sprintf("Not running"))
 	}
