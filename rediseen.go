@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -13,9 +14,9 @@ import (
 
 var pidFile = "/tmp/rediseen.pid"
 
-func savePID(pid int) {
+func savePID(pid int, fileForPid string) {
 
-	file, err := os.Create(pidFile)
+	file, err := os.Create(fileForPid)
 	if err != nil {
 		log.Printf("Unable to create pid file : %v\n", err)
 		os.Exit(1)
@@ -25,49 +26,40 @@ func savePID(pid int) {
 
 	_, err = file.WriteString(strconv.Itoa(pid))
 	if err != nil {
-		log.Printf("Unable to create pid file : %v\n", err)
+		log.Printf("Unable to create PID file : %v\n", err)
 		os.Exit(1)
 	}
 
 	file.Sync() // flush to disk
 }
 
-func stopDaemon() {
-	if _, err := os.Stat(pidFile); err == nil {
-		rawPid, err := ioutil.ReadFile(pidFile)
+func stopDaemon(fileForPid string) error {
+	if _, err := os.Stat(fileForPid); err == nil {
+		rawPid, err := ioutil.ReadFile(fileForPid)
 		if err != nil {
-			fmt.Println("Not running")
-			os.Exit(1)
+			return errors.New("Not running")
 		}
 		pid, err := strconv.Atoi(string(rawPid))
 		if err != nil {
-			fmt.Println("Unable to read and parse process id found in ", pidFile)
-			os.Exit(1)
+			return errors.New(fmt.Sprintf("Invalid PID found in %s", fileForPid))
 		}
 
 		process, err := os.FindProcess(pid)
 		if err != nil {
-			fmt.Printf("Unable to find process ID [%v] (error: %v)\n", pid, err.Error())
-			os.Exit(1)
+			return errors.New(fmt.Sprintf("Unable to find PID [%v] (error: %v)\n", pid, err.Error()))
 		}
 
-		// remove PID file
-		os.Remove(pidFile)
+		os.Remove(fileForPid)
 
-		fmt.Printf("Killing process ID [%v] now.\n", pid)
-		// kill process and exit immediately
 		err = process.Kill()
 		if err != nil {
-			fmt.Printf("Unable to kill process ID [%v] (error: %v)\n", pid, err.Error())
-			os.Exit(1)
+			return errors.New(fmt.Sprintf("Unable to kill process [%v] (error: %v)\n", pid, err.Error()))
 		} else {
-			fmt.Printf("Killed process ID [%v]\n", pid)
-			os.Exit(0)
+			return errors.New(fmt.Sprintf("Killed process [%v]\n", pid))
 		}
 
 	} else {
-		fmt.Println("Not running.")
-		os.Exit(1)
+		return errors.New(fmt.Sprintf("Not running"))
 	}
 }
 
@@ -107,7 +99,7 @@ func main() {
 				return
 			}
 			log.Println("[INFO] Running in daemon. PID:", cmd.Process.Pid)
-			savePID(cmd.Process.Pid)
+			savePID(cmd.Process.Pid, pidFile)
 			os.Exit(0)
 		}
 
@@ -120,7 +112,10 @@ func main() {
 			log.Println("[ERROR] Failed to launch. Details: ", serve.Error())
 		}
 	case "stop":
-		stopDaemon()
+		err := stopDaemon(pidFile)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
 	case "help":
 		fmt.Println(strHelpDoc)
 	case "version":
