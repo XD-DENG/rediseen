@@ -1,11 +1,16 @@
-# rediseen
+# Rediseen
 
-[![License](https://img.shields.io/:license-apache2-green.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
+[!["Latest Release"](https://img.shields.io/github/release/xd-deng/rediseen.svg)](https://github.com/xd-deng/rediseen/releases/latest)
+[![action](https://github.com/xd-deng/rediseen/workflows/Rediseen/badge.svg)](https://github.com/XD-DENG/rediseen/actions)
 [![travis](https://api.travis-ci.org/XD-DENG/rediseen.svg?branch=master)](https://travis-ci.org/XD-DENG/rediseen/branches)
 [![codecov](https://codecov.io/gh/XD-DENG/rediseen/branch/master/graph/badge.svg)](https://codecov.io/gh/XD-DENG/rediseen)
+[![License](https://img.shields.io/:license-apache2-green.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 
 Start a REST-like API service for your Redis database, without writing a single line of code.
+
+(Inspired by [sandman2](https://github.com/jeffknupp/sandman2), and built on shoulder of [go-redis/redis
+](https://github.com/go-redis/redis))
 
 
 ## 1. Quick Start

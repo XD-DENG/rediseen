@@ -1,5 +1,8 @@
 package main
 
+const defaultHost = "localhost"
+const defaultPort = "8000"
+
 const strNotImplemented = "not implemented"
 const strWrongTypeForIndexField = "wrong type for index/field"
 

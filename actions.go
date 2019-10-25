@@ -15,9 +15,6 @@ import (
 	"strings"
 )
 
-const defaultHost = "localhost"
-const defaultPort = "8000"
-
 var dbExposedMap = make(map[int]bool)
 var regexpKeyPatternAllowed *regexp.Regexp
 
@@ -32,7 +29,7 @@ func generateAddr() string {
 		port = defaultPort
 	}
 
-	return host+":"+port
+	return host + ":" + port
 }
 
 // Check Configurations, and stop proceeding if any configuration is missing or conflicting
