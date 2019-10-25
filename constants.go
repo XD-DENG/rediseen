@@ -6,7 +6,7 @@ const defaultPort = "8000"
 const strNotImplemented = "not implemented"
 const strWrongTypeForIndexField = "wrong type for index/field"
 
-const strUsage = "Usage: rediseen [start/help/version]"
+const strUsage = "Usage: rediseen [start/stop/help/version]"
 
 const strHelpDoc = "\n\n" + strUsage + "\n\n" +
 	"Configuration Items (via environment variables):\n" +
