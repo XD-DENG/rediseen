@@ -95,6 +95,16 @@ Then you can access the service at
 - `http://<your server address>:<REDISEEN_PORT>/<redis DB>/<key>`
 - `http://<your server address>:<REDISEEN_PORT>/<redis DB>/<key>/<index or value or member>`
 
+If you would like to run the service in daemon mode, apply flag `-d`.
+
+```bash
+# run service in daemon mode
+rediseen -d start
+
+# stop service running in daemon mode
+rediseen stop
+```
+
 
 ### 2.4 How to Consume the Service
 
