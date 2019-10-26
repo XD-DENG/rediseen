@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path"
 	"strconv"
 )
 
@@ -63,7 +64,7 @@ func main() {
 	fmt.Println(strHeader)
 
 	var daemon = flag.Bool("d", false, "Run in daemon mode")
-	var pidFile = flag.String("pidfile", "/tmp/rediseen.pid", "where PID is stored for daemon mode")
+	var pidFile = flag.String("pidfile", path.Join(os.TempDir(), "rediseen.pid"), "where PID is stored for daemon mode")
 	flag.Parse()
 
 	args := flag.Args()
