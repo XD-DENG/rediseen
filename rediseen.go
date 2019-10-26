@@ -63,7 +63,6 @@ func main() {
 	fmt.Println(strHeader)
 
 	flag.Parse()
-
 	args := flag.Args()
 	if len(args) != 1 {
 		fmt.Println(strUsage)

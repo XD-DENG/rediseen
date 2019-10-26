@@ -61,3 +61,14 @@ func Test_stopDaemon_normal(t *testing.T) {
 		t.Error("Expecting nil \ngot\n", err)
 	}
 }
+
+func Test_Main(t *testing.T) {
+	os.Args = []string{"", "version"}
+	main()
+
+	os.Args = []string{"", "help"}
+	main()
+
+	os.Args = []string{"", "stop"}
+	main()
+}
