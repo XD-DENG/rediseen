@@ -60,5 +60,4 @@ func Test_stopDaemon_normal(t *testing.T) {
 	if err != nil {
 		t.Error("Expecting nil \ngot\n", err)
 	}
-
 }

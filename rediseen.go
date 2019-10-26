@@ -13,6 +13,9 @@ import (
 	"strconv"
 )
 
+var daemon = flag.Bool("d", false, "Run in daemon mode")
+var pidFile = flag.String("pidfile", path.Join(os.TempDir(), "rediseen.pid"), "where PID is stored for daemon mode")
+
 func savePID(pid int, fileForPid string) error {
 
 	file, err := os.Create(fileForPid)
@@ -32,11 +35,7 @@ func savePID(pid int, fileForPid string) error {
 }
 
 func stopDaemon(fileForPid string) error {
-	if _, err := os.Stat(fileForPid); err == nil {
-		rawPid, err := ioutil.ReadFile(fileForPid)
-		if err != nil {
-			return errors.New("no running service found")
-		}
+	if rawPid, err := ioutil.ReadFile(fileForPid); err == nil {
 		pid, err := strconv.Atoi(string(rawPid))
 		if err != nil {
 			return errors.New(fmt.Sprintf("Invalid PID found in %s", fileForPid))
@@ -56,15 +55,13 @@ func stopDaemon(fileForPid string) error {
 			return nil
 		}
 	} else {
-		return errors.New(fmt.Sprintf("no running service found"))
+		return errors.New("no running service found")
 	}
 }
 
 func main() {
 	fmt.Println(strHeader)
 
-	var daemon = flag.Bool("d", false, "Run in daemon mode")
-	var pidFile = flag.String("pidfile", path.Join(os.TempDir(), "rediseen.pid"), "where PID is stored for daemon mode")
 	flag.Parse()
 
 	args := flag.Args()
