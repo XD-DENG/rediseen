@@ -65,10 +65,13 @@ func Test_stopDaemon_normal(t *testing.T) {
 func Test_Main(t *testing.T) {
 	// First element "" is a placeholder for executable
 	//ref: https://stackoverflow.com/a/48674736
+
+	// "rediseen"
 	os.Args = []string{""}
 	main()
 
-	for _, command := range []string{"version", "help", "stop", ""} {
+	// "rediseen version", "rediseen help", "rediseen stop", "rediseen wrong_command"
+	for _, command := range []string{"version", "help", "stop", "wrong_command"} {
 		os.Args = []string{"", command}
 		main()
 	}
