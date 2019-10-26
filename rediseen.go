@@ -66,7 +66,7 @@ func main() {
 	args := flag.Args()
 	if len(args) != 1 {
 		fmt.Println(strUsage)
-		os.Exit(0)
+		return
 	}
 
 	switch args[0] {
