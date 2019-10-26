@@ -41,16 +41,16 @@ func stopDaemon(fileForPid string) error {
 			return errors.New(fmt.Sprintf("Invalid PID found in %s", fileForPid))
 		}
 
+		os.Remove(fileForPid)
+
 		process, err := os.FindProcess(pid)
 		if err != nil {
-			return errors.New(fmt.Sprintf("Unable to find PID [%v] (error: %v)\n", pid, err.Error()))
+			return errors.New(fmt.Sprintf("Unable to find PID %v (error: %v)\n", pid, err.Error()))
 		}
-
-		os.Remove(fileForPid)
 
 		err = process.Kill()
 		if err != nil {
-			return errors.New(fmt.Sprintf("Unable to kill process [%v] (error: %v)\n", pid, err.Error()))
+			return errors.New(fmt.Sprintf("Unable to kill process %v (error: %v)\n", pid, err.Error()))
 		} else {
 			return nil
 		}
@@ -116,6 +116,8 @@ func main() {
 		err := stopDaemon(*pidFile)
 		if err != nil {
 			fmt.Println(err.Error())
+		} else {
+			fmt.Println("Service running in daemon is stopped.")
 		}
 	case "help":
 		fmt.Println(strHelpDoc)
