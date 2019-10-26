@@ -4,13 +4,20 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strings"
 	"testing"
 )
+
+func Test_savePID(t *testing.T) {
+	testPidFileLocation := "/xxx/yyy.pid"
+	err := savePID(100, testPidFileLocation)
+	compareAndShout(t, "Unable to create PID file", strings.Split(err.Error(), ":")[0])
+}
 
 func Test_stopDaemon_no_pid_file(t *testing.T) {
 	err := stopDaemon("/tmp/non-existing")
 
-	compareAndShout(t, "Not running", err.Error())
+	compareAndShout(t, "no running service found", err.Error())
 }
 
 func Test_stopDaemon_invalid_pid(t *testing.T) {

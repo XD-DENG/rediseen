@@ -12,32 +12,29 @@ import (
 	"strconv"
 )
 
-var pidFile = "/tmp/rediseen.pid"
-
-func savePID(pid int, fileForPid string) {
+func savePID(pid int, fileForPid string) error {
 
 	file, err := os.Create(fileForPid)
 	if err != nil {
-		log.Printf("Unable to create PID file : %v\n", err)
-		os.Exit(1)
+		return errors.New(fmt.Sprintf("Unable to create PID file: %v\n", err))
 	}
 
 	defer file.Close()
 
 	_, err = file.WriteString(strconv.Itoa(pid))
 	if err != nil {
-		log.Printf("Unable to write to PID file : %v\n", err)
-		os.Exit(1)
+		return errors.New(fmt.Sprintf("Unable to write to PID file : %v\n", err))
 	}
 
 	file.Sync() // flush to disk
+	return nil
 }
 
 func stopDaemon(fileForPid string) error {
 	if _, err := os.Stat(fileForPid); err == nil {
 		rawPid, err := ioutil.ReadFile(fileForPid)
 		if err != nil {
-			return errors.New("Not running")
+			return errors.New("no running service found")
 		}
 		pid, err := strconv.Atoi(string(rawPid))
 		if err != nil {
@@ -58,7 +55,7 @@ func stopDaemon(fileForPid string) error {
 			return nil
 		}
 	} else {
-		return errors.New(fmt.Sprintf("Not running"))
+		return errors.New(fmt.Sprintf("no running service found"))
 	}
 }
 
@@ -66,6 +63,7 @@ func main() {
 	fmt.Println(strHeader)
 
 	var daemon = flag.Bool("d", false, "Run in daemon mode")
+	var pidFile = flag.String("pidfile", "/tmp/rediseen.pid", "where PID is stored for daemon mode")
 	flag.Parse()
 
 	args := flag.Args()
@@ -86,8 +84,8 @@ func main() {
 
 		if *daemon {
 			// check if daemon already running.
-			if _, err := os.Stat(pidFile); err == nil {
-				fmt.Println(fmt.Sprintf("[ERROR] Already running or file %s exist.", pidFile))
+			if _, err := os.Stat(*pidFile); err == nil {
+				fmt.Println(fmt.Sprintf("[ERROR] Already running or file %s exist.", *pidFile))
 				os.Exit(1)
 			}
 
@@ -98,7 +96,11 @@ func main() {
 				return
 			}
 			log.Println("[INFO] Running in daemon. PID:", cmd.Process.Pid)
-			savePID(cmd.Process.Pid, pidFile)
+			err = savePID(cmd.Process.Pid, *pidFile)
+			if err != nil {
+				fmt.Println(err.Error())
+				os.Exit(1)
+			}
 			os.Exit(0)
 		}
 
@@ -111,7 +113,7 @@ func main() {
 			log.Println("[ERROR] Failed to launch. Details: ", serve.Error())
 		}
 	case "stop":
-		err := stopDaemon(pidFile)
+		err := stopDaemon(*pidFile)
 		if err != nil {
 			fmt.Println(err.Error())
 		}
