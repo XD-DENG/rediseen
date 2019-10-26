@@ -9,16 +9,9 @@ RUN apk add libc-dev
 RUN go build rediseen
 
 # Unit Test
-ENV REDISEEN_REDIS_URI=redis://:@localhost:6400
-ENV REDISEEN_KEY_PATTERN_EXPOSED="^key:[.]*"
-ENV REDISEEN_TEST_MODE=true
-ENV REDISEEN_DB_EXPOSED=0-5
-RUN go test -cover .
-
-ENV REDISEEN_REDIS_URI=
-ENV REDISEEN_KEY_PATTERN_EXPOSED=
-ENV REDISEEN_TEST_MODE=
-ENV REDISEEN_DB_EXPOSED=
+RUN REDISEEN_REDIS_URI=redis://:@localhost:6400 REDISEEN_KEY_PATTERN_EXPOSED="^key:[.]*" \
+    REDISEEN_TEST_MODE=true REDISEEN_DB_EXPOSED=0-5 \
+    go test -cover .
 
 
 # For smaller image size
