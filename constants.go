@@ -6,9 +6,9 @@ const defaultPort = "8000"
 const strNotImplemented = "not implemented"
 const strWrongTypeForIndexField = "wrong type for index/field"
 
-const strUsage = "Usage: rediseen [start/help/version]"
+const strUsage = "Usage: rediseen [-d] [start/stop/help/version]"
 
-const strHelpDoc = "\n\n" + strUsage + "\n\n" +
+const strHelpDoc = "\n" + strUsage + "\n\nFlag:\n-d: run in background\n\n" +
 	"Configuration Items (via environment variables):\n" +
 	"- REDISEEN_REDIS_URI: URI of your Redis database, e.g. `redis://:@localhost:6379`\n" +
 	"- REDISEEN_HOST: host of the service. Default port is 'localhost'\n" +
