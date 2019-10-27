@@ -60,17 +60,21 @@ func Test_stopDaemon_normal(t *testing.T) {
 	if err != nil {
 		t.Error("Expecting nil \ngot\n", err)
 	}
+
+	process, _ := os.FindProcess(cmd.Process.Pid)
+	status, _ := process.Wait()
+	compareAndShout(t, "signal: killed", status.String())
 }
 
 func Test_Main(t *testing.T) {
 	// First element "" is a placeholder for executable
 	//ref: https://stackoverflow.com/a/48674736
 
-	// "rediseen"
+	// command "rediseen"
 	os.Args = []string{""}
 	main()
 
-	// "rediseen version", "rediseen help", "rediseen stop", "rediseen wrong_command"
+	// commands "rediseen version", "rediseen help", "rediseen stop", "rediseen wrong_command"
 	for _, command := range []string{"version", "help", "stop", "wrong_command"} {
 		os.Args = []string{"", command}
 		main()

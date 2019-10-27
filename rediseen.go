@@ -17,20 +17,18 @@ var daemon = flag.Bool("d", false, "Run in daemon mode")
 var pidFile = flag.String("pidfile", path.Join(os.TempDir(), "rediseen.pid"), "where PID is stored for daemon mode")
 
 func savePID(pid int, fileForPid string) error {
-
-	file, err := os.Create(fileForPid)
+	f, err := os.Create(fileForPid)
 	if err != nil {
 		return errors.New(fmt.Sprintf("Unable to create PID file: %s", err.Error()))
 	}
+	defer f.Close()
 
-	defer file.Close()
-
-	_, err = file.WriteString(strconv.Itoa(pid))
+	_, err = f.WriteString(strconv.Itoa(pid))
 	if err != nil {
 		return errors.New(fmt.Sprintf("Unable to write to PID file : %s", err.Error()))
 	}
 
-	file.Sync() // flush to disk
+	f.Sync()
 	return nil
 }
 
@@ -41,7 +39,10 @@ func stopDaemon(fileForPid string) error {
 			return errors.New(fmt.Sprintf("Invalid PID found in %s", fileForPid))
 		}
 
-		os.Remove(fileForPid)
+		err = os.Remove(fileForPid)
+		if err != nil {
+			return errors.New(fmt.Sprintf("Unable to remmove PID file (error: %s)", err.Error()))
+		}
 
 		process, err := os.FindProcess(pid)
 		if err != nil {
