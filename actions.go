@@ -46,9 +46,9 @@ func configCheck() error {
 
 	_, err := redis.ParseURL(redisUri)
 	if err != nil {
-		return errors.New(fmt.Sprintf("Redis URI provided "+
+		return fmt.Errorf("Redis URI provided "+
 			"(via environment variable REDISEEN_REDIS_URI)"+
-			"is not valid (details: %s)", err.Error()))
+			"is not valid (details: %s)", err.Error())
 	}
 
 	if dbExposed == "" {
@@ -79,24 +79,23 @@ func configCheck() error {
 		if keyPatternAllowed != "" {
 			return errors.New("You have specified both REDISEEN_KEY_PATTERN_EXPOSED " +
 				"and REDISEEN_KEY_PATTERN_EXPOSE_ALL=true, which is conflicting.")
-		} else {
-			log.Println("[WARNING] You are exposing ALL keys.")
 		}
+		log.Println("[WARNING] You are exposing ALL keys.")
 	}
 
 	if keyPatternAllowed != "" {
 		regexpKeyPatternAllowed, err = regexp.Compile(keyPatternAllowed)
 		if err != nil {
-			return errors.New(fmt.Sprintf("REDISEEN_KEY_PATTERN_EXPOSED can not be "+
-				"compiled as regular expression. Details: %s\n", err.Error()))
+			return fmt.Errorf("REDISEEN_KEY_PATTERN_EXPOSED can not be "+
+				"compiled as regular expression. Details: %s\n", err.Error())
 		}
 		log.Println(fmt.Sprintf("[INFO] You are exposing keys of pattern `%s`", keyPatternAllowed))
 	}
 
 	err = conn.ClientPing()
 	if err != nil {
-		return errors.New(fmt.Sprintf("Initial talking to Redis failed. "+
-			"Please check the URI provided. Details: %s\n", err.Error()))
+		return fmt.Errorf("Initial talking to Redis failed. "+
+			"Please check the URI provided. Details: %s\n", err.Error())
 	}
 
 	return nil
@@ -171,9 +170,8 @@ func dbCheck(db int) bool {
 	_, ok := dbExposedMap[db]
 	if !ok {
 		return false
-	} else {
-		return true
 	}
+	return true
 }
 
 // Check if a string matches a pre-specified `keyPatternAllowed` (returns Boolean)

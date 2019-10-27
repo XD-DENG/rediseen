@@ -11,7 +11,7 @@ import (
 func Test_savePID(t *testing.T) {
 	testPidFileLocation := "/xxx/yyy.pid"
 	err := savePID(100, testPidFileLocation)
-	compareAndShout(t, "Unable to create PID file", strings.Split(err.Error(), ":")[0])
+	compareAndShout(t, "unable to create PID file", strings.Split(err.Error(), ":")[0])
 }
 
 func Test_stopDaemon_no_pid_file(t *testing.T) {
@@ -27,7 +27,7 @@ func Test_stopDaemon_invalid_pid(t *testing.T) {
 
 	file, err := os.Create(testPidFileLocation)
 	if err != nil {
-		log.Printf("Unable to create PID file : %v\n", err)
+		log.Printf("unable to create PID file : %v\n", err)
 		os.Exit(1)
 	}
 
@@ -35,7 +35,7 @@ func Test_stopDaemon_invalid_pid(t *testing.T) {
 
 	_, err = file.WriteString("invalid PID")
 	if err != nil {
-		log.Printf("Unable to create PID file : %v\n", err)
+		log.Printf("unable to create PID file : %v\n", err)
 		os.Exit(1)
 	}
 
@@ -43,7 +43,7 @@ func Test_stopDaemon_invalid_pid(t *testing.T) {
 
 	err = stopDaemon(testPidFileLocation)
 
-	compareAndShout(t, "Invalid PID found in "+testPidFileLocation, err.Error())
+	compareAndShout(t, "invalid PID found in "+testPidFileLocation, err.Error())
 }
 
 func Test_stopDaemon_normal(t *testing.T) {

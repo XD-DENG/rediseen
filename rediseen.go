@@ -19,13 +19,13 @@ var pidFile = flag.String("pidfile", path.Join(os.TempDir(), "rediseen.pid"), "w
 func savePID(pid int, fileForPid string) error {
 	f, err := os.Create(fileForPid)
 	if err != nil {
-		return errors.New(fmt.Sprintf("Unable to create PID file: %s", err.Error()))
+		return fmt.Errorf("unable to create PID file: %s", err.Error())
 	}
 	defer f.Close()
 
 	_, err = f.WriteString(strconv.Itoa(pid))
 	if err != nil {
-		return errors.New(fmt.Sprintf("Unable to write to PID file : %s", err.Error()))
+		return fmt.Errorf("unable to write to PID file : %s", err.Error())
 	}
 
 	f.Sync()
@@ -36,25 +36,24 @@ func stopDaemon(fileForPid string) error {
 	if rawPid, err := ioutil.ReadFile(fileForPid); err == nil {
 		pid, err := strconv.Atoi(string(rawPid))
 		if err != nil {
-			return errors.New(fmt.Sprintf("Invalid PID found in %s", fileForPid))
+			return fmt.Errorf("invalid PID found in %s", fileForPid)
 		}
 
 		err = os.Remove(fileForPid)
 		if err != nil {
-			return errors.New(fmt.Sprintf("Unable to remmove PID file (error: %s)", err.Error()))
+			return fmt.Errorf("unable to remmove PID file (error: %s)", err.Error())
 		}
 
 		process, err := os.FindProcess(pid)
 		if err != nil {
-			return errors.New(fmt.Sprintf("Unable to find PID %d (error: %s)", pid, err.Error()))
+			return fmt.Errorf("unable to find PID %d (error: %s)", pid, err.Error())
 		}
 
 		err = process.Kill()
 		if err != nil {
-			return errors.New(fmt.Sprintf("Unable to kill process %d (error: %s)", pid, err.Error()))
-		} else {
-			return nil
+			return fmt.Errorf("unable to kill process %d (error: %s)", pid, err.Error())
 		}
+		return nil
 	} else {
 		return errors.New("no running service found")
 	}
