@@ -112,20 +112,21 @@ func service(res http.ResponseWriter, req *http.Request) {
 		res.WriteHeader(http.StatusNotFound)
 		js, _ = json.Marshal(types.ErrorType{Error: "Key provided does not exist."})
 		res.Write(js)
-	} else {
-		var logMsg strings.Builder
-		logMsg.WriteString("Submit query for: db ")
-		logMsg.WriteString(strconv.Itoa(db))
-		logMsg.WriteString(", key `")
-		logMsg.WriteString(key)
-		logMsg.WriteString("`")
-		if index != "" {
-			logMsg.WriteString(", index/field `")
-			logMsg.WriteString(index)
-			logMsg.WriteString("`")
-		}
-
-		log.Println(logMsg.String())
-		get(client, res, key, index)
+		return
 	}
+
+	var logMsg strings.Builder
+	logMsg.WriteString("Submit query for: db ")
+	logMsg.WriteString(strconv.Itoa(db))
+	logMsg.WriteString(", key `")
+	logMsg.WriteString(key)
+	logMsg.WriteString("`")
+	if index != "" {
+		logMsg.WriteString(", index/field `")
+		logMsg.WriteString(index)
+		logMsg.WriteString("`")
+	}
+
+	log.Println(logMsg.String())
+	get(client, res, key, index)
 }
