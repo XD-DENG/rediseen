@@ -12,6 +12,40 @@ import (
 	"strings"
 )
 
+// parseKeyAndIndex helps parse the part like "key/3" in request like "/0/key/3"
+func parseKeyAndIndex(restPath string) (string, string) {
+	var key string
+	var index string
+
+	countBacktick := strings.Count(restPath, "`")
+	if countBacktick > 0 && countBacktick%2 == 0 {
+		if restPath[0] == '`' && restPath[len(restPath)-1] == '`' {
+			// Check case like /0/`key`/`index`
+			bothBackTickPattern, _ := regexp.MatchString("`(?P<Key>.+)`/`(?P<Index>.+)`", restPath)
+			if bothBackTickPattern {
+				p := regexp.MustCompile("`(?P<Key>.+)`/`(?P<Index>.+)`")
+				key = p.FindStringSubmatch(restPath)[1]
+				index = p.FindStringSubmatch(restPath)[2]
+			} else {
+				key = restPath[1:(len(restPath) - 1)]
+			}
+		} else {
+			p := regexp.MustCompile("`(?P<Key>.+)`/(?P<Index>.+)")
+			key = p.FindStringSubmatch(restPath)[1]
+			index = p.FindStringSubmatch(restPath)[2]
+		}
+	} else {
+		if restPath[0] == '`' && restPath[len(restPath)-1] == '`' {
+			key = restPath[1:(len(restPath) - 1)]
+		} else {
+			p := regexp.MustCompile("(?P<Key>.+)/(?P<Index>.+)")
+			key = p.FindStringSubmatch(restPath)[1]
+			index = p.FindStringSubmatch(restPath)[2]
+		}
+	}
+	return key, index
+}
+
 func service(res http.ResponseWriter, req *http.Request) {
 	var js []byte
 
@@ -46,32 +80,7 @@ func service(res http.ResponseWriter, req *http.Request) {
 		key = arguments[2]
 	} else {
 		restPath := strings.Join(arguments[2:], "/")
-		countBacktick := strings.Count(restPath, "`")
-		if countBacktick > 0 && countBacktick%2 == 0 {
-			if restPath[0] == '`' && restPath[len(restPath)-1] == '`' {
-				// Check case like /0/`key`/`index`
-				bothBackTickPattern, _ := regexp.MatchString("`(?P<Key>.+)`/`(?P<Index>.+)`", restPath)
-				if bothBackTickPattern {
-					p := regexp.MustCompile("`(?P<Key>.+)`/`(?P<Index>.+)`")
-					key = p.FindStringSubmatch(restPath)[1]
-					index = p.FindStringSubmatch(restPath)[2]
-				} else {
-					key = restPath[1:(len(restPath) - 1)]
-				}
-			} else {
-				p := regexp.MustCompile("`(?P<Key>.+)`/(?P<Index>.+)")
-				key = p.FindStringSubmatch(restPath)[1]
-				index = p.FindStringSubmatch(restPath)[2]
-			}
-		} else {
-			if restPath[0] == '`' && restPath[len(restPath)-1] == '`' {
-				key = restPath[1:(len(restPath) - 1)]
-			} else {
-				p := regexp.MustCompile("(?P<Key>.+)/(?P<Index>.+)")
-				key = p.FindStringSubmatch(restPath)[1]
-				index = p.FindStringSubmatch(restPath)[2]
-			}
-		}
+		key, index = parseKeyAndIndex(restPath)
 	}
 
 	db, err := strconv.Atoi(rawDb)
