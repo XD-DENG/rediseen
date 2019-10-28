@@ -34,17 +34,17 @@ func generateAddr() string {
 
 // Check Configurations, and stop proceeding if any configuration is missing or conflicting
 func configCheck() error {
-	var redisUri = os.Getenv("REDISEEN_REDIS_URI")
+	var redisURI = os.Getenv("REDISEEN_REDIS_URI")
 	var dbExposed = os.Getenv("REDISEEN_DB_EXPOSED")
 	var keyPatternAllowed = os.Getenv("REDISEEN_KEY_PATTERN_EXPOSED")
 	var keyPatternAllowAll = os.Getenv("REDISEEN_KEY_PATTERN_EXPOSE_ALL")
 
-	if redisUri == "" {
+	if redisURI == "" {
 		return errors.New("No valid Redis URI is provided " +
 			"(via environment variable REDISEEN_REDIS_URI)")
 	}
 
-	_, err := redis.ParseURL(redisUri)
+	_, err := redis.ParseURL(redisURI)
 	if err != nil {
 		return fmt.Errorf("Redis URI provided "+
 			"(via environment variable REDISEEN_REDIS_URI)"+
@@ -245,9 +245,8 @@ func get(client *redis.Client, res http.ResponseWriter, key string, indexOrField
 			res.WriteHeader(http.StatusNotFound)
 		}
 		js, _ = json.Marshal(types.ErrorType{Error: err.Error()})
-		res.Write(js)
 	} else {
 		js, _ = json.Marshal(types.ResponseType{ValueType: keyType, Value: value})
-		res.Write(js)
 	}
+	res.Write(js)
 }

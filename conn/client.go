@@ -5,8 +5,7 @@ import (
 	"os"
 )
 
-// Client() prepares a Redis client
-// Only Redis DB is needed, as all other information will be provided via configuration
+// Client prepares a Redis client. Only Redis DB is needed, as all other information will be provided via configuration
 func Client(db int) *redis.Client {
 	parsedUri, _ := redis.ParseURL(os.Getenv("REDISEEN_REDIS_URI"))
 
@@ -19,7 +18,7 @@ func Client(db int) *redis.Client {
 	return client
 }
 
-// ClientPing() checks the user-specified `REDISEEN_REDIS_URI` (using default db 0)
+// ClientPing checks the user-specified `REDISEEN_REDIS_URI` (using default db 0)
 func ClientPing() error {
 	client := Client(0)
 	defer client.Close()

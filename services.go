@@ -12,7 +12,44 @@ import (
 	"strings"
 )
 
+// parseKeyAndIndex helps parse strings like "key/3" in request like "/0/key/3" into "key" and "3"
+// It should also be able to handle cases like "`key/1`/5" (i.e., slash is part of the key or index/field)
+func parseKeyAndIndex(restPath string) (string, string) {
+	var key string
+	var index string
+
+	countBacktick := strings.Count(restPath, "`")
+	if countBacktick > 0 && countBacktick%2 == 0 {
+		if restPath[0] == '`' && restPath[len(restPath)-1] == '`' {
+			// Check case like /0/`key`/`index`
+			bothBackTickPattern, _ := regexp.MatchString("`(?P<Key>.+)`/`(?P<Index>.+)`", restPath)
+			if bothBackTickPattern {
+				p := regexp.MustCompile("`(?P<Key>.+)`/`(?P<Index>.+)`")
+				key = p.FindStringSubmatch(restPath)[1]
+				index = p.FindStringSubmatch(restPath)[2]
+			} else {
+				key = restPath[1:(len(restPath) - 1)]
+			}
+		} else {
+			p := regexp.MustCompile("`(?P<Key>.+)`/(?P<Index>.+)")
+			key = p.FindStringSubmatch(restPath)[1]
+			index = p.FindStringSubmatch(restPath)[2]
+		}
+	} else {
+		if restPath[0] == '`' && restPath[len(restPath)-1] == '`' {
+			key = restPath[1:(len(restPath) - 1)]
+		} else {
+			p := regexp.MustCompile("(?P<Key>.+)/(?P<Index>.+)")
+			key = p.FindStringSubmatch(restPath)[1]
+			index = p.FindStringSubmatch(restPath)[2]
+		}
+	}
+	return key, index
+}
+
 func service(res http.ResponseWriter, req *http.Request) {
+	res.Header().Set("Content-Type", "application/json")
+
 	var js []byte
 
 	if req.Method != "GET" {
@@ -21,8 +58,6 @@ func service(res http.ResponseWriter, req *http.Request) {
 		res.Write(js)
 		return
 	}
-
-	res.Header().Set("Content-Type", "application/json")
 
 	// Process URL Path into detailed information, like DB and Key
 	log.Printf("Request Path: '%s'\n", req.URL.Path)
@@ -45,33 +80,7 @@ func service(res http.ResponseWriter, req *http.Request) {
 	if len(arguments) == 3 {
 		key = arguments[2]
 	} else {
-		restPath := strings.Join(arguments[2:], "/")
-		countBacktick := strings.Count(restPath, "`")
-		if countBacktick > 0 && countBacktick%2 == 0 {
-			if restPath[0] == '`' && restPath[len(restPath)-1] == '`' {
-				// Check case like /0/`key`/`index`
-				bothBackTickPattern, _ := regexp.MatchString("`(?P<Key>.+)`/`(?P<Index>.+)`", restPath)
-				if bothBackTickPattern {
-					p := regexp.MustCompile("`(?P<Key>.+)`/`(?P<Index>.+)`")
-					key = p.FindStringSubmatch(restPath)[1]
-					index = p.FindStringSubmatch(restPath)[2]
-				} else {
-					key = restPath[1:(len(restPath) - 1)]
-				}
-			} else {
-				p := regexp.MustCompile("`(?P<Key>.+)`/(?P<Index>.+)")
-				key = p.FindStringSubmatch(restPath)[1]
-				index = p.FindStringSubmatch(restPath)[2]
-			}
-		} else {
-			if restPath[0] == '`' && restPath[len(restPath)-1] == '`' {
-				key = restPath[1:(len(restPath) - 1)]
-			} else {
-				p := regexp.MustCompile("(?P<Key>.+)/(?P<Index>.+)")
-				key = p.FindStringSubmatch(restPath)[1]
-				index = p.FindStringSubmatch(restPath)[2]
-			}
-		}
+		key, index = parseKeyAndIndex(strings.Join(arguments[2:], "/"))
 	}
 
 	db, err := strconv.Atoi(rawDb)
@@ -111,21 +120,22 @@ func service(res http.ResponseWriter, req *http.Request) {
 	if keyExists == 0 {
 		res.WriteHeader(http.StatusNotFound)
 		js, _ = json.Marshal(types.ErrorType{Error: "Key provided does not exist."})
-	} else {
-		var logMsg strings.Builder
-		logMsg.WriteString("Submit query for: db ")
-		logMsg.WriteString(strconv.Itoa(db))
-		logMsg.WriteString(", key `")
-		logMsg.WriteString(key)
-		logMsg.WriteString("`")
-		if index != "" {
-			logMsg.WriteString(", index/field `")
-			logMsg.WriteString(index)
-			logMsg.WriteString("`")
-		}
-
-		log.Println(logMsg.String())
-		get(client, res, key, index)
+		res.Write(js)
+		return
 	}
-	res.Write(js)
+
+	var logMsg strings.Builder
+	logMsg.WriteString("Submit query for: db ")
+	logMsg.WriteString(strconv.Itoa(db))
+	logMsg.WriteString(", key `")
+	logMsg.WriteString(key)
+	logMsg.WriteString("`")
+	if index != "" {
+		logMsg.WriteString(", index/field `")
+		logMsg.WriteString(index)
+		logMsg.WriteString("`")
+	}
+
+	log.Println(logMsg.String())
+	get(client, res, key, index)
 }
