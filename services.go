@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-// parseKeyAndIndex helps parse the part like "key/3" in request like "/0/key/3"
+// parseKeyAndIndex helps parse strings like "key/3" in request like "/0/key/3" into "key" and "3"
 // It should also be able to handle cases like "`key/1`/5" (i.e., slash is part of the key or index/field)
 func parseKeyAndIndex(restPath string) (string, string) {
 	var key string
@@ -48,6 +48,8 @@ func parseKeyAndIndex(restPath string) (string, string) {
 }
 
 func service(res http.ResponseWriter, req *http.Request) {
+	res.Header().Set("Content-Type", "application/json")
+
 	var js []byte
 
 	if req.Method != "GET" {
@@ -56,8 +58,6 @@ func service(res http.ResponseWriter, req *http.Request) {
 		res.Write(js)
 		return
 	}
-
-	res.Header().Set("Content-Type", "application/json")
 
 	// Process URL Path into detailed information, like DB and Key
 	log.Printf("Request Path: '%s'\n", req.URL.Path)
@@ -80,8 +80,7 @@ func service(res http.ResponseWriter, req *http.Request) {
 	if len(arguments) == 3 {
 		key = arguments[2]
 	} else {
-		restPath := strings.Join(arguments[2:], "/")
-		key, index = parseKeyAndIndex(restPath)
+		key, index = parseKeyAndIndex(strings.Join(arguments[2:], "/"))
 	}
 
 	db, err := strconv.Atoi(rawDb)
