@@ -31,9 +31,9 @@ func Test_generateAddr(t *testing.T) {
 
 func Test_configCheck_no_redis_uri(t *testing.T) {
 
-	originalRedisUri := os.Getenv("REDISEEN_REDIS_URI")
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
 	os.Setenv("REDISEEN_REDIS_URI", "")
-	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisUri)
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
 	err := configCheck()
 
@@ -48,9 +48,9 @@ func Test_configCheck_no_redis_uri(t *testing.T) {
 
 func Test_configCheck_invalid_redis_uri(t *testing.T) {
 
-	originalRedisUri := os.Getenv("REDISEEN_REDIS_URI")
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
 	os.Setenv("REDISEEN_REDIS_URI", "mysql://a:b@localhost:8888/db")
-	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisUri)
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
 	err := configCheck()
 
@@ -116,9 +116,9 @@ func Test_configCheck_invalid_db_exposed_2(t *testing.T) {
 
 func Test_configCheck_no_key_pattern_specified(t *testing.T) {
 
-	originalRedisUri := os.Getenv("REDISEEN_REDIS_URI")
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
 	os.Setenv("REDISEEN_REDIS_URI", "redis://:@localhost:6379")
-	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisUri)
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
 	originalKeyPatternAllowed := os.Getenv("REDISEEN_KEY_PATTERN_EXPOSED")
 	os.Setenv("REDISEEN_KEY_PATTERN_EXPOSED", "")
@@ -145,9 +145,9 @@ func Test_configCheck_no_key_pattern_specified(t *testing.T) {
 
 func Test_configCheck_conflicting_key_pattern_specified(t *testing.T) {
 
-	originalRedisUri := os.Getenv("REDISEEN_REDIS_URI")
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
 	os.Setenv("REDISEEN_REDIS_URI", "redis://:@localhost:6379")
-	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisUri)
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
 	originalKeyPatternAllowed := os.Getenv("REDISEEN_KEY_PATTERN_EXPOSED")
 	os.Setenv("REDISEEN_KEY_PATTERN_EXPOSED", "^key:[.]*")
@@ -174,9 +174,9 @@ func Test_configCheck_conflicting_key_pattern_specified(t *testing.T) {
 
 func Test_configCheck_bad_regex(t *testing.T) {
 
-	originalRedisUri := os.Getenv("REDISEEN_REDIS_URI")
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
 	os.Setenv("REDISEEN_REDIS_URI", "redis://:@localhost:6379")
-	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisUri)
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
 	originalKeyPatternAllowed := os.Getenv("REDISEEN_KEY_PATTERN_EXPOSED")
 	os.Setenv("REDISEEN_KEY_PATTERN_EXPOSED", "^key:[.*")
@@ -195,9 +195,9 @@ func Test_configCheck_bad_regex(t *testing.T) {
 
 func Test_configCheck_good_config(t *testing.T) {
 
-	originalRedisUri := os.Getenv("REDISEEN_REDIS_URI")
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
 	os.Setenv("REDISEEN_REDIS_URI", "redis://:@localhost:6379")
-	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisUri)
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
 	originalKeyPatternAllowed := os.Getenv("REDISEEN_KEY_PATTERN_EXPOSED")
 	os.Setenv("REDISEEN_KEY_PATTERN_EXPOSED", "^key:[.]*")

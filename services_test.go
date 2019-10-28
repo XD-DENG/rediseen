@@ -92,9 +92,9 @@ func Test_service_non_existent_key(t *testing.T) {
 	mr, _ := miniredis.Run()
 	defer mr.Close()
 
-	originalRedisUri := os.Getenv("REDISEEN_REDIS_URI")
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
-	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisUri)
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
 	s1 := httptest.NewServer(http.HandlerFunc(service))
 	defer s1.Close()
@@ -121,9 +121,9 @@ func Test_service_string_type(t *testing.T) {
 
 	mr.Set("key:1", "hi")
 
-	originalRedisUri := os.Getenv("REDISEEN_REDIS_URI")
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
-	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisUri)
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
 	s := httptest.NewServer(http.HandlerFunc(service))
 	defer s.Close()
@@ -150,9 +150,9 @@ func Test_service_string_check_by_index(t *testing.T) {
 
 	mr.Set("key:1", "Developer")
 
-	originalRedisUri := os.Getenv("REDISEEN_REDIS_URI")
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
-	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisUri)
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
 	s := httptest.NewServer(http.HandlerFunc(service))
 	defer s.Close()
@@ -218,9 +218,9 @@ func Test_service_string_check_by_index_wrong_index(t *testing.T) {
 
 	mr.Set("key:1", "Developer")
 
-	originalRedisUri := os.Getenv("REDISEEN_REDIS_URI")
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
-	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisUri)
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
 	s := httptest.NewServer(http.HandlerFunc(service))
 	defer s.Close()
@@ -246,9 +246,9 @@ func Test_service_string_type_with_slash_in_key(t *testing.T) {
 
 	mr.Set("key:/1", "hi")
 
-	originalRedisUri := os.Getenv("REDISEEN_REDIS_URI")
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
-	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisUri)
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
 	s := httptest.NewServer(http.HandlerFunc(service))
 	defer s.Close()
@@ -275,9 +275,9 @@ func Test_service_string_type_with_slash_and_backtick_in_key(t *testing.T) {
 
 	mr.Set("key:`/1", "hi")
 
-	originalRedisUri := os.Getenv("REDISEEN_REDIS_URI")
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
-	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisUri)
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
 	s := httptest.NewServer(http.HandlerFunc(service))
 	defer s.Close()
@@ -302,9 +302,9 @@ func Test_service_string_type_db_no_access(t *testing.T) {
 	mr, _ := miniredis.Run()
 	defer mr.Close()
 
-	originalRedisUri := os.Getenv("REDISEEN_REDIS_URI")
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
-	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisUri)
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
 	s := httptest.NewServer(http.HandlerFunc(service))
 	defer s.Close()
@@ -333,9 +333,9 @@ func Test_service_string_type_key_no_access(t *testing.T) {
 	//env var set for the test is REDISEEN_KEY_PATTERN_EXPOSED=^key:[.]*
 	mr.Set("id:1", "hi")
 
-	originalRedisUri := os.Getenv("REDISEEN_REDIS_URI")
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
-	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisUri)
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
 	s := httptest.NewServer(http.HandlerFunc(service))
 	defer s.Close()
@@ -363,9 +363,9 @@ func Test_service_list_key(t *testing.T) {
 	mr.Lpush("key:1", "hello")
 	mr.Lpush("key:1", "world")
 
-	originalRedisUri := os.Getenv("REDISEEN_REDIS_URI")
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
-	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisUri)
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
 	s := httptest.NewServer(http.HandlerFunc(service))
 	defer s.Close()
@@ -390,9 +390,9 @@ func Test_service_list_key_check_by_index(t *testing.T) {
 	mr.Lpush("key:1", "hello")
 	mr.Lpush("key:1", "world")
 
-	originalRedisUri := os.Getenv("REDISEEN_REDIS_URI")
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
-	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisUri)
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
 	s := httptest.NewServer(http.HandlerFunc(service))
 	defer s.Close()
@@ -439,9 +439,9 @@ func Test_service_set(t *testing.T) {
 
 	mr.SetAdd("key:1", "hello")
 
-	originalRedisUri := os.Getenv("REDISEEN_REDIS_URI")
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
-	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisUri)
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
 	s := httptest.NewServer(http.HandlerFunc(service))
 	defer s.Close()
@@ -465,9 +465,9 @@ func Test_service_set_check_by_index(t *testing.T) {
 
 	mr.SetAdd("key:1", "hello")
 
-	originalRedisUri := os.Getenv("REDISEEN_REDIS_URI")
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
-	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisUri)
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
 	s := httptest.NewServer(http.HandlerFunc(service))
 	defer s.Close()
@@ -503,9 +503,9 @@ func Test_service_hash(t *testing.T) {
 	mr.HSet("key:1", "role", "developer")
 	mr.HSet("key:1", "id", "1")
 
-	originalRedisUri := os.Getenv("REDISEEN_REDIS_URI")
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
-	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisUri)
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
 	s := httptest.NewServer(http.HandlerFunc(service))
 	defer s.Close()
@@ -530,9 +530,9 @@ func Test_service_hash_check_by_index(t *testing.T) {
 	mr.HSet("key:1", "role", "developer")
 	mr.HSet("key:1", "id", "1")
 
-	originalRedisUri := os.Getenv("REDISEEN_REDIS_URI")
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
-	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisUri)
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
 	s := httptest.NewServer(http.HandlerFunc(service))
 	defer s.Close()
@@ -568,9 +568,9 @@ func Test_service_zset(t *testing.T) {
 	mr.ZAdd("key:set", 100, "developer")
 	mr.ZAdd("key:set", 0, "bluffer")
 
-	originalRedisUri := os.Getenv("REDISEEN_REDIS_URI")
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
-	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisUri)
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
 	s := httptest.NewServer(http.HandlerFunc(service))
 	defer s.Close()
@@ -596,9 +596,9 @@ func Test_service_zset_check_by_field(t *testing.T) {
 	mr.ZAdd("key:set", 100, "developer")
 	mr.ZAdd("key:set", 0, "bluffer")
 
-	originalRedisUri := os.Getenv("REDISEEN_REDIS_URI")
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
-	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisUri)
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
 	s := httptest.NewServer(http.HandlerFunc(service))
 	defer s.Close()
@@ -622,9 +622,9 @@ func Test_service_delete_not_allowed(t *testing.T) {
 
 	mr.Set("key:1", "hello")
 
-	originalRedisUri := os.Getenv("REDISEEN_REDIS_URI")
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
-	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisUri)
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
 	s := httptest.NewServer(http.HandlerFunc(service))
 	defer s.Close()
@@ -655,9 +655,9 @@ func Test_service_delete_not_allowed_no_access(t *testing.T) {
 
 	mr.Set("id:1", "hello")
 
-	originalRedisUri := os.Getenv("REDISEEN_REDIS_URI")
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
-	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisUri)
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
 	s := httptest.NewServer(http.HandlerFunc(service))
 	defer s.Close()
