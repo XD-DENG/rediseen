@@ -245,9 +245,8 @@ func get(client *redis.Client, res http.ResponseWriter, key string, indexOrField
 			res.WriteHeader(http.StatusNotFound)
 		}
 		js, _ = json.Marshal(types.ErrorType{Error: err.Error()})
-		res.Write(js)
 	} else {
 		js, _ = json.Marshal(types.ResponseType{ValueType: keyType, Value: value})
-		res.Write(js)
 	}
+	res.Write(js)
 }
