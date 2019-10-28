@@ -13,6 +13,7 @@ import (
 )
 
 // parseKeyAndIndex helps parse the part like "key/3" in request like "/0/key/3"
+// It should also be able to handle cases like "`key/1`/5" (i.e., slash is part of the key or index/field)
 func parseKeyAndIndex(restPath string) (string, string) {
 	var key string
 	var index string
