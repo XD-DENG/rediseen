@@ -53,10 +53,10 @@ func stopDaemon(fileForPid string) error {
 		if err != nil {
 			return fmt.Errorf("unable to kill process %d (error: %s)", pid, err.Error())
 		}
-		return nil
 	} else {
 		return errors.New("no running service found")
 	}
+	return nil
 }
 
 func main() {

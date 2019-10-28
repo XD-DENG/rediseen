@@ -111,6 +111,7 @@ func service(res http.ResponseWriter, req *http.Request) {
 	if keyExists == 0 {
 		res.WriteHeader(http.StatusNotFound)
 		js, _ = json.Marshal(types.ErrorType{Error: "Key provided does not exist."})
+		res.Write(js)
 	} else {
 		var logMsg strings.Builder
 		logMsg.WriteString("Submit query for: db ")
@@ -127,5 +128,4 @@ func service(res http.ResponseWriter, req *http.Request) {
 		log.Println(logMsg.String())
 		get(client, res, key, index)
 	}
-	res.Write(js)
 }
