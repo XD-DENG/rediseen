@@ -189,12 +189,6 @@ func get(client *redis.Client, res http.ResponseWriter, key string, indexOrField
 
 	keyType, err := client.Type(key).Result()
 
-	if keyType == "string" || keyType == "list" {
-		index, _ = strconv.ParseInt(indexOrField, 10, 64)
-	} else {
-		field = indexOrField
-	}
-
 	if indexOrField == "" {
 		switch keyType {
 		case "string":
@@ -212,6 +206,12 @@ func get(client *redis.Client, res http.ResponseWriter, key string, indexOrField
 			err = errors.New(strNotImplemented)
 		}
 	} else {
+		if keyType == "string" || keyType == "list" {
+			index, _ = strconv.ParseInt(indexOrField, 10, 64)
+		} else {
+			field = indexOrField
+		}
+
 		switch keyType {
 		case "string":
 			if index == 0 && indexOrField != "0" {
