@@ -8,8 +8,3 @@ type ResponseType struct {
 type ErrorType struct {
 	Error string `json:"error"`
 }
-
-type ResultType struct {
-	Action string `json:"action"`
-	Result string `json:"result"`
-}
