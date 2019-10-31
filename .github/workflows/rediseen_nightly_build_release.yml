@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    name: Publish-to-DockerHub
+    name: Nightly Build (Master Branch)
     runs-on: ubuntu-latest
 
     steps:      
