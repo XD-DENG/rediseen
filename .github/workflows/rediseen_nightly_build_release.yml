@@ -1,25 +1,27 @@
-name: Rediseen_nightly_build_release
-on:
-  push:
-    branches:    
-      - master 
+# Commenting this out, given nightly docker image build will be handled by DockerHub Build
 
-jobs:
-  build:
-    name: Nightly Build (Master Branch)
-    runs-on: ubuntu-latest
+# name: Rediseen_nightly_build_release
+# on:
+#   push:
+#     branches:    
+#       - master 
 
-    steps:      
-      - name: Check out code
-        uses: actions/checkout@v1
+# jobs:
+#   build:
+#     name: Nightly Build (Master Branch)
+#     runs-on: ubuntu-latest
+
+#     steps:      
+#       - name: Check out code
+#         uses: actions/checkout@v1
           
-      - name: Build Rediseen Nightly Build Image
-        run: |
-          docker build -t ${{ secrets.DOCKERHUB_ID }}/rediseen:nightly .
+#       - name: Build Rediseen Nightly Build Image
+#         run: |
+#           docker build -t ${{ secrets.DOCKERHUB_ID }}/rediseen:nightly .
 
-      - name: Push to DockerHub
-        run: |
-          echo ${{ secrets.DOCKERHUB_PD }} | docker login --username=${{ secrets.DOCKERHUB_ID }} --password-stdin
-          docker push ${{ secrets.DOCKERHUB_ID }}/rediseen:nightly
-          docker logout
+#       - name: Push to DockerHub
+#         run: |
+#           echo ${{ secrets.DOCKERHUB_PD }} | docker login --username=${{ secrets.DOCKERHUB_ID }} --password-stdin
+#           docker push ${{ secrets.DOCKERHUB_ID }}/rediseen:nightly
+#           docker logout
           
