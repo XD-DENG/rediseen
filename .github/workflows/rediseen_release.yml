@@ -6,6 +6,12 @@ jobs:
     name: Publish_to_DockerHub
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Test
-        run: docker image ls
+    steps:        
+      - name: Build Rediseen Latest Image
+        run: docker build -t xddeng/rediseen:latest .
+        
+      - name: Push to DockerHub
+        run: |
+          docker login --username=${{ secrets.DOCKERHUB_ID }} --password=${{ secrets.DOCKERHUB_PD }}
+          docker push xddeng/rediseen:latest
+          
