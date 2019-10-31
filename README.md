@@ -42,11 +42,19 @@ For more details, please refer to the rest of this README documentation.
 
 ```bash
 docker run \
-    -e REDISEEN_REDIS_URI="redis://:@localhost:6379" \
+    -e REDISEEN_HOST=0.0.0.0 \
+    -e REDISEEN_REDIS_URI="redis://:@redis_host:6379" \
     -e REDISEEN_DB_EXPOSED=0 \
     -e REDISEEN_KEY_PATTERN_EXPOSED="^key:([0-9a-z]+)" \
+    -p 8000:8000 \
     xddeng/rediseen:1.1.1
 ```
+
+Please note:
+- `REDISEEN_HOST` needs to be `0.0.0.0` in order to expose the service outside the container.
+- `redis_host` in `REDISEEN_REDIS_URI` should not be something like "localhost" or "127.0.0.1" even
+    if you are running Redis on the same Docker host, because "localhost" here would refer to docker
+    runtime itself.
 
 
 ## 2. Usage
