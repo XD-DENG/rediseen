@@ -3,11 +3,11 @@ on: [push]
 
 jobs:
   build:
-    name: Publish_to_DockerHub
+    name: Publish-to-DockerHub
     runs-on: ubuntu-latest
 
     steps:      
-      - name: Check out code into the Go module directory
+      - name: Check out code
         uses: actions/checkout@v1
           
       - name: Build Rediseen Latest Image
