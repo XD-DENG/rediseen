@@ -8,10 +8,12 @@ jobs:
 
     steps:        
       - name: Build Rediseen Latest Image
-        run: docker build -t ${{ secrets.DOCKERHUB_ID }}/rediseen:latest
+        run: |
+          docker build -t rediseen .
+          docker tag rediseen ${{ secrets.DOCKERHUB_ID }}/rediseen:latest
 
       - name: Push to DockerHub
         run: |
           docker login --username=${{ secrets.DOCKERHUB_ID }} --password=${{ secrets.DOCKERHUB_PD }}
-          docker push xddeng/rediseen:latest
+          docker push ${{ secrets.DOCKERHUB_ID }}/rediseen:latest
           
