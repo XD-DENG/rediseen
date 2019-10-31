@@ -9,7 +9,8 @@ jobs:
     steps:                
       - name: Build Rediseen Latest Image
         run: |
-          docker build -t rediseen - < Dockerfile
+          ls -lah
+          docker build -t rediseen .
           docker tag rediseen ${{ secrets.DOCKERHUB_ID }}/rediseen:latest
 
       - name: Push to DockerHub
