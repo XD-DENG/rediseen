@@ -20,4 +20,4 @@ FROM alpine:3.9
 WORKDIR /app
 COPY --from=builder /app/rediseen ./rediseen
 
-CMD ["./rediseen"]
+CMD ["./rediseen", "start"]
