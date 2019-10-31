@@ -10,6 +10,8 @@ jobs:
       - name: Build Rediseen Latest Image
         run: |
           ls -lah
+          cd ../
+          ls -lah
           docker build -t rediseen .
           docker tag rediseen ${{ secrets.DOCKERHUB_ID }}/rediseen:latest
 
