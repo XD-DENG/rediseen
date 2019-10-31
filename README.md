@@ -45,7 +45,7 @@ docker run \
     -e REDISEEN_REDIS_URI="redis://:@localhost:6379" \
     -e REDISEEN_DB_EXPOSED=0 \
     -e REDISEEN_KEY_PATTERN_EXPOSED="^key:([0-9a-z]+)" \
-    xddeng/rediseen:latest
+    xddeng/rediseen:1.1.1
 ```
 
 
