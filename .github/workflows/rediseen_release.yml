@@ -6,7 +6,14 @@ jobs:
     name: Publish_to_DockerHub
     runs-on: ubuntu-latest
 
-    steps:        
+    steps:  
+      - name: Publish to Registry
+        uses: elgohr/Publish-Docker-Github-Action@master
+        with:
+          name: xddeng/rediseen
+          username: ${{ secrets.DOCKERHUB_ID }}
+          password: ${{ secrets.DOCKERHUB_PD }}
+              
       - name: Build Rediseen Latest Image
         run: |
           docker build -t rediseen .
