@@ -18,6 +18,8 @@ Start a REST-like API service for your Redis database, without writing a single 
 
 Let's assume that your Redis database URI is `redis://:@localhost:6379`, and you want to expose keys with prefix `key:` in logical database `0`.
 
+### 1.1 Quick Start with Homebrew
+
 ```bash
 # Install using Homebrew
 brew install XD-DENG/rediseen/rediseen
@@ -36,6 +38,15 @@ have a key named `key:1` set in your Redis database).
 
 For more details, please refer to the rest of this README documentation.
 
+### 1.2 Quick Start with Docker
+
+```bash
+docker run \
+    -e REDISEEN_REDIS_URI="redis://:@localhost:6379" \
+    -e REDISEEN_DB_EXPOSED=0 \
+    -e REDISEEN_KEY_PATTERN_EXPOSED="^key:([0-9a-z]+)" \
+    xddeng/rediseen:latest
+```
 
 
 ## 2. Usage
