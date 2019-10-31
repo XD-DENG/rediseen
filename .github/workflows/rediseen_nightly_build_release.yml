@@ -1,5 +1,8 @@
 name: Rediseen_nightly_build_release
-on: [push]
+on:
+  push:
+    branches:    
+      - master 
 
 jobs:
   build:
