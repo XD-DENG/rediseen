@@ -42,19 +42,21 @@ For more details, please refer to the rest of this README documentation.
 
 ```bash
 docker run \
-    -e REDISEEN_HOST=0.0.0.0 \
     -e REDISEEN_REDIS_URI="redis://:@redis_host:6379" \
     -e REDISEEN_DB_EXPOSED=0 \
     -e REDISEEN_KEY_PATTERN_EXPOSED="^key:([0-9a-z]+)" \
     -p 8000:8000 \
-    xddeng/rediseen:1.1.1
+    xddeng/rediseen:nightly
 ```
 
 Please note:
-- `REDISEEN_HOST` needs to be `0.0.0.0` in order to expose the service outside the container.
+- `REDISEEN_HOST` has already been set to `0.0.0.0` in Dockerfile, in order to expose the service outside the container.
 - `redis_host` in `REDISEEN_REDIS_URI` should not be something like "localhost" or "127.0.0.1" even
     if you are running Redis on the same Docker host, because "localhost" here would refer to docker
     runtime itself.
+- You can choose the image tag among `nightly` (latest code in master branch), `unstable` (latest dev branch),
+    and release tags (like `1.1.1`. Check [Docker Hub/xddeng/rediseen](https://hub.docker.com/r/xddeng/rediseen/tags)
+    for full tag list)
 
 
 ## 2. Usage

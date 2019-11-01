@@ -20,4 +20,7 @@ FROM alpine:3.9
 WORKDIR /app
 COPY --from=builder /app/rediseen ./rediseen
 
+ENV REDISEEN_HOST=0.0.0.0
+EXPOSE 8000
+
 CMD ["./rediseen", "start"]
