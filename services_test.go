@@ -25,7 +25,7 @@ func Test_service_wrong_usage(t *testing.T) {
 	defer s.Close()
 
 	expectedCode := 400
-	expectedError := "Usage: /db/key or /db/key/<index or filed>"
+	expectedError := "Usage: /db/key, /db/key/index, or /db/key/field"
 	var res *http.Response
 
 	for _, suffix := range []string{"/0", "/0/", "/0/key:1/", "/0/key:1/1/"} {
