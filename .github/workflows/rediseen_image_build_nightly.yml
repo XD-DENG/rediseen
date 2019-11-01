@@ -1,6 +1,4 @@
-# Backuping this, given nightly docker image build will be handled by DockerHub Build
-
-name: Rediseen_nightly_build_release
+name: Rediseen_Docker_Build_Nightly
 on:
   push:
     branches:    
