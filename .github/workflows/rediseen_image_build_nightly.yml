@@ -1,8 +1,10 @@
 name: Rediseen_Docker_Build_Nightly
 on:
   push:
-    branches:    
-      - master 
+    branches:
+      - master
+  schedule:
+    - cron:  '0 0 * * *'
 
 jobs:
   build:
