@@ -310,19 +310,21 @@ func Test_service_string_type_db_no_access(t *testing.T) {
 	defer s.Close()
 
 	// env var set for the test is REDISEEN_DB_EXPOSED=0-5
-	res, _ := http.Get(s.URL + "/10/key:1")
+	for _, db := range []int{6, 10, 100} {
+		res, _ := http.Get(s.URL + fmt.Sprintf("/%v/key:1", db))
 
-	expectedCode := 403
-	compareAndShout(t, expectedCode, res.StatusCode)
+		expectedCode := 403
+		compareAndShout(t, expectedCode, res.StatusCode)
 
-	resultStr, _ := ioutil.ReadAll(res.Body)
-	res.Body.Close()
+		resultStr, _ := ioutil.ReadAll(res.Body)
+		res.Body.Close()
 
-	var result types.ErrorType
-	json.Unmarshal([]byte(resultStr), &result)
+		var result types.ErrorType
+		json.Unmarshal([]byte(resultStr), &result)
 
-	expectedError := "DB 10 is not exposed"
-	compareAndShout(t, expectedError, result.Error)
+		expectedError := fmt.Sprintf("DB %v is not exposed", db)
+		compareAndShout(t, expectedError, result.Error)
+	}
 }
 
 func Test_service_string_type_key_no_access(t *testing.T) {

@@ -282,43 +282,29 @@ func Test_parseDbExposed_3(t *testing.T) {
 	}
 }
 
-func Test_validateDbExposeConfig(t *testing.T) {
-	var ok bool
+func Test_validateDbExposeConfig_valid_cases(t *testing.T) {
 	var err error
 
-	ok, err = validateDbExposeConfig("*")
-	if err != nil || ok == false {
-		t.Error("checkDbExpose() failed for '*'")
-	}
+	testStrings := []string{"*", "8", "1-10", "1;3;8", "1;3-7;18", "1;3-7;10-100"}
 
-	ok, err = validateDbExposeConfig("8")
-	if err != nil || ok == false {
-		t.Error("checkDbExpose() failed for '8'")
+	for _, s := range testStrings {
+		err = validateDbExposeConfig(s)
+		if err != nil {
+			t.Error(fmt.Sprintf("checkDbExpose() failed for '%s'", s))
+		}
 	}
+}
 
-	ok, err = validateDbExposeConfig("1-10")
-	if err != nil || ok == false {
-		t.Error("checkDbExpose() failed for '1-10'")
-	}
+func Test_validateDbExposeConfig_invalid_cases(t *testing.T) {
+	var err error
 
-	ok, err = validateDbExposeConfig("1;3;8")
-	if err != nil || ok == false {
-		t.Error("checkDbExpose() failed for '1;3;8'")
-	}
+	testStrings := []string{"-1;18", "a;18", "1,18", ";1;18", "1;18;", "1;-5", "1;-5;10"}
 
-	ok, err = validateDbExposeConfig("1;3-7;18")
-	if err != nil || ok == false {
-		t.Error("checkDbExpose() failed for '1;3-7;18'")
-	}
-
-	ok, err = validateDbExposeConfig("-1;18")
-	if err == nil || ok == true {
-		t.Error("checkDbExpose() passed WRONGLY for '-1;18'")
-	}
-
-	ok, err = validateDbExposeConfig("a;18")
-	if err == nil || ok == true {
-		t.Error("checkDbExpose() passed WRONGLY for 'a;18'")
+	for _, s := range testStrings {
+		err = validateDbExposeConfig(s)
+		if err == nil {
+			t.Error(fmt.Sprintf("checkDbExpose() passed WRONGLY for '%s'", s))
+		}
 	}
 }
 
