@@ -13,11 +13,9 @@ Start a REST-like API service for your Redis database, without writing a single 
 (Inspired by [sandman2](https://github.com/jeffknupp/sandman2), and built on shoulder of [go-redis/redis
 ](https://github.com/go-redis/redis))
 
-[<img src="https://raw.githubusercontent.com/XD-DENG/rediseen/misc/images/rediseen_video_demo.png">](https://youtu.be/SpHNnPIT0HM)
-
 <p align="center"> 
 <a href="https://youtu.be/SpHNnPIT0HM">
-<img src="https://raw.githubusercontent.com/XD-DENG/rediseen/misc/images/rediseen_video_demo.png" alt="drawing" width="300"/>
+<img src="https://raw.githubusercontent.com/XD-DENG/rediseen/misc/images/rediseen_video_demo.png" alt="drawing" width="450"/>
 </a>
 </p>
 
