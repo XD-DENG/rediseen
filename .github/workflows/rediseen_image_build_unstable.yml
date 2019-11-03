@@ -10,7 +10,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v1
 
-      - name: Build Rediseen Nightly Build Image
+      - name: Build Rediseen Unstable Build Image
         run: |
           docker build -t ${{ secrets.DOCKERHUB_ID }}/rediseen:unstable .
 
