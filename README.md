@@ -14,10 +14,11 @@ Start a REST-like API service for your Redis database, without writing a single 
 ](https://github.com/go-redis/redis))
 
 <p align="center"> 
-<a href="https://youtu.be/SpHNnPIT0HM">
-<img src="https://raw.githubusercontent.com/XD-DENG/rediseen/misc/images/rediseen_video_demo.png" alt="drawing" width="450"/>
-</a>
+    <a href="https://youtu.be/SpHNnPIT0HM">
+        <img src="https://raw.githubusercontent.com/XD-DENG/rediseen/misc/images/rediseen_video_demo.png" alt="drawing" width="450"/>
+    </a>
 </p>
+
 
 ## 1. Quick Start
 
