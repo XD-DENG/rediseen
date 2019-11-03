@@ -112,22 +112,19 @@ func validateDbExposeConfig(configDbExposed string) (bool, error) {
 	log.Println(fmt.Sprintf("[INFO] You are exposing logical database(s) `%s`", configDbExposed))
 
 	// case-2: "0" or "18"
-	patternCheck1, _ := regexp.MatchString("^[0-9]+$", configDbExposed)
-
 	// case-3: "0-10" or "0;0-10" or "1-10;13"
-	patternCheck2, _ := regexp.MatchString("(^[0-9]+)([0-9;-]*)([0-9]+$)", configDbExposed)
+	patternCheck, _ := regexp.MatchString("(^[0-9]+$)|(^[0-9]+)([0-9;-]*)([0-9]+$)", configDbExposed)
 
-	if !patternCheck1 && !patternCheck2 {
+	if !patternCheck {
 		return false, errors.New("illegal pattern")
 	}
 
 	// If multiple values are provided (semicolon-separated), check value by value
 	parts := strings.Split(configDbExposed, ";")
 	for _, p := range parts {
-		subPatternCheck1, _ := regexp.MatchString("^[0-9]+$", p)
-		subPatternCheck2, _ := regexp.MatchString("(^[0-9]+)(-)([0-9]+$)", p)
+		subPatternCheck, _ := regexp.MatchString("(^[0-9]+$)|(^[0-9]+)(-)([0-9]+$)", p)
 
-		if !subPatternCheck1 && !subPatternCheck2 {
+		if !subPatternCheck {
 			return false, errors.New("illegal pattern")
 		}
 	}
