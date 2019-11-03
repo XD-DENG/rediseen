@@ -55,13 +55,11 @@ func configCheck() error {
 		return errors.New("REDISEEN_DB_EXPOSED is not configured")
 	}
 
-	dbConfigCheckResult, err := validateDbExposeConfig(dbExposed)
-	if dbConfigCheckResult == false {
+	errDbConfigCheckResult := validateDbExposeConfig(dbExposed)
+	if errDbConfigCheckResult != nil {
 		var errMsg strings.Builder
 		errMsg.WriteString("REDISEEN_DB_EXPOSED provided can not be parsed properly")
-		if err != nil {
-			errMsg.WriteString(fmt.Sprintf(" (details: %s)", err.Error()))
-		}
+		errMsg.WriteString(fmt.Sprintf(" (details: %s)", errDbConfigCheckResult.Error()))
 		return errors.New(errMsg.String())
 	}
 
@@ -101,35 +99,31 @@ func configCheck() error {
 	return nil
 }
 
-// validate if the string given is legal
-func validateDbExposeConfig(configDbExposed string) (bool, error) {
+// validate if the string given as DB(s) to expose is legal.
+// returns nil if it is legal, otherwise returns the error
+func validateDbExposeConfig(configDbExposed string) error {
 	// case-1: "*"
 	if configDbExposed == "*" {
 		log.Println("[WARNING] You are exposing ALL logical databases.")
-		return true, nil
+		return nil
 	}
 
 	log.Println(fmt.Sprintf("[INFO] You are exposing logical database(s) `%s`", configDbExposed))
 
 	// case-2: "0" or "18"
 	// case-3: "0-10" or "0;0-10" or "1-10;13"
-	patternCheck, _ := regexp.MatchString("(^[0-9]+$)|(^[0-9]+)([0-9;-]*)([0-9]+$)", configDbExposed)
-
-	if !patternCheck {
-		return false, errors.New("illegal pattern")
-	}
-
 	// If multiple values are provided (semicolon-separated), check value by value
+	// This chunk handles cases where there is no semicolon in the string "automatically" as well
 	parts := strings.Split(configDbExposed, ";")
 	for _, p := range parts {
 		subPatternCheck, _ := regexp.MatchString("(^[0-9]+$)|(^[0-9]+)(-)([0-9]+$)", p)
 
 		if !subPatternCheck {
-			return false, errors.New("illegal pattern")
+			return errors.New("illegal pattern")
 		}
 	}
 
-	return true, nil
+	return nil
 }
 
 // provide strings like "0;1;3;5" or "0;9-14;5" into a map for later querying
