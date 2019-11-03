@@ -15,6 +15,12 @@ Start a REST-like API service for your Redis database, without writing a single 
 
 [<img src="https://raw.githubusercontent.com/XD-DENG/rediseen/misc/images/rediseen_video_demo.png">](https://youtu.be/SpHNnPIT0HM)
 
+<p align="center"> 
+<a href="https://youtu.be/SpHNnPIT0HM">
+<img src="https://raw.githubusercontent.com/XD-DENG/rediseen/misc/images/rediseen_video_demo.png" alt="drawing" width="300"/>
+</a>
+</p>
+
 ## 1. Quick Start
 
 Let's assume that your Redis database URI is `redis://:@localhost:6379`, and you want to expose keys with prefix `key:` in logical database `0`.
