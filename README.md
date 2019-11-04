@@ -52,7 +52,7 @@ docker run \
     -e REDISEEN_DB_EXPOSED=0 \
     -e REDISEEN_KEY_PATTERN_EXPOSED="^key:([0-9a-z]+)" \
     -p 8000:8000 \
-    xddeng/rediseen:nightly
+    xddeng/rediseen:latest
 ```
 
 Please note:
@@ -60,7 +60,7 @@ Please note:
 - `redis_host` in `REDISEEN_REDIS_URI` should not be something like "localhost" or "127.0.0.1" even
     if you are running Redis on the same Docker host, because "localhost" here would refer to docker
     runtime itself.
-- You can choose the image tag among `nightly` (latest code in master branch), `unstable` (latest dev branch),
+- You can choose the image tag among `latest` (latest release version), `nightly` (latest code in master branch), `unstable` (latest dev branch),
     and release tags (like `1.1.1`. Check [Docker Hub/xddeng/rediseen](https://hub.docker.com/r/xddeng/rediseen/tags)
     for full tag list)
 
