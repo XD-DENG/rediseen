@@ -167,6 +167,29 @@ func keyPatternCheck(key string) bool {
 	return regexpKeyPatternAllowed.MatchString(key)
 }
 
+func listKeysByDb(client *redis.Client, res http.ResponseWriter) {
+	keys, _ := client.Keys("*").Result()
+
+	var results []types.KeyInfoType
+
+	for _, k := range keys {
+		if keyPatternCheck(k) {
+			results = append(results, types.KeyInfoType{Key: k, Type: client.Type(k).Val()})
+		}
+	}
+
+	var count int
+
+	if len(results) >= 1000 {
+		count = 1000
+	} else {
+		count = len(results)
+	}
+
+	js, _ := json.Marshal(types.KeyListType{Keys: results, Total: len(results), Count: count})
+	res.Write(js)
+}
+
 // Handle requests to different Redis Data Types, and return values correspondingly
 func get(client *redis.Client, res http.ResponseWriter, key string, indexOrField string) {
 

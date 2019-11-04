@@ -25,10 +25,10 @@ func Test_service_wrong_usage(t *testing.T) {
 	defer s.Close()
 
 	expectedCode := 400
-	expectedError := "Usage: /db/key, /db/key/index, or /db/key/field"
+	expectedError := "Usage: /db, /db/key, /db/key/index, or /db/key/field"
 	var res *http.Response
 
-	for _, suffix := range []string{"/0", "/0/", "/0/key:1/", "/0/key:1/1/"} {
+	for _, suffix := range []string{"/0/", "/0/key:1/", "/0/key:1/1/"} {
 		res, _ = http.Get(s.URL + suffix)
 
 		if res.StatusCode != expectedCode {
@@ -112,6 +112,88 @@ func Test_service_non_existent_key(t *testing.T) {
 
 	expectedError := "Key provided does not exist."
 	compareAndShout(t, expectedError, result.Error)
+}
+
+func Test_service_list_keys_by_db_1(t *testing.T) {
+
+	mr, _ := miniredis.Run()
+	defer mr.Close()
+
+	testSlice1 := []string{"hi", "world", "test", "done"}
+	for i, v := range testSlice1 {
+		mr.Set(fmt.Sprintf("key:%v", i), v)
+	}
+
+	testSlice2 := []string{"r", "a", "n", "d", "o", "m"}
+	for i, v := range testSlice2 {
+		mr.HSet(fmt.Sprintf("key:%v", i+len(testSlice1)), v, v)
+	}
+
+	testSlice3 := []string{"list", "type"}
+	for i, v := range testSlice3 {
+		mr.Lpush(fmt.Sprintf("key:%v", i+len(testSlice1)+len(testSlice2)), v)
+	}
+
+	testSlice4 := []string{"no", "access", "key"}
+	for i, v := range testSlice4 {
+		mr.HSet(fmt.Sprintf("no_access_key:%v", i+len(testSlice1)+len(testSlice2)+len(testSlice3)), v, v)
+	}
+
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
+	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
+
+	s := httptest.NewServer(http.HandlerFunc(service))
+	defer s.Close()
+
+	res, _ := http.Get(s.URL + "/0")
+
+	expectedCode := 200
+	compareAndShout(t, expectedCode, res.StatusCode)
+
+	resultStr, _ := ioutil.ReadAll(res.Body)
+	res.Body.Close()
+
+	var result types.KeyListType
+	json.Unmarshal([]byte(resultStr), &result)
+
+	compareAndShout(t, len(testSlice1)+len(testSlice2)+len(testSlice3), len(result.Keys))
+	compareAndShout(t, len(testSlice1)+len(testSlice2)+len(testSlice3), result.Count)
+	if result.Total > 1000 {
+		t.Error("Listing keys function should return <= 1000 keys")
+	}
+}
+
+func Test_service_list_keys_by_db_2(t *testing.T) {
+
+	mr, _ := miniredis.Run()
+	defer mr.Close()
+
+	n := 2000
+	for i := 0; i < 2000; i++ {
+		mr.Set(fmt.Sprintf("key:%v", i), string(i))
+	}
+
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
+	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
+
+	s := httptest.NewServer(http.HandlerFunc(service))
+	defer s.Close()
+
+	res, _ := http.Get(s.URL + "/0")
+
+	expectedCode := 200
+	compareAndShout(t, expectedCode, res.StatusCode)
+
+	resultStr, _ := ioutil.ReadAll(res.Body)
+	res.Body.Close()
+
+	var result types.KeyListType
+	json.Unmarshal([]byte(resultStr), &result)
+
+	compareAndShout(t, 1000, result.Count)
+	compareAndShout(t, n, result.Total)
 }
 
 func Test_service_string_type(t *testing.T) {
