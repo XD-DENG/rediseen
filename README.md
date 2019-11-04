@@ -39,8 +39,8 @@ export REDISEEN_KEY_PATTERN_EXPOSED="^key:([0-9a-z]+)"
 rediseen start
 ```
 
-Now you should be able to query against the database, like `http://localhost:8000/0/key:1` (say you
-have a key named `key:1` set in your Redis database).
+Now you should be able to query against the database, like `http://localhost:8000/0` or `http://localhost:8000/0/key:1`
+(say you have a key named `key:1` set in your Redis database).
 
 For more details, please refer to the rest of this README documentation.
 
@@ -120,6 +120,7 @@ rediseen start
 ```
 
 Then you can access the service at
+- `http://<your server address>:<REDISEEN_PORT>/<redis DB>`
 - `http://<your server address>:<REDISEEN_PORT>/<redis DB>/<key>`
 - `http://<your server address>:<REDISEEN_PORT>/<redis DB>/<key>/<index or value or member>`
 
@@ -136,7 +137,36 @@ rediseen stop
 
 ### 2.4 How to Consume the Service
 
-#### 2.4.1 `/<redis DB>/<key>`
+#### 2.4.1 `/<redis DB>`
+
+This endpoint will return response in which you can get
+- the number of keys which are exposed
+- keys exposed and their types (only up to 1000 keys will be showed)
+
+A sample response follow below
+
+```json
+{
+    count: 3,
+    total: 3,
+    keys: [
+        {
+            key: "key:1",
+            type: "string"
+        },
+        {
+            key: "key:5",
+            type: "hash"
+        },
+        {
+            key: "key:100",
+            type: "zset"
+        }
+    ]
+}
+```
+
+#### 2.4.2 `/<redis DB>/<key>`
 
 | Data Type | Underlying Redis Command |
 | --- | --- |
@@ -147,7 +177,7 @@ rediseen stop
 | ZSET   | `ZRANGE(key, 0, -1)` |
 
 
-#### 2.4.2 `/<redis DB>/<key>/<index or value or member>`
+#### 2.4.3 `/<redis DB>/<key>/<index or value or member>`
 
 | Data Type | Usage | Return Value |
 | --- | --- | --- |
