@@ -65,29 +65,27 @@ func configCheck() error {
 
 	dbExposedMap = parseDbExposed(dbExposed)
 
-	if keyPatternAllowed == "" && keyPatternAllowAll != "true" {
-		strError := "You have not specified any key pattern to allow being accessed " +
-			"(environment variable REDISEEN_KEY_PATTERN_EXPOSED)\n" +
-			"        To allow ALL keys to be accessed, " +
-			"set environment variable REDISEEN_KEY_PATTERN_EXPOSE_ALL=true"
-		return errors.New(strError)
-	}
-
 	if keyPatternAllowAll == "true" {
 		if keyPatternAllowed != "" {
 			return errors.New("You have specified both REDISEEN_KEY_PATTERN_EXPOSED " +
 				"and REDISEEN_KEY_PATTERN_EXPOSE_ALL=true, which is conflicting.")
 		}
 		log.Println("[WARNING] You are exposing ALL keys.")
-	}
-
-	if keyPatternAllowed != "" {
-		regexpKeyPatternAllowed, err = regexp.Compile(keyPatternAllowed)
-		if err != nil {
-			return fmt.Errorf("REDISEEN_KEY_PATTERN_EXPOSED can not be "+
-				"compiled as regular expression. Details: %s\n", err.Error())
+	} else {
+		if keyPatternAllowed == "" {
+			strError := "You have not specified any key pattern to allow being accessed " +
+				"(environment variable REDISEEN_KEY_PATTERN_EXPOSED)\n" +
+				"        To allow ALL keys to be accessed, " +
+				"set environment variable REDISEEN_KEY_PATTERN_EXPOSE_ALL=true"
+			return errors.New(strError)
+		} else {
+			regexpKeyPatternAllowed, err = regexp.Compile(keyPatternAllowed)
+			if err != nil {
+				return fmt.Errorf("REDISEEN_KEY_PATTERN_EXPOSED can not be "+
+					"compiled as regular expression. Details: %s\n", err.Error())
+			}
+			log.Println(fmt.Sprintf("[INFO] You are exposing keys of pattern `%s`", keyPatternAllowed))
 		}
-		log.Println(fmt.Sprintf("[INFO] You are exposing keys of pattern `%s`", keyPatternAllowed))
 	}
 
 	err = conn.ClientPing()
@@ -108,8 +106,6 @@ func validateDbExposeConfig(configDbExposed string) error {
 		return nil
 	}
 
-	log.Println(fmt.Sprintf("[INFO] You are exposing logical database(s) `%s`", configDbExposed))
-
 	// case-2: "0" or "18"
 	// case-3: "0-10" or "0;0-10" or "1-10;13"
 	// If multiple values are provided (semicolon-separated), check value by value
@@ -123,6 +119,7 @@ func validateDbExposeConfig(configDbExposed string) error {
 		}
 	}
 
+	log.Println(fmt.Sprintf("[INFO] You are exposing logical database(s) `%s`", configDbExposed))
 	return nil
 }
 

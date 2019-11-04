@@ -274,7 +274,7 @@ func Test_parseDbExposed_3(t *testing.T) {
 		t.Error("parsing wrongly")
 	}
 
-	for _, i := range []int{2, 10, 16, 99, 101, 1, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 100} {
+	for i := 1; i <= 100; i++ {
 		_, ok := result[i]
 		if ok {
 			t.Error("parsing wrongly")
@@ -330,7 +330,7 @@ func Test_dbCheck_expose_all(t *testing.T) {
 	os.Setenv("REDISEEN_DB_EXPOSED", "*")
 	defer os.Setenv("REDISEEN_DB_EXPOSED", originalDbExposed)
 
-	for _, i := range []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16} {
+	for i := 0; i <= 100; i++ {
 		if dbCheck(i) == false {
 			t.Error("something is wrong with dbCheck()")
 		}
