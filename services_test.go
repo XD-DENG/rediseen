@@ -379,6 +379,7 @@ func Test_service_string_type_with_slash_and_backtick_in_key(t *testing.T) {
 	compareAndShout(t, "hi", result.Value)
 }
 
+// Validate if listing-keys feature returns 200 if the DB in client request IS exposed
 func Test_service_list_keys_for_db_with_access(t *testing.T) {
 	mr, _ := miniredis.Run()
 	defer mr.Close()
@@ -408,6 +409,7 @@ func Test_service_list_keys_for_db_with_access(t *testing.T) {
 	}
 }
 
+// Validate if listing-keys feature returns 403 if the DB in client request is NOT exposed
 func Test_service_list_keys_for_db_without_access(t *testing.T) {
 	mr, _ := miniredis.Run()
 	defer mr.Close()
