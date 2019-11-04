@@ -63,9 +63,9 @@ func service(res http.ResponseWriter, req *http.Request) {
 	log.Printf("Request Path: '%s'\n", req.URL.Path)
 	arguments := strings.Split(req.URL.Path, "/")
 
-	if strings.HasSuffix(req.URL.Path, "/") || len(arguments) < 3 {
+	if strings.HasSuffix(req.URL.Path, "/") || len(arguments) < 2 {
 		res.WriteHeader(http.StatusBadRequest)
-		js, _ = json.Marshal(types.ErrorType{Error: "Usage: /db/key, /db/key/index, or /db/key/field"})
+		js, _ = json.Marshal(types.ErrorType{Error: "Usage: /db, /db/key, /db/key/index, or /db/key/field"})
 		res.Write(js)
 		return
 	}
@@ -76,13 +76,6 @@ func service(res http.ResponseWriter, req *http.Request) {
 
 	rawDb = arguments[1]
 
-	// deal with situation where key contains "/"
-	if len(arguments) == 3 {
-		key = arguments[2]
-	} else {
-		key, index = parseKeyAndIndex(strings.Join(arguments[2:], "/"))
-	}
-
 	db, err := strconv.Atoi(rawDb)
 	if err != nil {
 		res.WriteHeader(http.StatusBadRequest)
@@ -91,11 +84,24 @@ func service(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	client := conn.Client(db)
+	defer client.Close()
+
 	if !dbCheck(db) {
 		res.WriteHeader(http.StatusForbidden)
 		js, _ = json.Marshal(types.ErrorType{Error: fmt.Sprintf("DB %d is not exposed", db)})
 		res.Write(js)
 		return
+	}
+
+	// deal with situation where key contains "/"
+	if len(arguments) == 2 {
+		listKeysByDb(client, res)
+		return
+	} else if len(arguments) == 3 {
+		key = arguments[2]
+	} else {
+		key, index = parseKeyAndIndex(strings.Join(arguments[2:], "/"))
 	}
 
 	if !keyPatternCheck(key) {
@@ -104,9 +110,6 @@ func service(res http.ResponseWriter, req *http.Request) {
 		res.Write(js)
 		return
 	}
-
-	client := conn.Client(db)
-	defer client.Close()
 
 	// Check if key exists, meanwhile check Redis connection
 	keyExists, err := client.Exists(key).Result()
