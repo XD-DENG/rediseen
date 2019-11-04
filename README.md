@@ -143,7 +143,7 @@ This endpoint will return response in which you can get
 - the number of keys which are exposed
 - keys exposed and their types (only up to 1000 keys will be showed)
 
-A sample response follow below
+A sample response follows below
 
 ```
 {
