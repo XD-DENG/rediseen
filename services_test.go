@@ -420,7 +420,7 @@ func Test_service_list_keys_for_db_without_access(t *testing.T) {
 	defer s.Close()
 
 	// env var set for the test is REDISEEN_DB_EXPOSED=0-5
-	for _, db := range []int{6, 10, 100} {
+	for db := 6; db <= 100; db++ {
 		res, _ := http.Get(s.URL + fmt.Sprintf("/%v", db))
 
 		expectedCode := 403
