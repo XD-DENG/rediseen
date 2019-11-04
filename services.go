@@ -87,6 +87,13 @@ func service(res http.ResponseWriter, req *http.Request) {
 	client := conn.Client(db)
 	defer client.Close()
 
+	if !dbCheck(db) {
+		res.WriteHeader(http.StatusForbidden)
+		js, _ = json.Marshal(types.ErrorType{Error: fmt.Sprintf("DB %d is not exposed", db)})
+		res.Write(js)
+		return
+	}
+
 	// deal with situation where key contains "/"
 	if len(arguments) == 2 {
 		listKeysByDb(client, res)
@@ -95,13 +102,6 @@ func service(res http.ResponseWriter, req *http.Request) {
 		key = arguments[2]
 	} else {
 		key, index = parseKeyAndIndex(strings.Join(arguments[2:], "/"))
-	}
-
-	if !dbCheck(db) {
-		res.WriteHeader(http.StatusForbidden)
-		js, _ = json.Marshal(types.ErrorType{Error: fmt.Sprintf("DB %d is not exposed", db)})
-		res.Write(js)
-		return
 	}
 
 	if !keyPatternCheck(key) {

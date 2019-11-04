@@ -379,6 +379,64 @@ func Test_service_string_type_with_slash_and_backtick_in_key(t *testing.T) {
 	compareAndShout(t, "hi", result.Value)
 }
 
+func Test_service_list_keys_for_db_with_access(t *testing.T) {
+	mr, _ := miniredis.Run()
+	defer mr.Close()
+
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
+	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
+
+	s := httptest.NewServer(http.HandlerFunc(service))
+	defer s.Close()
+
+	// env var set for the test is REDISEEN_DB_EXPOSED=0-5
+	for db := 0; db <= 5; db++ {
+		res, _ := http.Get(s.URL + fmt.Sprintf("/%v", db))
+
+		expectedCode := 200
+		compareAndShout(t, expectedCode, res.StatusCode)
+
+		resultStr, _ := ioutil.ReadAll(res.Body)
+		res.Body.Close()
+
+		var result types.KeyListType
+		json.Unmarshal([]byte(resultStr), &result)
+
+		compareAndShout(t, 0, result.Count)
+		compareAndShout(t, 0, result.Total)
+	}
+}
+
+func Test_service_list_keys_for_db_without_access(t *testing.T) {
+	mr, _ := miniredis.Run()
+	defer mr.Close()
+
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
+	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
+
+	s := httptest.NewServer(http.HandlerFunc(service))
+	defer s.Close()
+
+	// env var set for the test is REDISEEN_DB_EXPOSED=0-5
+	for _, db := range []int{6, 10, 100} {
+		res, _ := http.Get(s.URL + fmt.Sprintf("/%v", db))
+
+		expectedCode := 403
+		compareAndShout(t, expectedCode, res.StatusCode)
+
+		resultStr, _ := ioutil.ReadAll(res.Body)
+		res.Body.Close()
+
+		var result types.ErrorType
+		json.Unmarshal([]byte(resultStr), &result)
+
+		expectedError := fmt.Sprintf("DB %v is not exposed", db)
+		compareAndShout(t, expectedError, result.Error)
+	}
+}
+
 func Test_service_string_type_db_no_access(t *testing.T) {
 
 	mr, _ := miniredis.Run()
