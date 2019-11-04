@@ -145,7 +145,7 @@ This endpoint will return response in which you can get
 
 A sample response follow below
 
-```json
+```
 {
     count: 3,
     total: 3,
