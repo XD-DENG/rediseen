@@ -114,6 +114,8 @@ func Test_service_non_existent_key(t *testing.T) {
 	compareAndShout(t, expectedError, result.Error)
 }
 
+// Check listing-keys feature
+// Taking keys which are NOT exposed into consideration as well (they should NOT be counted or returned)
 func Test_service_list_keys_by_db_1(t *testing.T) {
 
 	mr, _ := miniredis.Run()
@@ -164,6 +166,10 @@ func Test_service_list_keys_by_db_1(t *testing.T) {
 	}
 }
 
+// Check listing-keys feature
+// Check the situation where more than 1000 keys are exposed
+// `Total` should be the total number, BUT only up to 1000 keys should be returned.
+// `Count` should be up to 1000 as well
 func Test_service_list_keys_by_db_2(t *testing.T) {
 
 	mr, _ := miniredis.Run()
