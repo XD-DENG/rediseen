@@ -147,20 +147,20 @@ A sample response follows below
 
 ```
 {
-    count: 3,
-    total: 3,
-    keys: [
+    "count": 3,
+    "total": 3,
+    "keys": [
         {
-            key: "key:1",
-            type: "string"
+            "key": "key:1",
+            "type": "string"
         },
         {
-            key: "key:5",
-            type: "hash"
+            "key": "key:5",
+            "type": "hash"
         },
         {
-            key: "key:100",
-            type: "zset"
+            "key": "key:100",
+            "type": "zset"
         }
     ]
 }
