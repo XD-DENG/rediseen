@@ -39,8 +39,36 @@ export REDISEEN_KEY_PATTERN_EXPOSED="^key:([0-9a-z]+)"
 rediseen start
 ```
 
-Now you should be able to query against the database, like `http://localhost:8000/0` or `http://localhost:8000/0/key:1`
-(say you have a key named `key:1` set in your Redis database).
+Now you should be able to query against your Redis database, like `http://localhost:8000/0` or `http://localhost:8000/0/key:1`
+(say you have keys `key:1` (string) and `key:2` (hash) set in your Redis database). Sample responses follow below
+
+```bash
+GET /0
+
+{
+    "count": 2,
+    "total": 2,
+    "keys": [
+        {
+            "key": "key:1",
+            "type": "string"
+        },
+        {
+            "key": "key:2",
+            "type": "hash"
+        }
+    ]
+}
+```
+
+```bash
+GET /0/key:1
+
+{
+    "type": "string",
+    "value": "rediseen"
+}
+```
 
 For more details, please refer to the rest of this README documentation.
 
