@@ -167,6 +167,12 @@ func keyPatternCheck(key string) bool {
 	return regexpKeyPatternAllowed.MatchString(key)
 }
 
+// Given a Redis client (in which logical DB is specified),
+// List keys whose names match with REDISEEN_KEY_PATTERN_EXPOSED, together with their types.
+// Only up to 1000 keys will be returned.
+// In the response, we also give `count` and `total`.
+// `count`<=1000, while `total` is the actual total number of keys whose names match with REDISEEN_KEY_PATTERN_EXPOSED
+// Results are written into a http.ResponseWriter directly.
 func listKeysByDb(client *redis.Client, res http.ResponseWriter) {
 	keys, _ := client.Keys("*").Result()
 
