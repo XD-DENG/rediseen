@@ -40,7 +40,7 @@ rediseen start
 ```
 
 Now you should be able to query against your Redis database, like `http://localhost:8000/0` or `http://localhost:8000/0/key:1`
-(say you have keys `key:1` (string) and `key:2` (hash) set in your Redis database). Sample responses follow below
+(say you have keys `key:1` (string) and `key:2` (hash) set in your logical DB `0`). Sample responses follow below
 
 ```bash
 GET /0
