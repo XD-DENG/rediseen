@@ -94,13 +94,15 @@ func service(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// deal with situation where key contains "/"
 	if len(arguments) == 2 {
+		// request type-1: /db
 		listKeysByDb(client, res)
 		return
 	} else if len(arguments) == 3 {
+		// request type-2: /db/key
 		key = arguments[2]
 	} else {
+		// request type-3: /db/key/index, or /db/key/field
 		key, index = parseKeyAndIndex(strings.Join(arguments[2:], "/"))
 	}
 
