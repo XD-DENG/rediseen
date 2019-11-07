@@ -63,7 +63,7 @@ func service(res http.ResponseWriter, req *http.Request) {
 	log.Printf("Request Path: '%s'\n", req.URL.Path)
 	arguments := strings.Split(req.URL.Path, "/")
 
-	if strings.HasSuffix(req.URL.Path, "/") || len(arguments) < 2 {
+	if strings.HasSuffix(req.URL.Path, "/") || len(arguments) < 2 || len(arguments) > 4 {
 		res.WriteHeader(http.StatusBadRequest)
 		js, _ = json.Marshal(types.ErrorType{Error: "Usage: /db, /db/key, /db/key/index, or /db/key/field"})
 		res.Write(js)
