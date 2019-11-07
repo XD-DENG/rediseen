@@ -26,9 +26,10 @@ func Test_service_wrong_usage(t *testing.T) {
 
 	expectedCode := 400
 	expectedError := "Usage: /db, /db/key, /db/key/index, or /db/key/field"
+	casesToTest := []string{"/0/", "/0/key:1/", "/0/key:1/1/", "/0/key:1/1/1", "/0/key:1/1/1/", "/0/key:1/1/1/1"}
 	var res *http.Response
 
-	for _, suffix := range []string{"/0/", "/0/key:1/", "/0/key:1/1/"} {
+	for _, suffix := range casesToTest {
 		res, _ = http.Get(s.URL + suffix)
 
 		if res.StatusCode != expectedCode {

@@ -62,8 +62,9 @@ func service(res http.ResponseWriter, req *http.Request) {
 	// Process URL Path into detailed information, like DB and Key
 	log.Printf("Request Path: '%s'\n", req.URL.Path)
 	arguments := strings.Split(req.URL.Path, "/")
+	countArguments := len(arguments)
 
-	if strings.HasSuffix(req.URL.Path, "/") || len(arguments) < 2 {
+	if strings.HasSuffix(req.URL.Path, "/") || countArguments < 2 || countArguments > 4 {
 		res.WriteHeader(http.StatusBadRequest)
 		js, _ = json.Marshal(types.ErrorType{Error: "Usage: /db, /db/key, /db/key/index, or /db/key/field"})
 		res.Write(js)
@@ -94,13 +95,15 @@ func service(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// deal with situation where key contains "/"
-	if len(arguments) == 2 {
+	if countArguments == 2 {
+		// request type-1: /db
 		listKeysByDb(client, res)
 		return
-	} else if len(arguments) == 3 {
+	} else if countArguments == 3 {
+		// request type-2: /db/key
 		key = arguments[2]
 	} else {
+		// request type-3: /db/key/index, or /db/key/field
 		key, index = parseKeyAndIndex(strings.Join(arguments[2:], "/"))
 	}
 
