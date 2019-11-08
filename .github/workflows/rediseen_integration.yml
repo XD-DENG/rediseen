@@ -41,39 +41,24 @@ jobs:
         go build -v .
         ./rediseen -d start
         
-        if curl http://localhost:9000/0 | grep count; then
-            echo OK
-        else
-            echo "You're on fire"
-            exit 1
-        fi
-        
-        if curl http://localhost:9000/0/key:1 | grep "Key provided does not exist"; then
-            echo OK
-        else
-            echo "You're on fire"
-            exit 1
-        fi
+        check_by_grep_output () {
+            # $1: URL to Curl
+            # $2: string expected in the output
+            if curl $1 | grep $2; then
+                echo OK
+            else
+                echo "You're on fire"
+                exit 1
+            fi
+        }
 
-        if curl http://localhost:9000/0/no_access_key:1 | grep "Key pattern is forbidden from access"; then
-            echo OK
-        else
-            echo "You're on fire"
-            exit 1
-        fi
-
-        if curl http://localhost:9000/6 | grep "DB 6 is not exposed"; then
-            echo OK
-        else
-            echo "You're on fire"
-            exit 1
-        fi
-        
-        if curl http://localhost:9000/6/key:1 | grep "DB 6 is not exposed"; then
-            echo OK
-        else
-            echo "You're on fire"
-            exit 1
-        fi
+        check_by_grep_output http://localhost:9000 "Usage: /db, /db/key, /db/key/index, or /db/key/field"
+        check_by_grep_output http://localhost:9000/0/key:1/1/1 "Usage: /db, /db/key, /db/key/index, or /db/key/field"
+        check_by_grep_output http://localhost:9000/0 "count"
+        check_by_grep_output http://localhost:9000/0/key:1 "Key provided does not exist"
+        check_by_grep_output http://localhost:9000/0/key:1/1 "Key provided does not exist"
+        check_by_grep_output http://localhost:9000/0/no_access_key:1 "Key pattern is forbidden from access"
+        check_by_grep_output http://localhost:9000/6 "DB 6 is not exposed"
+        check_by_grep_output http://localhost:9000/6/key:1 "DB 6 is not exposed"
 
         ./rediseen stop
