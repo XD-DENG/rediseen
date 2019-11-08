@@ -1,4 +1,4 @@
-name: Rediseen_Integration_Test
+name: RediseenIntegrationTest
 on: [push]
 
 jobs:
@@ -38,9 +38,8 @@ jobs:
         REDISEEN_REDIS_URI: redis://:@localhost:${{ job.services.redis.ports['6379'] }}
         REDISEEN_DB_EXPOSED: 0-5
       run: |
-        go build -v .
-        ./rediseen -d start
-        
+        apt-get install redis-tools
+
         check_by_grep_output () {
             # $1: URL to Curl
             # $2: string expected in the output
@@ -55,6 +54,10 @@ jobs:
             echo
         }
 
+        go build -v .
+
+        ./rediseen -d start
+
         check_by_grep_output http://localhost:9000 "Usage: /db, /db/key, /db/key/index, or /db/key/field"
         check_by_grep_output http://localhost:9000/0/key:1/1/1 "Usage: /db, /db/key, /db/key/index, or /db/key/field"
         check_by_grep_output http://localhost:9000/0 "count"
@@ -64,4 +67,16 @@ jobs:
         check_by_grep_output http://localhost:9000/6 "DB 6 is not exposed"
         check_by_grep_output http://localhost:9000/6/key:1 "DB 6 is not exposed"
 
-        ./rediseen stop
+        echo "set key:1 Rediseen" | redis-cli
+        check_by_grep_output http://localhost:9000/0/key:1 "Rediseen"
+
+        echo "hset key:2 year 2019" | redis-cli
+        check_by_grep_output http://localhost:9000/0/key:2/year "2019"
+
+        echo "del key:1" | redis-cli
+        check_by_grep_output http://localhost:9000/0/key:1 "Key provided does not exist"
+
+        echo "del key:2" | redis-cli
+        check_by_grep_output http://localhost:9000/0/key:2 "Key provided does not exist"
+        
+        ./rediseen stop    
