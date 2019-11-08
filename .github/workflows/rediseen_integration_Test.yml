@@ -38,7 +38,7 @@ jobs:
         REDISEEN_REDIS_URI: redis://:@localhost:${{ job.services.redis.ports['6379'] }}
         REDISEEN_DB_EXPOSED: 0-5
       run: |
-        apt-get install redis-tools
+        sudo apt-get install redis-tools
 
         check_by_grep_output () {
             # $1: URL to Curl
