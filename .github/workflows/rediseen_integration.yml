@@ -59,7 +59,7 @@ jobs:
             exit 1
         fi
 
-        if curl http://localhost:9000/6 | grep "DB 6 is not exposed"; then
+        if curl http://localhost:9000/6 | grep "Key provided does not exist"; then
             echo OK
         else
             exit 1
