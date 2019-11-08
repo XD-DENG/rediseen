@@ -44,7 +44,9 @@ jobs:
         check_by_grep_output () {
             # $1: URL to Curl
             # $2: string expected in the output
-            if curl $1 | grep "$2"; then
+            echo Calling: $1
+            echo Expecting: $2
+            if curl -s $1 | grep "$2"; then
                 echo OK
             else
                 echo "You're on fire"
