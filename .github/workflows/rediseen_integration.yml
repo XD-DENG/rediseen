@@ -44,7 +44,7 @@ jobs:
         check_by_grep_output () {
             # $1: URL to Curl
             # $2: string expected in the output
-            if curl $1 | grep $2; then
+            if curl $1 | grep "$2"; then
                 echo OK
             else
                 echo "You're on fire"
@@ -52,8 +52,8 @@ jobs:
             fi
         }
 
-        check_by_grep_output http://localhost:9000 "Usage"
-        check_by_grep_output http://localhost:9000/0/key:1/1/1 "Usage"
+        check_by_grep_output http://localhost:9000 "Usage: /db, /db/key, /db/key/index, or /db/key/field"
+        check_by_grep_output http://localhost:9000/0/key:1/1/1 "Usage: /db, /db/key, /db/key/index, or /db/key/field"
         check_by_grep_output http://localhost:9000/0 "count"
         check_by_grep_output http://localhost:9000/0/key:1 "Key provided does not exist"
         check_by_grep_output http://localhost:9000/0/key:1/1 "Key provided does not exist"
