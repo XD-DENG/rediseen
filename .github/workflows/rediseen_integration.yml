@@ -40,5 +40,8 @@ jobs:
         go build -v .
         ./rediseen -d start
         curl http://localhost:8000/0
+        curl http://localhost:8000/0/key:1
+        curl http://localhost:8000/0/no_access_key:1
         curl http://localhost:8000/6
+        curl http://localhost:8000/6/key:1
         ./rediseen stop
