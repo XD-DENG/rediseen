@@ -78,11 +78,22 @@ jobs:
         check_by_grep_output http://localhost:9000/0/key:2/year "hash"
         check_by_grep_output http://localhost:9000/0/key:2/year "2019"
         check_by_grep_output http://localhost:9000/0/key:2/project "rediseen"
+        
+        echo "lpush key:3 github" | redis-cli -p ${{ job.services.redis.ports['6379'] }}
+        echo "lpush key:3 coding" | redis-cli -p ${{ job.services.redis.ports['6379'] }}
+        echo "rpush key:3 ENJOY" | redis-cli -p ${{ job.services.redis.ports['6379'] }}
+        check_by_grep_output http://localhost:9000/0/key:3 "list"
+        check_by_grep_output http://localhost:9000/0/key:3/0 "coding"
+        check_by_grep_output http://localhost:9000/0/key:3/1 "github"
+        check_by_grep_output http://localhost:9000/0/key:3/2 "ENJOY"
 
         echo "del key:1" | redis-cli -p ${{ job.services.redis.ports['6379'] }}
         check_by_grep_output http://localhost:9000/0/key:1 "Key provided does not exist"
 
         echo "del key:2" | redis-cli -p ${{ job.services.redis.ports['6379'] }}
         check_by_grep_output http://localhost:9000/0/key:2 "Key provided does not exist"
+
+        echo "del key:3" | redis-cli -p ${{ job.services.redis.ports['6379'] }}
+        check_by_grep_output http://localhost:9000/0/key:3 "Key provided does not exist"
         
         ./rediseen stop    
