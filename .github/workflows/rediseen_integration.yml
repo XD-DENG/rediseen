@@ -1,0 +1,44 @@
+name: Rediseen_Integration_Test
+on: [push]
+
+jobs:
+  build:
+    name: IntegrationTest
+    runs-on: ubuntu-latest
+
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379/tcp
+
+    steps:
+    - name: Set up Go 1.12
+      uses: actions/setup-go@v1
+      with:
+        go-version: 1.12
+      id: go
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v1
+
+    - name: Get dependencies
+      run: |
+        go get -v -t -d ./...
+        if [ -f Gopkg.toml ]; then
+            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+            dep ensure
+        fi
+
+    - name: Integration Test
+      env:
+        REDISEEN_KEY_PATTERN_EXPOSED: "^key:[.]*"
+        REDISEEN_KEY_PATTERN_EXPOSE_ALL: false
+        REDISEEN_REDIS_URI: redis://:@localhost:${{ job.services.redis.ports['6379'] }}
+        REDISEEN_DB_EXPOSED: 0-5
+      run: |
+        go build -v .
+        rediseen -d start
+        curl http://localhost:8000/0
+        curl http://localhost:8000/6
+        rediseen stop
