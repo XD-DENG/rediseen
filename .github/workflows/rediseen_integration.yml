@@ -32,6 +32,7 @@ jobs:
 
     - name: Integration Test
       env:
+        REDISEEN_PORT: 9000
         REDISEEN_KEY_PATTERN_EXPOSED: "^key:[.]*"
         REDISEEN_KEY_PATTERN_EXPOSE_ALL: false
         REDISEEN_REDIS_URI: redis://:@localhost:${{ job.services.redis.ports['6379'] }}
@@ -39,9 +40,35 @@ jobs:
       run: |
         go build -v .
         ./rediseen -d start
-        curl http://localhost:8000/0
-        curl http://localhost:8000/0/key:1
-        curl http://localhost:8000/0/no_access_key:1
-        curl http://localhost:8000/6
-        curl http://localhost:8000/6/key:1
+        
+        if curl http://localhost:9000/0 | grep count; then
+            echo OK
+        else
+            exit 1
+        fi
+        
+        if curl http://localhost:9000/0/key:1 | grep "Key provided does not exist"; then
+            echo OK
+        else
+            exit 1
+        fi
+
+        if curl http://localhost:9000/0/no_access_key:1 | grep "Key pattern is forbidden from access"; then
+            echo OK
+        else
+            exit 1
+        fi
+
+        if curl http://localhost:9000/6 | grep "DB 6 is not exposed"; then
+            echo OK
+        else
+            exit 1
+        fi
+        
+        if curl http://localhost:9000/6/key:1 | grep "DB 6 is not exposed"; then
+            echo OK
+        else
+            exit 1
+        fi
+
         ./rediseen stop
