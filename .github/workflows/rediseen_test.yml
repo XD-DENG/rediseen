@@ -1,4 +1,4 @@
-name: Rediseen
+name: RediseenUnitTest
 on: [push]
 
 jobs:
@@ -27,7 +27,7 @@ jobs:
             dep ensure
         fi
 
-    - name: Test
+    - name: Unit Test
       env:
         REDISEEN_KEY_PATTERN_EXPOSED: "^key:[.]*"
         REDISEEN_KEY_PATTERN_EXPOSE_ALL: false
@@ -40,4 +40,3 @@ jobs:
       run: |
         go build -v .
         ./rediseen version
-        ./rediseen invalid_command
