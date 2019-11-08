@@ -44,30 +44,35 @@ jobs:
         if curl http://localhost:9000/0 | grep count; then
             echo OK
         else
+            echo "You're on fire"
             exit 1
         fi
         
         if curl http://localhost:9000/0/key:1 | grep "Key provided does not exist"; then
             echo OK
         else
+            echo "You're on fire"
             exit 1
         fi
 
         if curl http://localhost:9000/0/no_access_key:1 | grep "Key pattern is forbidden from access"; then
             echo OK
         else
+            echo "You're on fire"
             exit 1
         fi
 
-        if curl http://localhost:9000/6 | grep "Key provided does not exist"; then
+        if curl http://localhost:9000/6 | grep "DB 6 is not exposed"; then
             echo OK
         else
+            echo "You're on fire"
             exit 1
         fi
         
         if curl http://localhost:9000/6/key:1 | grep "DB 6 is not exposed"; then
             echo OK
         else
+            echo "You're on fire"
             exit 1
         fi
 
