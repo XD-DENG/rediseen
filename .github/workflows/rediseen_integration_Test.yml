@@ -69,9 +69,15 @@ jobs:
 
         echo "set key:1 Rediseen" | redis-cli -p ${{ job.services.redis.ports['6379'] }}
         check_by_grep_output http://localhost:9000/0/key:1 "Rediseen"
+        check_by_grep_output http://localhost:9000/0/key:1 "string"
+        check_by_grep_output http://localhost:9000/0/key:1/2 "d"
 
         echo "hset key:2 year 2019" | redis-cli -p ${{ job.services.redis.ports['6379'] }}
+        echo "hset key:2 project rediseen" | redis-cli -p ${{ job.services.redis.ports['6379'] }}
+        check_by_grep_output http://localhost:9000/0/key:2 "hash"
+        check_by_grep_output http://localhost:9000/0/key:2/year "hash"
         check_by_grep_output http://localhost:9000/0/key:2/year "2019"
+        check_by_grep_output http://localhost:9000/0/key:2/project "rediseen"
 
         echo "del key:1" | redis-cli -p ${{ job.services.redis.ports['6379'] }}
         check_by_grep_output http://localhost:9000/0/key:1 "Key provided does not exist"
