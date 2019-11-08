@@ -38,7 +38,7 @@ jobs:
         REDISEEN_DB_EXPOSED: 0-5
       run: |
         go build -v .
-        rediseen -d start
+        ./rediseen -d start
         curl http://localhost:8000/0
         curl http://localhost:8000/6
-        rediseen stop
+        ./rediseen stop
