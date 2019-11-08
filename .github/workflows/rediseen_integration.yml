@@ -52,6 +52,7 @@ jobs:
                 echo "You're on fire"
                 exit 1
             fi
+            echo
         }
 
         check_by_grep_output http://localhost:9000 "Usage: /db, /db/key, /db/key/index, or /db/key/field"
