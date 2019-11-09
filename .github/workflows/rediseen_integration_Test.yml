@@ -85,6 +85,7 @@ jobs:
 
         check_by_grep_output http://localhost:9000 "Usage: /db, /db/key, /db/key/index, or /db/key/field"
         check_by_grep_output http://localhost:9000/0/key:1/1/1 "Usage: /db, /db/key, /db/key/index, or /db/key/field"
+        check_by_jq_field http://localhost:9000 error "Usage: /db, /db/key, /db/key/index, or /db/key/field"
         check_by_grep_output http://localhost:9000/0 "count"
         check_by_grep_output http://localhost:9000/0/key:1 "Key provided does not exist"
         check_by_grep_output http://localhost:9000/0/key:1/1 "Key provided does not exist"
