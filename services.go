@@ -60,13 +60,11 @@ func service(res http.ResponseWriter, req *http.Request) {
 
 	var js []byte
 
-	if os.Getenv("REDISEEN_API_KEY") != "" {
-		if !apiKeyCheck(req) {
-			res.WriteHeader(http.StatusUnauthorized)
-			js, _ = json.Marshal(types.ErrorType{Error: "unauthorized"})
-			res.Write(js)
-			return
-		}
+	if os.Getenv("REDISEEN_API_KEY") != "" && !apiKeyCheck(req) {
+		res.WriteHeader(http.StatusUnauthorized)
+		js, _ = json.Marshal(types.ErrorType{Error: "unauthorized"})
+		res.Write(js)
+		return
 	}
 
 	if req.Method != "GET" {
