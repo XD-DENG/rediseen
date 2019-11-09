@@ -90,10 +90,10 @@ jobs:
         check_by_grep_output http://localhost:9000/0 "count"
         check_by_jq_field http://localhost:9000/0 count "0"
         check_by_jq_field http://localhost:9000/0 total "0"
-        check_by_grep_output http://localhost:9000/0/key:1 "Key provided does not exist"
-        check_by_jq_field http://localhost:9000/0/key:1 error "Key provided does not exist"
-        check_by_grep_output http://localhost:9000/0/key:1/1 "Key provided does not exist"
-        check_by_jq_field http://localhost:9000/0/key:1/1 error "Key provided does not exist"
+        check_by_grep_output http://localhost:9000/0/key:1 "Key provided does not exist."
+        check_by_jq_field http://localhost:9000/0/key:1 error "Key provided does not exist."
+        check_by_grep_output http://localhost:9000/0/key:1/1 "Key provided does not exist."
+        check_by_jq_field http://localhost:9000/0/key:1/1 error "Key provided does not exist."
         check_by_jq_field http://localhost:9000/0/no_access_key error "Key pattern is forbidden from access"
         check_by_grep_output http://localhost:9000/6 "DB 6 is not exposed"
         check_by_jq_field http://localhost:9000/6 error "DB 6 is not exposed"
@@ -125,12 +125,12 @@ jobs:
         check_by_grep_output http://localhost:9000/0/key:3/2 "ENJOY"
 
         echo "del key:1" | redis-cli -p ${{ job.services.redis.ports['6379'] }}
-        check_by_grep_output http://localhost:9000/0/key:1 "Key provided does not exist"
+        check_by_grep_output http://localhost:9000/0/key:1 "Key provided does not exist."
 
         echo "del key:2" | redis-cli -p ${{ job.services.redis.ports['6379'] }}
-        check_by_grep_output http://localhost:9000/0/key:2 "Key provided does not exist"
+        check_by_grep_output http://localhost:9000/0/key:2 "Key provided does not exist."
 
         echo "del key:3" | redis-cli -p ${{ job.services.redis.ports['6379'] }}
-        check_by_grep_output http://localhost:9000/0/key:3 "Key provided does not exist"
+        check_by_grep_output http://localhost:9000/0/key:3 "Key provided does not exist."
         
         ./rediseen stop    
