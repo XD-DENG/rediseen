@@ -71,6 +71,7 @@ jobs:
 
             RESULT=$(curl -s $1 | jq -r '.'$2)
             if [ "$RESULT" == "$3" ]; then
+                echo $RESULT
                 echo OK
             else
                 echo "You're on fire"
@@ -90,15 +91,23 @@ jobs:
         check_by_jq_field http://localhost:9000/0 count "0"
         check_by_jq_field http://localhost:9000/0 total "0"
         check_by_grep_output http://localhost:9000/0/key:1 "Key provided does not exist"
+        check_by_jq_field http://localhost:9000/0/key:1 error "Key provided does not exist"
         check_by_grep_output http://localhost:9000/0/key:1/1 "Key provided does not exist"
-        check_by_grep_output http://localhost:9000/0/no_access_key "Key pattern is forbidden from access"
+        check_by_jq_field http://localhost:9000/0/key:1/1 error "Key provided does not exist"
+        check_by_jq_field http://localhost:9000/0/no_access_key error "Key pattern is forbidden from access"
         check_by_grep_output http://localhost:9000/6 "DB 6 is not exposed"
+        check_by_jq_field http://localhost:9000/6 error "DB 6 is not exposed"
         check_by_grep_output http://localhost:9000/6/key:1 "DB 6 is not exposed"
+        check_by_jq_field http://localhost:9000/6/key:1 error "DB 6 is not exposed"
 
         echo "set key:1 Rediseen" | redis-cli -p ${{ job.services.redis.ports['6379'] }}
         check_by_grep_output http://localhost:9000/0/key:1 "Rediseen"
         check_by_grep_output http://localhost:9000/0/key:1 "string"
+        check_by_jq_field http://localhost:9000/6/key:1 value "Rediseen"
+        check_by_jq_field http://localhost:9000/6/key:1 type "string"
         check_by_grep_output http://localhost:9000/0/key:1/2 "d"
+        check_by_jq_field http://localhost:9000/6/key:1/2 value "d"
+        check_by_jq_field http://localhost:9000/6/key:1/2 type "string"
 
         echo "hset key:2 year 2019" | redis-cli -p ${{ job.services.redis.ports['6379'] }}
         echo "hset key:2 project rediseen" | redis-cli -p ${{ job.services.redis.ports['6379'] }}
