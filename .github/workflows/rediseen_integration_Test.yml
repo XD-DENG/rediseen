@@ -69,9 +69,10 @@ jobs:
             echo Checking Field: $2
             echo Expecting Field: $3
 
-            RESULT=$(curl -s $1 | jq -r '.'$2)
+            OUTPUT=$(curl -s $1)
+            echo $OUTPUT
+            RESULT=$(echo $OUTPUT | jq -r '.'$2)
             if [ "$RESULT" == "$3" ]; then
-                echo $RESULT
                 echo OK
             else
                 echo "You're on fire"
