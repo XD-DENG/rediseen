@@ -48,7 +48,7 @@ func parseKeyAndIndex(restPath string) (string, string) {
 	return key, index
 }
 
-func apiKeyCheck(req *http.Request) bool {
+func apiKeyMatch(req *http.Request) bool {
 	if req.Header.Get("X-API-KEY") == os.Getenv("REDISEEN_API_KEY") {
 		return true
 	}
@@ -60,11 +60,16 @@ func service(res http.ResponseWriter, req *http.Request) {
 
 	var js []byte
 
-	if os.Getenv("REDISEEN_API_KEY") != "" && !apiKeyCheck(req) {
-		res.WriteHeader(http.StatusUnauthorized)
-		js, _ = json.Marshal(types.ErrorType{Error: "unauthorized"})
-		res.Write(js)
-		return
+	var authEnforced bool
+	authEnforced = os.Getenv("REDISEEN_API_KEY") != ""
+
+	if authEnforced {
+		if !apiKeyMatch(req) {
+			res.WriteHeader(http.StatusUnauthorized)
+			js, _ = json.Marshal(types.ErrorType{Error: "unauthorized"})
+			res.Write(js)
+			return
+		}
 	}
 
 	if req.Method != "GET" {
