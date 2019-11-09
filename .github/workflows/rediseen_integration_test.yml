@@ -10,10 +10,13 @@ jobs:
   build:
     name: IntegrationTest
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        redisversion: [latest, 5.0.6, 4.0.14]
 
     services:
       redis:
-        image: redis
+        image: redis:${{ matrix.redisversion }}
         ports:
           - 6379/tcp
 
