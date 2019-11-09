@@ -23,4 +23,6 @@ COPY --from=builder /app/rediseen ./rediseen
 ENV REDISEEN_HOST=0.0.0.0
 EXPOSE 8000
 
+ENV PATH=$PATH:${pwd}
+
 CMD ["./rediseen", "start"]
