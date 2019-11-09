@@ -829,3 +829,52 @@ func Test_service_delete_not_allowed_no_access(t *testing.T) {
 	expectedError := "Method DELETE is not allowed"
 	compareAndShout(t, expectedError, result.Error)
 }
+
+func Test_api_key_authentication(t *testing.T) {
+
+	mr, _ := miniredis.Run()
+	defer mr.Close()
+
+	mr.Set("key:1", "hello")
+
+	os.Setenv("REDISEEN_API_KEY", "nopass")
+	defer os.Setenv("REDISEEN_REDIS_URI", "")
+
+	s := httptest.NewServer(http.HandlerFunc(service))
+	defer s.Close()
+
+	// case-1: no API Key is provided in request header
+	// (to FAIL)
+	res, _ := http.Get(s.URL + "/0")
+
+	expectedCode := 401
+	compareAndShout(t, expectedCode, res.StatusCode)
+
+	resultStr, _ := ioutil.ReadAll(res.Body)
+	res.Body.Close()
+
+	var result types.ErrorType
+	json.Unmarshal([]byte(resultStr), &result)
+
+	compareAndShout(t, "unauthorized", result.Error)
+
+	// case-2: correct API Key is provided in request header
+	// (to SUCCEED)
+	client := &http.Client{}
+	req, _ := http.NewRequest("GET", s.URL+"/0", nil)
+	req.Header.Add("X-API-KEY", "nopass")
+	res, _ = client.Do(req)
+
+	expectedCode = 200
+	compareAndShout(t, expectedCode, res.StatusCode)
+
+	// case-3: wrong API Key is provided in request header
+	// (to FAIL)
+	client = &http.Client{}
+	req, _ = http.NewRequest("GET", s.URL+"/0", nil)
+	req.Header.Add("X-API-KEY", "wrongkey")
+	res, _ = client.Do(req)
+
+	expectedCode = 401
+	compareAndShout(t, expectedCode, res.StatusCode)
+}

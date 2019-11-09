@@ -112,4 +112,12 @@ jobs:
         echo "del key:3" | redis-cli -p ${{ job.services.redis.ports['6379'] }}
         check_by_jq_field http://localhost:9000/0/key:3 error "Key provided does not exist."
         
-        ./rediseen stop    
+        ./rediseen stop
+
+
+        export REDISEEN_API_KEY=RandomKey
+
+        ./rediseen -d start
+        check_by_jq_field http://localhost:9000/0 error "unauthorized"
+        ./rediseen stop
+
