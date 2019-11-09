@@ -44,6 +44,7 @@ jobs:
         REDISEEN_DB_EXPOSED: 0-5
       run: |
         sudo apt-get install redis-tools
+        sudo apt-get install jq
 
         check_by_grep_output () {
             # $1: URL to Curl
@@ -51,6 +52,22 @@ jobs:
             echo Calling: $1
             echo Expecting: $2
             if curl -s $1 | grep "$2"; then
+                echo OK
+            else
+                echo "You're on fire"
+                exit 1
+            fi
+            echo
+        }
+        
+        check_by_jq_field () {
+            # $1: URL to Curl
+            # $2: field in the JSON response to check 
+            # $3: value expected for the field specified
+            echo Calling: $1
+            echo Checking Field: $2
+            echo Expecting Field: $3
+            if curl -s '$1' | jq '.$2'; then
                 echo OK
             else
                 echo "You're on fire"
