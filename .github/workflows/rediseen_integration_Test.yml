@@ -70,7 +70,7 @@ jobs:
             echo Expecting Field: $3
 
             RESULT=$(curl -s $1 | jq -r '.'$2)
-            if [ $RESULT == $3 ]; then
+            if [ "$RESULT" == "$3" ]; then
                 echo OK
             else
                 echo "You're on fire"
@@ -87,6 +87,8 @@ jobs:
         check_by_grep_output http://localhost:9000/0/key:1/1/1 "Usage: /db, /db/key, /db/key/index, or /db/key/field"
         check_by_jq_field http://localhost:9000 error "Usage: /db, /db/key, /db/key/index, or /db/key/field"
         check_by_grep_output http://localhost:9000/0 "count"
+        check_by_jq_field http://localhost:9000/0 count "0"
+        check_by_jq_field http://localhost:9000/0 total "0"
         check_by_grep_output http://localhost:9000/0/key:1 "Key provided does not exist"
         check_by_grep_output http://localhost:9000/0/key:1/1 "Key provided does not exist"
         check_by_grep_output http://localhost:9000/0/no_access_key "Key pattern is forbidden from access"
