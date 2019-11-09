@@ -72,11 +72,6 @@ func main() {
 	switch args[0] {
 	case "start":
 		log.Println("[INFO] Daemon mode:", *daemon)
-		if os.Getenv("REDISEEN_API_KEY") == "" {
-			log.Println("[WARNING] API is NOT secured with X-API-KEY")
-		} else {
-			log.Println("[INFO] API is secured with X-API-KEY (to access, specify X-API-KEY in request header)")
-		}
 
 		err := configCheck()
 		if err != nil {
