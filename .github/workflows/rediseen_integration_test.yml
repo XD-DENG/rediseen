@@ -10,10 +10,13 @@ jobs:
   build:
     name: IntegrationTest
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        redisversion: [latest, 5.0.6, 4.0.14]
 
     services:
       redis:
-        image: redis
+        image: redis:${{ matrix.redisversion }}
         ports:
           - 6379/tcp
 
@@ -45,20 +48,6 @@ jobs:
       run: |
         sudo apt-get install redis-tools
         sudo apt-get install jq
-
-        check_by_grep_output () {
-            # $1: URL to Curl
-            # $2: string expected in the output
-            echo Calling: $1
-            echo Expecting: $2
-            if curl -s $1 | grep "$2"; then
-                echo OK
-            else
-                echo "You're on fire"
-                exit 1
-            fi
-            echo
-        }
         
         check_by_jq_field () {
             # $1: URL to Curl
@@ -85,37 +74,24 @@ jobs:
 
         ./rediseen -d start
 
-        check_by_grep_output http://localhost:9000 "Usage: /db, /db/key, /db/key/index, or /db/key/field"
-        check_by_grep_output http://localhost:9000/0/key:1/1/1 "Usage: /db, /db/key, /db/key/index, or /db/key/field"
         check_by_jq_field http://localhost:9000 error "Usage: /db, /db/key, /db/key/index, or /db/key/field"
-        check_by_grep_output http://localhost:9000/0 "count"
+        check_by_jq_field http://localhost:9000/0/key:1/1/1 error "Usage: /db, /db/key, /db/key/index, or /db/key/field"
         check_by_jq_field http://localhost:9000/0 count "0"
         check_by_jq_field http://localhost:9000/0 total "0"
-        check_by_grep_output http://localhost:9000/0/key:1 "Key provided does not exist."
         check_by_jq_field http://localhost:9000/0/key:1 error "Key provided does not exist."
-        check_by_grep_output http://localhost:9000/0/key:1/1 "Key provided does not exist."
         check_by_jq_field http://localhost:9000/0/key:1/1 error "Key provided does not exist."
         check_by_jq_field http://localhost:9000/0/no_access_key error "Key pattern is forbidden from access"
-        check_by_grep_output http://localhost:9000/6 "DB 6 is not exposed"
         check_by_jq_field http://localhost:9000/6 error "DB 6 is not exposed"
-        check_by_grep_output http://localhost:9000/6/key:1 "DB 6 is not exposed"
         check_by_jq_field http://localhost:9000/6/key:1 error "DB 6 is not exposed"
 
         echo "set key:1 Rediseen" | redis-cli -p ${{ job.services.redis.ports['6379'] }}
-        check_by_grep_output http://localhost:9000/0/key:1 "Rediseen"
-        check_by_grep_output http://localhost:9000/0/key:1 "string"
         check_by_jq_field http://localhost:9000/0/key:1 value "Rediseen"
         check_by_jq_field http://localhost:9000/0/key:1 type "string"
-        check_by_grep_output http://localhost:9000/0/key:1/2 "d"
         check_by_jq_field http://localhost:9000/0/key:1/2 value "d"
         check_by_jq_field http://localhost:9000/0/key:1/2 type "string"
 
         echo "hset key:2 year 2019" | redis-cli -p ${{ job.services.redis.ports['6379'] }}
         echo "hset key:2 project rediseen" | redis-cli -p ${{ job.services.redis.ports['6379'] }}
-        check_by_grep_output http://localhost:9000/0/key:2 "hash"
-        check_by_grep_output http://localhost:9000/0/key:2/year "hash"
-        check_by_grep_output http://localhost:9000/0/key:2/year "2019"
-        check_by_grep_output http://localhost:9000/0/key:2/project "rediseen"
         check_by_jq_field http://localhost:9000/0/key:2 type "hash"
         check_by_jq_field http://localhost:9000/0/key:2/year type "hash"
         check_by_jq_field http://localhost:9000/0/key:2/year value "2019"
@@ -125,22 +101,26 @@ jobs:
         echo "lpush key:3 github" | redis-cli -p ${{ job.services.redis.ports['6379'] }}
         echo "lpush key:3 coding" | redis-cli -p ${{ job.services.redis.ports['6379'] }}
         echo "rpush key:3 ENJOY" | redis-cli -p ${{ job.services.redis.ports['6379'] }}
-        check_by_grep_output http://localhost:9000/0/key:3 "list"
-        check_by_grep_output http://localhost:9000/0/key:3/0 "coding"
-        check_by_grep_output http://localhost:9000/0/key:3/1 "github"
-        check_by_grep_output http://localhost:9000/0/key:3/2 "ENJOY"
         check_by_jq_field http://localhost:9000/0/key:3 type "list"
+        check_by_jq_field http://localhost:9000/0/key:3/0 value "coding"
+        check_by_jq_field http://localhost:9000/0/key:3/1 value "github"
+        check_by_jq_field http://localhost:9000/0/key:3/2 value "ENJOY"
 
         echo "del key:1" | redis-cli -p ${{ job.services.redis.ports['6379'] }}
-        check_by_grep_output http://localhost:9000/0/key:1 "Key provided does not exist."
         check_by_jq_field http://localhost:9000/0/key:1 error "Key provided does not exist."
 
         echo "del key:2" | redis-cli -p ${{ job.services.redis.ports['6379'] }}
-        check_by_grep_output http://localhost:9000/0/key:2 "Key provided does not exist."
         check_by_jq_field http://localhost:9000/0/key:2 error "Key provided does not exist."
 
         echo "del key:3" | redis-cli -p ${{ job.services.redis.ports['6379'] }}
-        check_by_grep_output http://localhost:9000/0/key:3 "Key provided does not exist."
         check_by_jq_field http://localhost:9000/0/key:3 error "Key provided does not exist."
         
-        ./rediseen stop    
+        ./rediseen stop
+
+
+        export REDISEEN_API_KEY=RandomKey
+
+        ./rediseen -d start
+        check_by_jq_field http://localhost:9000/0 error "unauthorized"
+        ./rediseen stop
+

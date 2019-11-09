@@ -71,7 +71,7 @@ func main() {
 
 	switch args[0] {
 	case "start":
-		fmt.Println("Daemon mode:", *daemon)
+		log.Println("[INFO] Daemon mode:", *daemon)
 
 		err := configCheck()
 		if err != nil {

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"rediseen/conn"
 	"rediseen/types"
 	"regexp"
@@ -47,10 +48,29 @@ func parseKeyAndIndex(restPath string) (string, string) {
 	return key, index
 }
 
+func apiKeyMatch(req *http.Request) bool {
+	if req.Header.Get("X-API-KEY") == os.Getenv("REDISEEN_API_KEY") {
+		return true
+	}
+	return false
+}
+
 func service(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-Type", "application/json")
 
 	var js []byte
+
+	var authEnforced bool
+	authEnforced = os.Getenv("REDISEEN_API_KEY") != ""
+
+	if authEnforced {
+		if !apiKeyMatch(req) {
+			res.WriteHeader(http.StatusUnauthorized)
+			js, _ = json.Marshal(types.ErrorType{Error: "unauthorized"})
+			res.Write(js)
+			return
+		}
+	}
 
 	if req.Method != "GET" {
 		res.WriteHeader(http.StatusMethodNotAllowed)

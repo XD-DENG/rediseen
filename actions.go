@@ -39,6 +39,12 @@ func configCheck() error {
 	var keyPatternAllowed = os.Getenv("REDISEEN_KEY_PATTERN_EXPOSED")
 	var keyPatternAllowAll = os.Getenv("REDISEEN_KEY_PATTERN_EXPOSE_ALL")
 
+	if os.Getenv("REDISEEN_API_KEY") == "" {
+		log.Println("[WARNING] API is NOT secured with X-API-KEY")
+	} else {
+		log.Println("[INFO] API is secured with X-API-KEY (to access, specify X-API-KEY in request header)")
+	}
+
 	if redisURI == "" {
 		return errors.New("No valid Redis URI is provided " +
 			"(via environment variable REDISEEN_REDIS_URI)")

@@ -193,11 +193,31 @@ func Test_configCheck_bad_regex(t *testing.T) {
 	}
 }
 
-func Test_configCheck_good_config(t *testing.T) {
+func Test_configCheck_good_config_without_auth_config(t *testing.T) {
 
 	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
 	os.Setenv("REDISEEN_REDIS_URI", "redis://:@localhost:6379")
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
+
+	originalKeyPatternAllowed := os.Getenv("REDISEEN_KEY_PATTERN_EXPOSED")
+	os.Setenv("REDISEEN_KEY_PATTERN_EXPOSED", "^key:[.]*")
+	defer os.Setenv("REDISEEN_KEY_PATTERN_EXPOSED", originalKeyPatternAllowed)
+
+	err := configCheck()
+
+	if err != nil {
+		t.Error("Not expecting error but got error")
+	}
+}
+
+func Test_configCheck_good_config_with_auth_config(t *testing.T) {
+
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
+	os.Setenv("REDISEEN_REDIS_URI", "redis://:@localhost:6379")
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
+
+	os.Setenv("REDISEEN_API_KEY", "RandomKey")
+	defer os.Unsetenv("REDISEEN_API_KEY")
 
 	originalKeyPatternAllowed := os.Getenv("REDISEEN_KEY_PATTERN_EXPOSED")
 	os.Setenv("REDISEEN_KEY_PATTERN_EXPOSED", "^key:[.]*")
