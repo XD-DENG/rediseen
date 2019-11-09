@@ -136,7 +136,7 @@ Configuration is done via **environment variables**.
 | `REDISEEN_DB_EXPOSED` | Redis logical database(s) to expose.<br><br>E.g., `0`, `0;3;9`, `0-9;15`, or `*` (expose all logical databases) | Compulsory |
 | `REDISEEN_KEY_PATTERN_EXPOSED` | Regular expression pattern, representing the name pattern of keys that you intend to expose.<br><br>For example, `user:([0-9a-z/.]+)\|^info:([0-9a-z/.]+)` exposes keys like `user:1`, `user:x1`, `testuser:1`, `info:1`, etc. |  |
 | `REDISEEN_KEY_PATTERN_EXPOSE_ALL` | If you intend to expose ***all*** your keys, set `REDISEEN_KEY_PATTERN_EXPOSE_ALL` to `true`. | `REDISEEN_KEY_PATTERN_EXPOSED` can only be empty (or not set) if you have set `REDISEEN_KEY_PATTERN_EXPOSE_ALL` to `true`. |
-| `REDISEEN_API_KEY` | API Key for authentication. Authentication is only enabled when `REDISEEN_API_KEY` is set and is not "".<br><br>If it is set, client must provide the API key in HTTP header (field `X-API-KEY`).<br><br> Note this authentication is only considered secure if used together with other security mechanisms such as HTTPS/SSL [1]. | Optional |
+| `REDISEEN_API_KEY` | API Key for authentication. Authentication is only enabled when `REDISEEN_API_KEY` is set and is not "".<br><br>Once it is set, client must add the API key into HTTP header as field `X-API-KEY` in order to access the API.<br><br>Note this authentication is only considered secure if used together with other security mechanisms such as HTTPS/SSL [1]. | Optional |
 | `REDISEEN_TEST_MODE` | Set to `true` to skip Redis connection validation for unit tests. | For Dev Only |
 
 
@@ -222,8 +222,8 @@ A sample response follows below
 API Key authentication is supported.
 
 To enable authentication, simply set environment variable `REDISEEN_API_KEY` and the value would be the key.
-Once it's set, client will need to specify the API key as `X-API-KEY` in their HTTP header,
-otherwise 401 error (`Unauthorized`) will be returned.
+Once it's set, client will have to add the API key as `X-API-KEY` in their HTTP header in order to access anything
+meaningful, otherwise 401 error (`Unauthorized`) will be returned.
 
 For example,
 
