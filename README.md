@@ -228,14 +228,28 @@ meaningful, otherwise 401 error (`Unauthorized`) will be returned.
 For example,
 
 ```bash
-# API Key Authentication is enabled
+export REDISEEN_REDIS_URI="redis://:@localhost:6379"
+export REDISEEN_DB_EXPOSED=0
+export REDISEEN_KEY_PATTERN_EXPOSED="^key:([0-9a-z]+)"
+export REDISEEN_API_KEY="demo_key" # Set REDISEEN_API_KEY to enforce API Key Authentication
 
+# Start the service and run in background
+rediseen -d start
+
+# REJECTED: No X-API-KEY is given in HTTP header
 curl -s http://localhost:8000/0 | jq
 {
   "error": "unauthorized"
 }
 
-curl -s -H "X-API-KEY: api_key_value" http://localhost:8000/0 | jq
+# REJECTED: Wrong X-API-KEY is given in HTTP header
+curl -s -H "X-API-KEY: wrong_key" http://localhost:8000/0 | jq
+{
+  "error": "unauthorized"
+}
+
+# ACCEPTED: Correct X-API-KEY is given in HTTP header
+curl -s -H "X-API-KEY: demo_key" http://localhost:8000/0 | jq
 {
   "count": 1,
   "total": 1,
