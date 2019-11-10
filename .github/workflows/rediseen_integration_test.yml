@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        redisversion: [latest, 5.0.6, 4.0.14]
+        redisversion: [latest, 5.0.6, 4.0.14, 3.2.12, 2.8.23]
 
     services:
       redis:
