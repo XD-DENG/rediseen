@@ -80,3 +80,16 @@ func Test_Main(t *testing.T) {
 		main()
 	}
 }
+
+func Test_Main_invalid_config(t *testing.T) {
+	// First element "" is a placeholder for executable
+	//ref: https://stackoverflow.com/a/48674736
+
+	// command "rediseen start" with invalid configuration
+	originalValue := os.Getenv("REDISEEN_REDIS_URI")
+	os.Setenv("REDISEEN_REDIS_URI", "invalid_url")
+	defer os.Setenv("REDISEEN_REDIS_URI", originalValue)
+
+	os.Args = []string{"", "start"}
+	main()
+}

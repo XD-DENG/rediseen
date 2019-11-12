@@ -3,9 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/go-redis/redis"
-	"log"
 	"net/http"
 	"os"
 	"rediseen/types"
@@ -13,32 +11,6 @@ import (
 	"strconv"
 	"strings"
 )
-
-// validate if the string given as DB(s) to expose is legal.
-// returns nil if it is legal, otherwise returns the error
-func validateDbExposeConfig(configDbExposed string) error {
-	// case-1: "*"
-	if configDbExposed == "*" {
-		log.Println("[WARNING] You are exposing ALL logical databases.")
-		return nil
-	}
-
-	// case-2: "0" or "18"
-	// case-3: "0-10" or "0;0-10" or "1-10;13"
-	// If multiple values are provided (semicolon-separated), check value by value
-	// This chunk handles cases where there is no semicolon in the string "automatically" as well
-	parts := strings.Split(configDbExposed, ";")
-	for _, p := range parts {
-		subPatternCheck, _ := regexp.MatchString("(^[0-9]+$)|(^[0-9]+)(-)([0-9]+$)", p)
-
-		if !subPatternCheck {
-			return errors.New("illegal pattern")
-		}
-	}
-
-	log.Println(fmt.Sprintf("[INFO] You are exposing logical database(s) `%s`", configDbExposed))
-	return nil
-}
 
 // provide strings like "0;1;3;5" or "0;9-14;5" into a map for later querying
 // store as a map to achieve O(1) search complexity
