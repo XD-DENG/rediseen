@@ -39,7 +39,8 @@ func Test_configCheck_no_redis_uri(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", "")
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	err := configCheck()
+	var config configuration
+	err := config.loadFromEnv()
 
 	if err == nil {
 		t.Error("Expecting error but got nil")
@@ -56,7 +57,8 @@ func Test_configCheck_invalid_redis_uri(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", "mysql://a:b@localhost:8888/db")
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	err := configCheck()
+	var config configuration
+	err := config.loadFromEnv()
 
 	if err == nil {
 		t.Error("Expecting error but got nil")
@@ -73,7 +75,8 @@ func Test_configCheck_no_db_exposed(t *testing.T) {
 	os.Setenv("REDISEEN_DB_EXPOSED", "")
 	defer os.Setenv("REDISEEN_DB_EXPOSED", originalDbExposed)
 
-	err := configCheck()
+	var config configuration
+	err := config.loadFromEnv()
 
 	if err == nil {
 		t.Error("Expecting error but got nil")
@@ -90,7 +93,8 @@ func Test_configCheck_invalid_db_exposed_1(t *testing.T) {
 	os.Setenv("REDISEEN_DB_EXPOSED", "-1")
 	defer os.Setenv("REDISEEN_DB_EXPOSED", originalDbExposed)
 
-	err := configCheck()
+	var config configuration
+	err := config.loadFromEnv()
 
 	if err == nil {
 		t.Error("Expecting error but got nil")
@@ -107,7 +111,8 @@ func Test_configCheck_invalid_db_exposed_2(t *testing.T) {
 	os.Setenv("REDISEEN_DB_EXPOSED", "1;-2;10")
 	defer os.Setenv("REDISEEN_DB_EXPOSED", originalDbExposed)
 
-	err := configCheck()
+	var config configuration
+	err := config.loadFromEnv()
 
 	if err == nil {
 		t.Error("Expecting error but got nil")
@@ -132,7 +137,8 @@ func Test_configCheck_no_key_pattern_specified(t *testing.T) {
 	os.Setenv("REDISEEN_KEY_PATTERN_EXPOSE_ALL", "")
 	defer os.Setenv("REDISEEN_KEY_PATTERN_EXPOSE_ALL", originalKeyPatternAllowAll)
 
-	err := configCheck()
+	var config configuration
+	err := config.loadFromEnv()
 
 	if err == nil {
 		t.Error("Expecting error but got nil")
@@ -161,7 +167,8 @@ func Test_configCheck_conflicting_key_pattern_specified(t *testing.T) {
 	os.Setenv("REDISEEN_KEY_PATTERN_EXPOSE_ALL", "true")
 	defer os.Setenv("REDISEEN_KEY_PATTERN_EXPOSE_ALL", originalKeyPatternAllowAll)
 
-	err := configCheck()
+	var config configuration
+	err := config.loadFromEnv()
 
 	if err == nil {
 		t.Error("Expecting error but got nil")
@@ -186,7 +193,8 @@ func Test_configCheck_bad_regex(t *testing.T) {
 	os.Setenv("REDISEEN_KEY_PATTERN_EXPOSED", "^key:[.*")
 	defer os.Setenv("REDISEEN_KEY_PATTERN_EXPOSED", originalKeyPatternAllowed)
 
-	err := configCheck()
+	var config configuration
+	err := config.loadFromEnv()
 
 	if err == nil {
 		t.Error("Expecting error but got nil")
@@ -207,7 +215,8 @@ func Test_configCheck_good_config_without_auth_config(t *testing.T) {
 	os.Setenv("REDISEEN_KEY_PATTERN_EXPOSED", "^key:[.]*")
 	defer os.Setenv("REDISEEN_KEY_PATTERN_EXPOSED", originalKeyPatternAllowed)
 
-	err := configCheck()
+	var config configuration
+	err := config.loadFromEnv()
 
 	if err != nil {
 		t.Error("Not expecting error but got error")
@@ -227,7 +236,8 @@ func Test_configCheck_good_config_with_auth_config(t *testing.T) {
 	os.Setenv("REDISEEN_KEY_PATTERN_EXPOSED", "^key:[.]*")
 	defer os.Setenv("REDISEEN_KEY_PATTERN_EXPOSED", originalKeyPatternAllowed)
 
-	err := configCheck()
+	var config configuration
+	err := config.loadFromEnv()
 
 	if err != nil {
 		t.Error("Not expecting error but got error")
@@ -240,7 +250,8 @@ func Test_configCheck_connection_failure(t *testing.T) {
 	os.Setenv("REDISEEN_TEST_MODE", "")
 	defer os.Setenv("REDISEEN_TEST_MODE", originalTestMode)
 
-	err := configCheck()
+	var config configuration
+	err := config.loadFromEnv()
 
 	if err == nil {
 		t.Error("Expecting error but got nil")
@@ -337,7 +348,6 @@ func Test_dbCheck(t *testing.T) {
 
 	var config configuration
 	config.loadFromEnv()
-	config.validate()
 	for i := 0; i <= 5; i++ {
 		if dbCheck(i, config.dbExposedMap) == false {
 			t.Error("something is wrong with dbCheck()")

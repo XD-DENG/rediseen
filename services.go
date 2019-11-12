@@ -110,7 +110,6 @@ func service(res http.ResponseWriter, req *http.Request) {
 
 	var config configuration
 	config.loadFromEnv()
-	config.validate()
 	if !dbCheck(db, config.dbExposedMap) {
 		res.WriteHeader(http.StatusForbidden)
 		js, _ = json.Marshal(types.ErrorType{Error: fmt.Sprintf("DB %d is not exposed", db)})

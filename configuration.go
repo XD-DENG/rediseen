@@ -55,28 +55,6 @@ func (c *configuration) loadFromEnv() error {
 			"compiled as regular expression. Details: %s\n", err.Error())
 	}
 
-	return nil
-}
-
-func (c *configuration) validate() error {
-	if c.authEnforced {
-		log.Println("[INFO] API is secured with X-API-KEY (to access, specify X-API-KEY in request header)")
-	} else {
-		log.Println("[WARNING] API is NOT secured with X-API-KEY")
-	}
-
-	if c.redisURI == "" {
-		return errors.New("No valid Redis URI is provided " +
-			"(via environment variable REDISEEN_REDIS_URI)")
-	}
-
-	_, err := redis.ParseURL(c.redisURI)
-	if err != nil {
-		return fmt.Errorf("Redis URI provided "+
-			"(via environment variable REDISEEN_REDIS_URI)"+
-			"is not valid (details: %s)", err.Error())
-	}
-
 	if c.dbExposed == "" {
 		return errors.New("REDISEEN_DB_EXPOSED is not configured")
 	}
@@ -90,6 +68,24 @@ func (c *configuration) validate() error {
 	}
 
 	c.dbExposedMap = parseDbExposed(c.dbExposed)
+
+	if c.authEnforced {
+		log.Println("[INFO] API is secured with X-API-KEY (to access, specify X-API-KEY in request header)")
+	} else {
+		log.Println("[WARNING] API is NOT secured with X-API-KEY")
+	}
+
+	if c.redisURI == "" {
+		return errors.New("No valid Redis URI is provided " +
+			"(via environment variable REDISEEN_REDIS_URI)")
+	}
+
+	_, err = redis.ParseURL(c.redisURI)
+	if err != nil {
+		return fmt.Errorf("Redis URI provided "+
+			"(via environment variable REDISEEN_REDIS_URI)"+
+			"is not valid (details: %s)", err.Error())
+	}
 
 	if c.keyPatternExposeAll {
 		if c.keyPatternExposed != "" {
@@ -115,6 +111,5 @@ func (c *configuration) validate() error {
 				"Please check the URI provided. Details: %s\n", err.Error())
 		}
 	}
-
 	return nil
 }

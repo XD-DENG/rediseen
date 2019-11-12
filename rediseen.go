@@ -69,7 +69,7 @@ func main() {
 		fmt.Println(strUsage)
 		return
 	}
-	
+
 	err := config.loadFromEnv()
 	if err != nil {
 		fmt.Println("[ERROR] " + err.Error())
@@ -79,12 +79,6 @@ func main() {
 	switch args[0] {
 	case "start":
 		log.Println("[INFO] Daemon mode:", *daemon)
-
-		err := config.validate()
-		if err != nil {
-			fmt.Println("[ERROR] " + err.Error())
-			return
-		}
 
 		if *daemon {
 			// check if daemon already running.

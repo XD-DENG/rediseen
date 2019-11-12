@@ -8,88 +8,11 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"rediseen/conn"
 	"rediseen/types"
 	"regexp"
 	"strconv"
 	"strings"
 )
-
-var dbExposedMap = make(map[int]bool)
-var regexpKeyPatternAllowed *regexp.Regexp
-
-// Check Configurations, and stop proceeding if any configuration is missing or conflicting
-func configCheck() error {
-	var redisURI = os.Getenv("REDISEEN_REDIS_URI")
-	var dbExposed = os.Getenv("REDISEEN_DB_EXPOSED")
-	var keyPatternAllowed = os.Getenv("REDISEEN_KEY_PATTERN_EXPOSED")
-	var keyPatternAllowAll = os.Getenv("REDISEEN_KEY_PATTERN_EXPOSE_ALL")
-
-	if os.Getenv("REDISEEN_API_KEY") == "" {
-		log.Println("[WARNING] API is NOT secured with X-API-KEY")
-	} else {
-		log.Println("[INFO] API is secured with X-API-KEY (to access, specify X-API-KEY in request header)")
-	}
-
-	if redisURI == "" {
-		return errors.New("No valid Redis URI is provided " +
-			"(via environment variable REDISEEN_REDIS_URI)")
-	}
-
-	_, err := redis.ParseURL(redisURI)
-	if err != nil {
-		return fmt.Errorf("Redis URI provided "+
-			"(via environment variable REDISEEN_REDIS_URI)"+
-			"is not valid (details: %s)", err.Error())
-	}
-
-	if dbExposed == "" {
-		return errors.New("REDISEEN_DB_EXPOSED is not configured")
-	}
-
-	errDbConfigCheckResult := validateDbExposeConfig(dbExposed)
-	if errDbConfigCheckResult != nil {
-		var errMsg strings.Builder
-		errMsg.WriteString("REDISEEN_DB_EXPOSED provided can not be parsed properly")
-		errMsg.WriteString(fmt.Sprintf(" (details: %s)", errDbConfigCheckResult.Error()))
-		return errors.New(errMsg.String())
-	}
-
-	dbExposedMap = parseDbExposed(dbExposed)
-
-	if keyPatternAllowAll == "true" {
-		if keyPatternAllowed != "" {
-			return errors.New("You have specified both REDISEEN_KEY_PATTERN_EXPOSED " +
-				"and REDISEEN_KEY_PATTERN_EXPOSE_ALL=true, which is conflicting.")
-		}
-		log.Println("[WARNING] You are exposing ALL keys.")
-	} else {
-		if keyPatternAllowed == "" {
-			strError := "You have not specified any key pattern to allow being accessed " +
-				"(environment variable REDISEEN_KEY_PATTERN_EXPOSED)\n" +
-				"        To allow ALL keys to be accessed, " +
-				"set environment variable REDISEEN_KEY_PATTERN_EXPOSE_ALL=true"
-			return errors.New(strError)
-		} else {
-			regexpKeyPatternAllowed, err = regexp.Compile(keyPatternAllowed)
-			if err != nil {
-				return fmt.Errorf("REDISEEN_KEY_PATTERN_EXPOSED can not be "+
-					"compiled as regular expression. Details: %s\n", err.Error())
-			}
-			log.Println(fmt.Sprintf("[INFO] You are exposing keys of pattern `%s`", keyPatternAllowed))
-		}
-	}
-
-	if os.Getenv("REDISEEN_TEST_MODE") != "true" {
-		err = conn.ClientPing()
-		if err != nil {
-			return fmt.Errorf("Initial talking to Redis failed. "+
-				"Please check the URI provided. Details: %s\n", err.Error())
-		}
-	}
-
-	return nil
-}
 
 // validate if the string given as DB(s) to expose is legal.
 // returns nil if it is legal, otherwise returns the error
