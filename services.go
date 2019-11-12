@@ -108,7 +108,10 @@ func service(res http.ResponseWriter, req *http.Request) {
 	client := conn.Client(db)
 	defer client.Close()
 
-	if !dbCheck(db) {
+	var config configuration
+	config.loadFromEnv()
+	config.validate()
+	if !dbCheck(db, config.dbExposedMap) {
 		res.WriteHeader(http.StatusForbidden)
 		js, _ = json.Marshal(types.ErrorType{Error: fmt.Sprintf("DB %d is not exposed", db)})
 		res.Write(js)
@@ -117,7 +120,7 @@ func service(res http.ResponseWriter, req *http.Request) {
 
 	if countArguments == 2 {
 		// request type-1: /db
-		listKeysByDb(client, res)
+		listKeysByDb(client, res, config.regexpKeyPatternExposed)
 		return
 	} else if countArguments == 3 {
 		// request type-2: /db/key
@@ -127,7 +130,7 @@ func service(res http.ResponseWriter, req *http.Request) {
 		key, index = parseKeyAndIndex(strings.Join(arguments[2:], "/"))
 	}
 
-	if !keyPatternCheck(key) {
+	if !keyPatternCheck(key, config.regexpKeyPatternExposed) {
 		res.WriteHeader(http.StatusForbidden)
 		js, _ = json.Marshal(types.ErrorType{Error: "Key pattern is forbidden from access"})
 		res.Write(js)

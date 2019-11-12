@@ -23,11 +23,10 @@ func ClientPing() error {
 	client := Client(0)
 	defer client.Close()
 
-	if os.Getenv("REDISEEN_TEST_MODE") != "true" {
-		pingResult, err := client.Ping().Result()
-		if pingResult != "PONG" {
-			return err
-		}
+	pingResult, err := client.Ping().Result()
+	if pingResult != "PONG" {
+		return err
 	}
+
 	return nil
 }

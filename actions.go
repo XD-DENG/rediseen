@@ -18,20 +18,6 @@ import (
 var dbExposedMap = make(map[int]bool)
 var regexpKeyPatternAllowed *regexp.Regexp
 
-// generate the Addr to expose
-func generateAddr() string {
-	host := os.Getenv("REDISEEN_HOST")
-	if host == "" {
-		host = defaultHost
-	}
-	port := os.Getenv("REDISEEN_PORT")
-	if port == "" {
-		port = defaultPort
-	}
-
-	return host + ":" + port
-}
-
 // Check Configurations, and stop proceeding if any configuration is missing or conflicting
 func configCheck() error {
 	var redisURI = os.Getenv("REDISEEN_REDIS_URI")
@@ -94,10 +80,12 @@ func configCheck() error {
 		}
 	}
 
-	err = conn.ClientPing()
-	if err != nil {
-		return fmt.Errorf("Initial talking to Redis failed. "+
-			"Please check the URI provided. Details: %s\n", err.Error())
+	if os.Getenv("REDISEEN_TEST_MODE") != "true" {
+		err = conn.ClientPing()
+		if err != nil {
+			return fmt.Errorf("Initial talking to Redis failed. "+
+				"Please check the URI provided. Details: %s\n", err.Error())
+		}
 	}
 
 	return nil
@@ -156,7 +144,7 @@ func parseDbExposed(configDbExposed string) map[int]bool {
 }
 
 //Check if db given by user is forbidden from being exposed
-func dbCheck(db int) bool {
+func dbCheck(db int, dbExposedMap map[int]bool) bool {
 	if os.Getenv("REDISEEN_DB_EXPOSED") == "*" {
 		return true
 	}
@@ -169,8 +157,8 @@ func dbCheck(db int) bool {
 }
 
 // Check if a string matches a pre-specified `keyPatternAllowed` (returns Boolean)
-func keyPatternCheck(key string) bool {
-	return regexpKeyPatternAllowed.MatchString(key)
+func keyPatternCheck(key string, regexpKeyPatternExposed *regexp.Regexp) bool {
+	return regexpKeyPatternExposed.MatchString(key)
 }
 
 // Given a Redis client (in which logical DB is specified),
@@ -179,13 +167,13 @@ func keyPatternCheck(key string) bool {
 // In the response, we also give `count` and `total`.
 // `count`<=1000, while `total` is the actual total number of keys whose names match with REDISEEN_KEY_PATTERN_EXPOSED
 // Results are written into a http.ResponseWriter directly.
-func listKeysByDb(client *redis.Client, res http.ResponseWriter) {
+func listKeysByDb(client *redis.Client, res http.ResponseWriter, regexpKeyPatternExposed *regexp.Regexp) {
 	keys, _ := client.Keys("*").Result()
 
 	var results []types.KeyInfoType
 
 	for _, k := range keys {
-		if keyPatternCheck(k) {
+		if keyPatternCheck(k, regexpKeyPatternExposed) {
 			results = append(results, types.KeyInfoType{Key: k, Type: client.Type(k).Val()})
 		}
 	}

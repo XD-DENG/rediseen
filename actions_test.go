@@ -8,24 +8,28 @@ import (
 )
 
 func Test_generateAddr(t *testing.T) {
-	if generateAddr() != "localhost:8000" {
-		t.Error("generateAddr is not handling default set-up correctly.")
+	config.loadFromEnv()
+	if config.bindAddress != "localhost:8000" {
+		t.Error("bindAddress is not created for default set-up correctly.")
 	}
 
 	os.Setenv("REDISEEN_HOST", "0.0.0.0")
-	if generateAddr() != "0.0.0.0:8000" {
-		t.Error("generateAddr is not handling customized set-up correctly.")
+	config.loadFromEnv()
+	if config.bindAddress != "0.0.0.0:8000" {
+		t.Error("bindAddress is not created for customized set-up correctly.")
 	}
 
 	os.Setenv("REDISEEN_PORT", "80")
-	if generateAddr() != "0.0.0.0:80" {
-		t.Error("generateAddr is not handling customized set-up correctly.")
+	config.loadFromEnv()
+	if config.bindAddress != "0.0.0.0:80" {
+		t.Error("bindAddress is not created for customized set-up correctly.")
 	}
 
 	os.Unsetenv("REDISEEN_HOST")
 	os.Unsetenv("REDISEEN_PORT")
-	if generateAddr() != "localhost:8000" {
-		t.Error("generateAddr is not handling default set-up correctly.")
+	config.loadFromEnv()
+	if config.bindAddress != "localhost:8000" {
+		t.Error("bindAddress is not created for default set-up correctly.")
 	}
 }
 
@@ -331,14 +335,17 @@ func Test_validateDbExposeConfig_invalid_cases(t *testing.T) {
 func Test_dbCheck(t *testing.T) {
 	// Test Environment Variable: REDISEEN_DB_EXPOSED=0-5
 
+	var config configuration
+	config.loadFromEnv()
+	config.validate()
 	for i := 0; i <= 5; i++ {
-		if dbCheck(i) == false {
+		if dbCheck(i, config.dbExposedMap) == false {
 			t.Error("something is wrong with dbCheck()")
 		}
 	}
 
 	for _, i := range []int{6, 10, 8, 16, 99, 101} {
-		if dbCheck(i) == true {
+		if dbCheck(i, config.dbExposedMap) == true {
 			t.Error("something is wrong with dbCheck()")
 		}
 	}
@@ -351,7 +358,7 @@ func Test_dbCheck_expose_all(t *testing.T) {
 	defer os.Setenv("REDISEEN_DB_EXPOSED", originalDbExposed)
 
 	for i := 0; i <= 100; i++ {
-		if dbCheck(i) == false {
+		if dbCheck(i, config.dbExposedMap) == false {
 			t.Error("something is wrong with dbCheck()")
 		}
 	}
