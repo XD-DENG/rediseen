@@ -76,14 +76,12 @@ func (c *configuration) loadFromEnv() error {
 	}
 
 	if c.redisURI == "" {
-		return errors.New("No valid Redis URI is provided " +
-			"(via environment variable REDISEEN_REDIS_URI)")
+		return errors.New("No valid Redis URI is provided (via environment variable REDISEEN_REDIS_URI)")
 	}
 
 	_, err = redis.ParseURL(c.redisURI)
 	if err != nil {
-		return fmt.Errorf("Redis URI provided "+
-			"(via environment variable REDISEEN_REDIS_URI)"+
+		return fmt.Errorf("Redis URI provided (via environment variable REDISEEN_REDIS_URI)"+
 			"is not valid (details: %s)", err.Error())
 	}
 

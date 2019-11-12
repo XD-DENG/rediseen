@@ -129,7 +129,7 @@ func service(res http.ResponseWriter, req *http.Request) {
 		key, index = parseKeyAndIndex(strings.Join(arguments[2:], "/"))
 	}
 
-	if !keyPatternCheck(key, config.regexpKeyPatternExposed) {
+	if !config.regexpKeyPatternExposed.MatchString(key) {
 		res.WriteHeader(http.StatusForbidden)
 		js, _ = json.Marshal(types.ErrorType{Error: "Key pattern is forbidden from access"})
 		res.Write(js)

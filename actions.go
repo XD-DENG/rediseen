@@ -51,11 +51,6 @@ func dbCheck(db int, dbExposedMap map[int]bool) bool {
 	return true
 }
 
-// Check if a string matches a pre-specified `keyPatternAllowed` (returns Boolean)
-func keyPatternCheck(key string, regexpKeyPatternExposed *regexp.Regexp) bool {
-	return regexpKeyPatternExposed.MatchString(key)
-}
-
 // Given a Redis client (in which logical DB is specified),
 // List keys whose names match with REDISEEN_KEY_PATTERN_EXPOSED, together with their types.
 // Only up to 1000 keys will be returned.
@@ -68,7 +63,7 @@ func listKeysByDb(client *redis.Client, res http.ResponseWriter, regexpKeyPatter
 	var results []types.KeyInfoType
 
 	for _, k := range keys {
-		if keyPatternCheck(k, regexpKeyPatternExposed) {
+		if regexpKeyPatternExposed.MatchString(k) {
 			results = append(results, types.KeyInfoType{Key: k, Type: client.Type(k).Val()})
 		}
 	}
