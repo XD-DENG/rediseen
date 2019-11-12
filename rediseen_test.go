@@ -93,3 +93,8 @@ func Test_Main_invalid_config(t *testing.T) {
 	os.Args = []string{"", "start"}
 	main()
 }
+
+func Test_Main_start_command(t *testing.T) {
+	os.Args = []string{"", "-d", "start"}
+	main()
+}
