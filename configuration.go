@@ -8,6 +8,7 @@ import (
 	"os"
 	"rediseen/conn"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -112,6 +113,19 @@ func (c *configuration) loadFromEnv() error {
 	return nil
 }
 
+//Check if db given by user is forbidden from being exposed
+func (c *configuration) dbCheck(db int) bool {
+	if os.Getenv("REDISEEN_DB_EXPOSED") == "*" {
+		return true
+	}
+
+	_, ok := c.dbExposedMap[db]
+	if !ok {
+		return false
+	}
+	return true
+}
+
 // validate if the string given as DB(s) to expose is legal.
 // returns nil if it is legal, otherwise returns the error
 func validateDbExposeConfig(configDbExposed string) error {
@@ -136,4 +150,30 @@ func validateDbExposeConfig(configDbExposed string) error {
 
 	log.Println(fmt.Sprintf("[INFO] You are exposing logical database(s) `%s`", configDbExposed))
 	return nil
+}
+
+// provide strings like "0;1;3;5" or "0;9-14;5" into a map for later querying
+// store as a map to achieve O(1) search complexity
+func parseDbExposed(configDbExposed string) map[int]bool {
+	result := make(map[int]bool)
+	parts := strings.Split(configDbExposed, ";")
+
+	for _, p := range parts {
+		patternCheckResult1, _ := regexp.MatchString("^[0-9]+$", p)
+		patternCheckResult2, _ := regexp.MatchString("(^[0-9]+)(-)([0-9]+$)", p)
+
+		if patternCheckResult1 {
+			dbInt, _ := strconv.Atoi(p)
+			result[dbInt] = true
+		} else if patternCheckResult2 {
+			temp := strings.Split(p, "-")
+			dbInt1, _ := strconv.Atoi(temp[0])
+			dbInt2, _ := strconv.Atoi(temp[1])
+			for i := dbInt1; i <= dbInt2; i++ {
+				result[i] = true
+			}
+		}
+	}
+
+	return result
 }
