@@ -69,17 +69,17 @@ func main() {
 		return
 	}
 
-	var s service
-
-	err := s.loadConfigFromEnv()
-	if err != nil {
-		fmt.Println("[ERROR] " + err.Error())
-		return
-	}
-
 	switch args[0] {
 	case "start":
 		log.Println("[INFO] Daemon mode:", *daemon)
+
+		var s service
+
+		err := s.loadConfigFromEnv()
+		if err != nil {
+			fmt.Println("[ERROR] " + err.Error())
+			return
+		}
 
 		if *daemon {
 			// check if daemon already running.
