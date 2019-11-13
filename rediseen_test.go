@@ -70,8 +70,9 @@ func Test_Main(t *testing.T) {
 	// First element "" is a placeholder for executable
 	//ref: https://stackoverflow.com/a/48674736
 
+	originalValue := os.Getenv("REDISEEN_REDIS_URI")
 	os.Setenv("REDISEEN_REDIS_URI", "redis://:@localhost:6400")
-	defer os.Unsetenv("REDISEEN_REDIS_URI")
+	defer os.Setenv("REDISEEN_REDIS_URI", originalValue)
 
 	// command "rediseen"
 	os.Args = []string{""}
@@ -98,8 +99,9 @@ func Test_Main_invalid_config(t *testing.T) {
 }
 
 func Test_Main_start_command(t *testing.T) {
+	originalValue := os.Getenv("REDISEEN_REDIS_URI")
 	os.Setenv("REDISEEN_REDIS_URI", "redis://:@localhost:6400")
-	defer os.Unsetenv("REDISEEN_REDIS_URI")
+	defer os.Setenv("REDISEEN_REDIS_URI", originalValue)
 
 	os.Args = []string{"", "-d", "start"}
 	main()
