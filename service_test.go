@@ -730,7 +730,7 @@ func Test_service_string_check_by_index_wrong_index(t *testing.T) {
 	var result types.ErrorType
 	json.Unmarshal([]byte(resultStr), &result)
 
-	expectedError := strWrongTypeForIndexField
+	expectedError := "wrong type for index/field"
 	compareAndShout(t, expectedError, result.Error)
 }
 
@@ -1001,7 +1001,7 @@ func Test_service_list_key_check_by_index(t *testing.T) {
 	result, _ = ioutil.ReadAll(res.Body)
 	res.Body.Close()
 
-	expectedResult = fmt.Sprintf(`{"error":"%s"}`, strWrongTypeForIndexField)
+	expectedResult = fmt.Sprintf(`{"error":"%s"}`, "wrong type for index/field")
 	compareAndShout(t, expectedResult, string(result))
 }
 

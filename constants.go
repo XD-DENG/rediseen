@@ -3,9 +3,6 @@ package main
 const defaultHost = "localhost"
 const defaultPort = "8000"
 
-const strNotImplemented = "not implemented"
-const strWrongTypeForIndexField = "wrong type for index/field"
-
 const strUsage = "Usage: rediseen [-d] [start/stop/help/version]"
 
 const strHelpDoc = "\n" + strUsage + "\n\nFlag:\n-d: run in background\n\n" +
