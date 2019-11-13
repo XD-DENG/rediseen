@@ -5,7 +5,6 @@ import (
 	"errors"
 	"github.com/go-redis/redis"
 	"net/http"
-	"os"
 	"rediseen/types"
 	"regexp"
 	"strconv"
@@ -45,13 +44,6 @@ func parseKeyAndIndex(restPath string) (string, string) {
 		}
 	}
 	return key, index
-}
-
-func apiKeyMatch(req *http.Request) bool {
-	if req.Header.Get("X-API-KEY") == os.Getenv("REDISEEN_API_KEY") {
-		return true
-	}
-	return false
 }
 
 // Given a Redis client (in which logical DB is specified),

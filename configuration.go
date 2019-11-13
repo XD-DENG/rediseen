@@ -118,7 +118,7 @@ func (c *configuration) loadFromEnv() error {
 
 //Check if db given by user is forbidden from being exposed
 func (c *configuration) dbCheck(db int) bool {
-	if os.Getenv("REDISEEN_DB_EXPOSED") == "*" {
+	if c.dbExposed == "*" {
 		return true
 	}
 
@@ -129,16 +129,20 @@ func (c *configuration) dbCheck(db int) bool {
 	return true
 }
 
+func (c *configuration) apiKeyMatch(req *http.Request) bool {
+	if req.Header.Get("X-API-KEY") == c.apiKey {
+		return true
+	}
+	return false
+}
+
 func (c *configuration) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-Type", "application/json")
 
 	var js []byte
 
-	var authEnforced bool
-	authEnforced = os.Getenv("REDISEEN_API_KEY") != ""
-
-	if authEnforced {
-		if !apiKeyMatch(req) {
+	if c.authEnforced {
+		if !c.apiKeyMatch(req) {
 			res.WriteHeader(http.StatusUnauthorized)
 			js, _ = json.Marshal(types.ErrorType{Error: "unauthorized"})
 			res.Write(js)
