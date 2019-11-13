@@ -21,7 +21,9 @@ func compareAndShout(t *testing.T, expected interface{}, actual interface{}) {
 
 func Test_service_wrong_usage(t *testing.T) {
 
-	s := httptest.NewServer(http.HandlerFunc(service))
+	var config configuration
+	config.loadFromEnv()
+	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
 	expectedCode := 400
@@ -48,7 +50,9 @@ func Test_service_wrong_usage(t *testing.T) {
 
 func Test_service_non_integer_db_provided(t *testing.T) {
 
-	s := httptest.NewServer(http.HandlerFunc(service))
+	var config configuration
+	config.loadFromEnv()
+	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
 	res, _ := http.Get(s.URL + "/a/key")
@@ -68,7 +72,9 @@ func Test_service_non_integer_db_provided(t *testing.T) {
 
 func Test_service_redis_conn_refused(t *testing.T) {
 
-	s := httptest.NewServer(http.HandlerFunc(service))
+	var config configuration
+	config.loadFromEnv()
+	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
 	res, _ := http.Get(s.URL + "/0/key:1")
@@ -97,10 +103,12 @@ func Test_service_non_existent_key(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	s1 := httptest.NewServer(http.HandlerFunc(service))
-	defer s1.Close()
+	var config configuration
+	config.loadFromEnv()
+	s := httptest.NewServer(http.Handler(&config))
+	defer s.Close()
 
-	res, _ := http.Get(s1.URL + "/0/key:1")
+	res, _ := http.Get(s.URL + "/0/key:1")
 
 	expectedCode := 404
 	compareAndShout(t, expectedCode, res.StatusCode)
@@ -146,7 +154,9 @@ func Test_service_list_keys_by_db_1(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	s := httptest.NewServer(http.HandlerFunc(service))
+	var config configuration
+	config.loadFromEnv()
+	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
 	res, _ := http.Get(s.URL + "/0")
@@ -185,7 +195,9 @@ func Test_service_list_keys_by_db_2(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	s := httptest.NewServer(http.HandlerFunc(service))
+	var config configuration
+	config.loadFromEnv()
+	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
 	res, _ := http.Get(s.URL + "/0")
@@ -214,7 +226,9 @@ func Test_service_string_type(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	s := httptest.NewServer(http.HandlerFunc(service))
+	var config configuration
+	config.loadFromEnv()
+	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
 	res, _ := http.Get(s.URL + "/0/key:1")
@@ -243,7 +257,9 @@ func Test_service_string_check_by_index(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	s := httptest.NewServer(http.HandlerFunc(service))
+	var config configuration
+	config.loadFromEnv()
+	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
 	res, _ := http.Get(s.URL + "/0/key:1/0")
@@ -311,7 +327,9 @@ func Test_service_string_check_by_index_wrong_index(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	s := httptest.NewServer(http.HandlerFunc(service))
+	var config configuration
+	config.loadFromEnv()
+	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
 	res, _ := http.Get(s.URL + "/0/key:1/x")
@@ -339,7 +357,9 @@ func Test_service_string_type_with_slash_in_key(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	s := httptest.NewServer(http.HandlerFunc(service))
+	var config configuration
+	config.loadFromEnv()
+	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
 	res, _ := http.Get(s.URL + "/0/`key:/1`")
@@ -368,7 +388,9 @@ func Test_service_string_type_with_slash_and_backtick_in_key(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	s := httptest.NewServer(http.HandlerFunc(service))
+	var config configuration
+	config.loadFromEnv()
+	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
 	res, _ := http.Get(s.URL + "/0/`key:`/1`")
@@ -395,7 +417,9 @@ func Test_service_list_keys_for_db_with_access(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	s := httptest.NewServer(http.HandlerFunc(service))
+	var config configuration
+	config.loadFromEnv()
+	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
 	// env var set for the test is REDISEEN_DB_EXPOSED=0-5
@@ -425,7 +449,9 @@ func Test_service_list_keys_for_db_without_access(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	s := httptest.NewServer(http.HandlerFunc(service))
+	var config configuration
+	config.loadFromEnv()
+	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
 	// env var set for the test is REDISEEN_DB_EXPOSED=0-5
@@ -455,7 +481,9 @@ func Test_service_string_type_db_no_access(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	s := httptest.NewServer(http.HandlerFunc(service))
+	var config configuration
+	config.loadFromEnv()
+	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
 	// env var set for the test is REDISEEN_DB_EXPOSED=0-5
@@ -488,7 +516,9 @@ func Test_service_string_type_key_no_access(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	s := httptest.NewServer(http.HandlerFunc(service))
+	var config configuration
+	config.loadFromEnv()
+	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
 	res, _ := http.Get(s.URL + "/0/id:1")
@@ -518,7 +548,9 @@ func Test_service_list_key(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	s := httptest.NewServer(http.HandlerFunc(service))
+	var config configuration
+	config.loadFromEnv()
+	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
 	res, _ := http.Get(s.URL + "/0/key:1")
@@ -545,7 +577,9 @@ func Test_service_list_key_check_by_index(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	s := httptest.NewServer(http.HandlerFunc(service))
+	var config configuration
+	config.loadFromEnv()
+	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
 	res, _ := http.Get(s.URL + "/0/key:1/0")
@@ -594,7 +628,9 @@ func Test_service_set(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	s := httptest.NewServer(http.HandlerFunc(service))
+	var config configuration
+	config.loadFromEnv()
+	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
 	res, _ := http.Get(s.URL + "/0/key:1")
@@ -620,7 +656,9 @@ func Test_service_set_check_by_index(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	s := httptest.NewServer(http.HandlerFunc(service))
+	var config configuration
+	config.loadFromEnv()
+	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
 	res, _ := http.Get(s.URL + "/0/key:1/hello")
@@ -658,7 +696,9 @@ func Test_service_hash(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	s := httptest.NewServer(http.HandlerFunc(service))
+	var config configuration
+	config.loadFromEnv()
+	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
 	res, _ := http.Get(s.URL + "/0/key:1")
@@ -685,7 +725,9 @@ func Test_service_hash_check_by_index(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	s := httptest.NewServer(http.HandlerFunc(service))
+	var config configuration
+	config.loadFromEnv()
+	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
 	res, _ := http.Get(s.URL + "/0/key:1/role")
@@ -723,7 +765,9 @@ func Test_service_zset(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	s := httptest.NewServer(http.HandlerFunc(service))
+	var config configuration
+	config.loadFromEnv()
+	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
 	res, _ := http.Get(s.URL + "/0/key:set")
@@ -751,7 +795,9 @@ func Test_service_zset_check_by_field(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	s := httptest.NewServer(http.HandlerFunc(service))
+	var config configuration
+	config.loadFromEnv()
+	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
 	res, _ := http.Get(s.URL + "/0/key:set/developer")
@@ -777,7 +823,9 @@ func Test_service_delete_not_allowed(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	s := httptest.NewServer(http.HandlerFunc(service))
+	var config configuration
+	config.loadFromEnv()
+	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
 	client := &http.Client{}
@@ -810,7 +858,9 @@ func Test_service_delete_not_allowed_no_access(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	s := httptest.NewServer(http.HandlerFunc(service))
+	var config configuration
+	config.loadFromEnv()
+	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
 	client := &http.Client{}
@@ -840,7 +890,9 @@ func Test_api_key_authentication(t *testing.T) {
 	os.Setenv("REDISEEN_API_KEY", "nopass")
 	defer os.Setenv("REDISEEN_REDIS_URI", "")
 
-	s := httptest.NewServer(http.HandlerFunc(service))
+	var config configuration
+	config.loadFromEnv()
+	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
 	// case-1: no API Key is provided in request header

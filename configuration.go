@@ -1,12 +1,15 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/go-redis/redis"
 	"log"
+	"net/http"
 	"os"
 	"rediseen/conn"
+	"rediseen/types"
 	"regexp"
 	"strconv"
 	"strings"
@@ -124,6 +127,117 @@ func (c *configuration) dbCheck(db int) bool {
 		return false
 	}
 	return true
+}
+
+func (c *configuration) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	res.Header().Set("Content-Type", "application/json")
+
+	var js []byte
+
+	var authEnforced bool
+	authEnforced = os.Getenv("REDISEEN_API_KEY") != ""
+
+	if authEnforced {
+		if !apiKeyMatch(req) {
+			res.WriteHeader(http.StatusUnauthorized)
+			js, _ = json.Marshal(types.ErrorType{Error: "unauthorized"})
+			res.Write(js)
+			return
+		}
+	}
+
+	if req.Method != "GET" {
+		res.WriteHeader(http.StatusMethodNotAllowed)
+		js, _ = json.Marshal(types.ErrorType{Error: fmt.Sprintf("Method %s is not allowed", req.Method)})
+		res.Write(js)
+		return
+	}
+
+	// Process URL Path into detailed information, like DB and Key
+	log.Printf("Request Path: '%s'\n", req.URL.Path)
+	arguments := strings.Split(req.URL.Path, "/")
+	countArguments := len(arguments)
+
+	if strings.HasSuffix(req.URL.Path, "/") || countArguments < 2 || countArguments > 4 {
+		res.WriteHeader(http.StatusBadRequest)
+		js, _ = json.Marshal(types.ErrorType{Error: "Usage: /db, /db/key, /db/key/index, or /db/key/field"})
+		res.Write(js)
+		return
+	}
+
+	var rawDb string
+	var key string
+	var index string
+
+	rawDb = arguments[1]
+
+	db, err := strconv.Atoi(rawDb)
+	if err != nil {
+		res.WriteHeader(http.StatusBadRequest)
+		js, _ = json.Marshal(types.ErrorType{Error: "Provide an integer for DB"})
+		res.Write(js)
+		return
+	}
+
+	client := conn.Client(db)
+	defer client.Close()
+
+	if !c.dbCheck(db) {
+		res.WriteHeader(http.StatusForbidden)
+		js, _ = json.Marshal(types.ErrorType{Error: fmt.Sprintf("DB %d is not exposed", db)})
+		res.Write(js)
+		return
+	}
+
+	if countArguments == 2 {
+		// request type-1: /db
+		listKeysByDb(client, res, c.regexpKeyPatternExposed)
+		return
+	} else if countArguments == 3 {
+		// request type-2: /db/key
+		key = arguments[2]
+	} else {
+		// request type-3: /db/key/index, or /db/key/field
+		key, index = parseKeyAndIndex(strings.Join(arguments[2:], "/"))
+	}
+
+	if !c.regexpKeyPatternExposed.MatchString(key) {
+		res.WriteHeader(http.StatusForbidden)
+		js, _ = json.Marshal(types.ErrorType{Error: "Key pattern is forbidden from access"})
+		res.Write(js)
+		return
+	}
+
+	// Check if key exists, meanwhile check Redis connection
+	keyExists, err := client.Exists(key).Result()
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		js, _ = json.Marshal(types.ErrorType{Error: err.Error()})
+		res.Write(js)
+		return
+	}
+
+	if keyExists == 0 {
+		res.WriteHeader(http.StatusNotFound)
+		js, _ = json.Marshal(types.ErrorType{Error: "Key provided does not exist."})
+		res.Write(js)
+		return
+	}
+
+	var logMsg strings.Builder
+	logMsg.WriteString("Submit query for: db ")
+	logMsg.WriteString(strconv.Itoa(db))
+	logMsg.WriteString(", key `")
+	logMsg.WriteString(key)
+	logMsg.WriteString("`")
+	if index != "" {
+		logMsg.WriteString(", index/field `")
+		logMsg.WriteString(index)
+		logMsg.WriteString("`")
+	}
+
+	log.Println(logMsg.String())
+	get(client, res, key, index)
 }
 
 // validate if the string given as DB(s) to expose is legal.

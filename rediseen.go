@@ -102,7 +102,7 @@ func main() {
 			os.Exit(0)
 		}
 
-		http.HandleFunc("/", service)
+		http.Handle("/", &config)
 
 		log.Printf("[INFO] Serving at %s", config.bindAddress)
 		serve := http.ListenAndServe(config.bindAddress, nil)
