@@ -195,7 +195,7 @@ func (c *configuration) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if countArguments == 2 {
 		// request type-1: /db
-		listKeysByDb(client, res, c.regexpKeyPatternExposed)
+		conn.ListKeysByDb(client, res, c.regexpKeyPatternExposed)
 		return
 	} else if countArguments == 3 {
 		// request type-2: /db/key
@@ -241,7 +241,7 @@ func (c *configuration) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	}
 
 	log.Println(logMsg.String())
-	get(client, res, key, index)
+	conn.Get(client, res, key, index)
 }
 
 // validate if the string given as DB(s) to expose is legal.
@@ -294,4 +294,39 @@ func parseDbExposed(configDbExposed string) map[int]bool {
 	}
 
 	return result
+}
+
+// parseKeyAndIndex helps parse strings like "key/3" in request like "/0/key/3" into "key" and "3"
+// It should also be able to handle cases like "`key/1`/5" (i.e., slash is part of the key or index/field)
+func parseKeyAndIndex(restPath string) (string, string) {
+	var key string
+	var index string
+
+	countBacktick := strings.Count(restPath, "`")
+	if countBacktick > 0 && countBacktick%2 == 0 {
+		if restPath[0] == '`' && restPath[len(restPath)-1] == '`' {
+			// Check case like /0/`key`/`index`
+			bothBackTickPattern, _ := regexp.MatchString("`(?P<Key>.+)`/`(?P<Index>.+)`", restPath)
+			if bothBackTickPattern {
+				p := regexp.MustCompile("`(?P<Key>.+)`/`(?P<Index>.+)`")
+				key = p.FindStringSubmatch(restPath)[1]
+				index = p.FindStringSubmatch(restPath)[2]
+			} else {
+				key = restPath[1:(len(restPath) - 1)]
+			}
+		} else {
+			p := regexp.MustCompile("`(?P<Key>.+)`/(?P<Index>.+)")
+			key = p.FindStringSubmatch(restPath)[1]
+			index = p.FindStringSubmatch(restPath)[2]
+		}
+	} else {
+		if restPath[0] == '`' && restPath[len(restPath)-1] == '`' {
+			key = restPath[1:(len(restPath) - 1)]
+		} else {
+			p := regexp.MustCompile("(?P<Key>.+)/(?P<Index>.+)")
+			key = p.FindStringSubmatch(restPath)[1]
+			index = p.FindStringSubmatch(restPath)[2]
+		}
+	}
+	return key, index
 }
