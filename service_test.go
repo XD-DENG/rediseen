@@ -14,26 +14,27 @@ import (
 )
 
 func Test_generateAddr(t *testing.T) {
-	config.loadFromEnv()
+	var config service
+	config.loadConfigFromEnv()
 	if config.bindAddress != "localhost:8000" {
 		t.Error("bindAddress is not created for default set-up correctly.")
 	}
 
 	os.Setenv("REDISEEN_HOST", "0.0.0.0")
-	config.loadFromEnv()
+	config.loadConfigFromEnv()
 	if config.bindAddress != "0.0.0.0:8000" {
 		t.Error("bindAddress is not created for customized set-up correctly.")
 	}
 
 	os.Setenv("REDISEEN_PORT", "80")
-	config.loadFromEnv()
+	config.loadConfigFromEnv()
 	if config.bindAddress != "0.0.0.0:80" {
 		t.Error("bindAddress is not created for customized set-up correctly.")
 	}
 
 	os.Unsetenv("REDISEEN_HOST")
 	os.Unsetenv("REDISEEN_PORT")
-	config.loadFromEnv()
+	config.loadConfigFromEnv()
 	if config.bindAddress != "localhost:8000" {
 		t.Error("bindAddress is not created for default set-up correctly.")
 	}
@@ -45,8 +46,8 @@ func Test_configCheck_no_redis_uri(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", "")
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	var config configuration
-	err := config.loadFromEnv()
+	var config service
+	err := config.loadConfigFromEnv()
 
 	if err == nil {
 		t.Error("Expecting error but got nil")
@@ -63,8 +64,8 @@ func Test_configCheck_invalid_redis_uri(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", "mysql://a:b@localhost:8888/db")
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	var config configuration
-	err := config.loadFromEnv()
+	var config service
+	err := config.loadConfigFromEnv()
 
 	if err == nil {
 		t.Error("Expecting error but got nil")
@@ -81,8 +82,8 @@ func Test_configCheck_no_db_exposed(t *testing.T) {
 	os.Setenv("REDISEEN_DB_EXPOSED", "")
 	defer os.Setenv("REDISEEN_DB_EXPOSED", originalDbExposed)
 
-	var config configuration
-	err := config.loadFromEnv()
+	var config service
+	err := config.loadConfigFromEnv()
 
 	if err == nil {
 		t.Error("Expecting error but got nil")
@@ -99,8 +100,8 @@ func Test_configCheck_invalid_db_exposed_1(t *testing.T) {
 	os.Setenv("REDISEEN_DB_EXPOSED", "-1")
 	defer os.Setenv("REDISEEN_DB_EXPOSED", originalDbExposed)
 
-	var config configuration
-	err := config.loadFromEnv()
+	var config service
+	err := config.loadConfigFromEnv()
 
 	if err == nil {
 		t.Error("Expecting error but got nil")
@@ -117,8 +118,8 @@ func Test_configCheck_invalid_db_exposed_2(t *testing.T) {
 	os.Setenv("REDISEEN_DB_EXPOSED", "1;-2;10")
 	defer os.Setenv("REDISEEN_DB_EXPOSED", originalDbExposed)
 
-	var config configuration
-	err := config.loadFromEnv()
+	var config service
+	err := config.loadConfigFromEnv()
 
 	if err == nil {
 		t.Error("Expecting error but got nil")
@@ -143,8 +144,8 @@ func Test_configCheck_no_key_pattern_specified(t *testing.T) {
 	os.Setenv("REDISEEN_KEY_PATTERN_EXPOSE_ALL", "")
 	defer os.Setenv("REDISEEN_KEY_PATTERN_EXPOSE_ALL", originalKeyPatternAllowAll)
 
-	var config configuration
-	err := config.loadFromEnv()
+	var config service
+	err := config.loadConfigFromEnv()
 
 	if err == nil {
 		t.Error("Expecting error but got nil")
@@ -173,8 +174,8 @@ func Test_configCheck_conflicting_key_pattern_specified(t *testing.T) {
 	os.Setenv("REDISEEN_KEY_PATTERN_EXPOSE_ALL", "true")
 	defer os.Setenv("REDISEEN_KEY_PATTERN_EXPOSE_ALL", originalKeyPatternAllowAll)
 
-	var config configuration
-	err := config.loadFromEnv()
+	var config service
+	err := config.loadConfigFromEnv()
 
 	if err == nil {
 		t.Error("Expecting error but got nil")
@@ -199,8 +200,8 @@ func Test_configCheck_all_key_exposed(t *testing.T) {
 	os.Setenv("REDISEEN_KEY_PATTERN_EXPOSED", "")
 	defer os.Setenv("REDISEEN_KEY_PATTERN_EXPOSED", originalValue2)
 
-	var config configuration
-	err := config.loadFromEnv()
+	var config service
+	err := config.loadConfigFromEnv()
 
 	if err != nil {
 		t.Error("Not expecting error but got error")
@@ -217,8 +218,8 @@ func Test_configCheck_bad_regex(t *testing.T) {
 	os.Setenv("REDISEEN_KEY_PATTERN_EXPOSED", "^key:[.*")
 	defer os.Setenv("REDISEEN_KEY_PATTERN_EXPOSED", originalKeyPatternAllowed)
 
-	var config configuration
-	err := config.loadFromEnv()
+	var config service
+	err := config.loadConfigFromEnv()
 
 	if err == nil {
 		t.Error("Expecting error but got nil")
@@ -239,8 +240,8 @@ func Test_configCheck_good_config_without_auth_config(t *testing.T) {
 	os.Setenv("REDISEEN_KEY_PATTERN_EXPOSED", "^key:[.]*")
 	defer os.Setenv("REDISEEN_KEY_PATTERN_EXPOSED", originalKeyPatternAllowed)
 
-	var config configuration
-	err := config.loadFromEnv()
+	var config service
+	err := config.loadConfigFromEnv()
 
 	if err != nil {
 		t.Error("Not expecting error but got error")
@@ -260,8 +261,8 @@ func Test_configCheck_good_config_with_auth_config(t *testing.T) {
 	os.Setenv("REDISEEN_KEY_PATTERN_EXPOSED", "^key:[.]*")
 	defer os.Setenv("REDISEEN_KEY_PATTERN_EXPOSED", originalKeyPatternAllowed)
 
-	var config configuration
-	err := config.loadFromEnv()
+	var config service
+	err := config.loadConfigFromEnv()
 
 	if err != nil {
 		t.Error("Not expecting error but got error")
@@ -274,8 +275,8 @@ func Test_configCheck_connection_failure(t *testing.T) {
 	os.Setenv("REDISEEN_TEST_MODE", "")
 	defer os.Setenv("REDISEEN_TEST_MODE", originalTestMode)
 
-	var config configuration
-	err := config.loadFromEnv()
+	var config service
+	err := config.loadConfigFromEnv()
 
 	if err == nil {
 		t.Error("Expecting error but got nil")
@@ -370,8 +371,8 @@ func Test_parseDbExposed_3(t *testing.T) {
 func Test_dbCheck(t *testing.T) {
 	// Test Environment Variable: REDISEEN_DB_EXPOSED=0-5
 
-	var config configuration
-	config.loadFromEnv()
+	var config service
+	config.loadConfigFromEnv()
 	for i := 0; i <= 5; i++ {
 		if config.dbCheck(i) == false {
 			t.Error("something is wrong with dbCheck()")
@@ -391,8 +392,8 @@ func Test_dbCheck_expose_all(t *testing.T) {
 	os.Setenv("REDISEEN_DB_EXPOSED", "*")
 	defer os.Setenv("REDISEEN_DB_EXPOSED", originalDbExposed)
 
-	var config configuration
-	config.loadFromEnv()
+	var config service
+	config.loadConfigFromEnv()
 	for i := 0; i <= 100; i++ {
 		if config.dbCheck(i) == false {
 			t.Error("something is wrong with dbCheck()")
@@ -408,8 +409,8 @@ func compareAndShout(t *testing.T, expected interface{}, actual interface{}) {
 
 func Test_service_wrong_usage(t *testing.T) {
 
-	var config configuration
-	config.loadFromEnv()
+	var config service
+	config.loadConfigFromEnv()
 	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
@@ -437,8 +438,8 @@ func Test_service_wrong_usage(t *testing.T) {
 
 func Test_service_non_integer_db_provided(t *testing.T) {
 
-	var config configuration
-	config.loadFromEnv()
+	var config service
+	config.loadConfigFromEnv()
 	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
@@ -459,8 +460,8 @@ func Test_service_non_integer_db_provided(t *testing.T) {
 
 func Test_service_redis_conn_refused(t *testing.T) {
 
-	var config configuration
-	config.loadFromEnv()
+	var config service
+	config.loadConfigFromEnv()
 	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
@@ -490,8 +491,8 @@ func Test_service_non_existent_key(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	var config configuration
-	config.loadFromEnv()
+	var config service
+	config.loadConfigFromEnv()
 	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
@@ -541,8 +542,8 @@ func Test_service_list_keys_by_db_1(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	var config configuration
-	config.loadFromEnv()
+	var config service
+	config.loadConfigFromEnv()
 	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
@@ -582,8 +583,8 @@ func Test_service_list_keys_by_db_2(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	var config configuration
-	config.loadFromEnv()
+	var config service
+	config.loadConfigFromEnv()
 	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
@@ -613,8 +614,8 @@ func Test_service_string_type(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	var config configuration
-	config.loadFromEnv()
+	var config service
+	config.loadConfigFromEnv()
 	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
@@ -644,8 +645,8 @@ func Test_service_string_check_by_index(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	var config configuration
-	config.loadFromEnv()
+	var config service
+	config.loadConfigFromEnv()
 	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
@@ -714,8 +715,8 @@ func Test_service_string_check_by_index_wrong_index(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	var config configuration
-	config.loadFromEnv()
+	var config service
+	config.loadConfigFromEnv()
 	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
@@ -744,8 +745,8 @@ func Test_service_string_type_with_slash_in_key(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	var config configuration
-	config.loadFromEnv()
+	var config service
+	config.loadConfigFromEnv()
 	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
@@ -775,8 +776,8 @@ func Test_service_string_type_with_slash_and_backtick_in_key(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	var config configuration
-	config.loadFromEnv()
+	var config service
+	config.loadConfigFromEnv()
 	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
@@ -804,8 +805,8 @@ func Test_service_list_keys_for_db_with_access(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	var config configuration
-	config.loadFromEnv()
+	var config service
+	config.loadConfigFromEnv()
 	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
@@ -836,8 +837,8 @@ func Test_service_list_keys_for_db_without_access(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	var config configuration
-	config.loadFromEnv()
+	var config service
+	config.loadConfigFromEnv()
 	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
@@ -868,8 +869,8 @@ func Test_service_string_type_db_no_access(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	var config configuration
-	config.loadFromEnv()
+	var config service
+	config.loadConfigFromEnv()
 	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
@@ -903,8 +904,8 @@ func Test_service_string_type_key_no_access(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	var config configuration
-	config.loadFromEnv()
+	var config service
+	config.loadConfigFromEnv()
 	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
@@ -935,8 +936,8 @@ func Test_service_list_key(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	var config configuration
-	config.loadFromEnv()
+	var config service
+	config.loadConfigFromEnv()
 	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
@@ -964,8 +965,8 @@ func Test_service_list_key_check_by_index(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	var config configuration
-	config.loadFromEnv()
+	var config service
+	config.loadConfigFromEnv()
 	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
@@ -1015,8 +1016,8 @@ func Test_service_set(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	var config configuration
-	config.loadFromEnv()
+	var config service
+	config.loadConfigFromEnv()
 	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
@@ -1043,8 +1044,8 @@ func Test_service_set_check_by_index(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	var config configuration
-	config.loadFromEnv()
+	var config service
+	config.loadConfigFromEnv()
 	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
@@ -1083,8 +1084,8 @@ func Test_service_hash(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	var config configuration
-	config.loadFromEnv()
+	var config service
+	config.loadConfigFromEnv()
 	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
@@ -1112,8 +1113,8 @@ func Test_service_hash_check_by_index(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	var config configuration
-	config.loadFromEnv()
+	var config service
+	config.loadConfigFromEnv()
 	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
@@ -1152,8 +1153,8 @@ func Test_service_zset(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	var config configuration
-	config.loadFromEnv()
+	var config service
+	config.loadConfigFromEnv()
 	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
@@ -1182,8 +1183,8 @@ func Test_service_zset_check_by_field(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	var config configuration
-	config.loadFromEnv()
+	var config service
+	config.loadConfigFromEnv()
 	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
@@ -1210,8 +1211,8 @@ func Test_service_delete_not_allowed(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	var config configuration
-	config.loadFromEnv()
+	var config service
+	config.loadConfigFromEnv()
 	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
@@ -1245,8 +1246,8 @@ func Test_service_delete_not_allowed_no_access(t *testing.T) {
 	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
 	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
 
-	var config configuration
-	config.loadFromEnv()
+	var config service
+	config.loadConfigFromEnv()
 	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 
@@ -1277,8 +1278,8 @@ func Test_api_key_authentication(t *testing.T) {
 	os.Setenv("REDISEEN_API_KEY", "nopass")
 	defer os.Setenv("REDISEEN_REDIS_URI", "")
 
-	var config configuration
-	config.loadFromEnv()
+	var config service
+	config.loadConfigFromEnv()
 	s := httptest.NewServer(http.Handler(&config))
 	defer s.Close()
 

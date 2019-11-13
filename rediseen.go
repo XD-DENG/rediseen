@@ -15,7 +15,6 @@ import (
 
 var daemon = flag.Bool("d", false, "Run in daemon mode")
 var pidFile = flag.String("pidfile", path.Join(os.TempDir(), "rediseen.pid"), "where PID is stored for daemon mode")
-var config configuration
 
 func savePID(pid int, fileForPid string) error {
 	f, err := os.Create(fileForPid)
@@ -70,7 +69,9 @@ func main() {
 		return
 	}
 
-	err := config.loadFromEnv()
+	var s service
+
+	err := s.loadConfigFromEnv()
 	if err != nil {
 		fmt.Println("[ERROR] " + err.Error())
 		return
@@ -102,10 +103,10 @@ func main() {
 			os.Exit(0)
 		}
 
-		http.Handle("/", &config)
+		http.Handle("/", &s)
 
-		log.Printf("[INFO] Serving at %s", config.bindAddress)
-		serve := http.ListenAndServe(config.bindAddress, nil)
+		log.Printf("[INFO] Serving at %s", s.bindAddress)
+		serve := http.ListenAndServe(s.bindAddress, nil)
 		if serve != nil {
 			log.Println("[ERROR] Failed to launch. Details: ", serve.Error())
 		}

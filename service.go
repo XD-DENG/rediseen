@@ -15,7 +15,7 @@ import (
 	"strings"
 )
 
-type configuration struct {
+type service struct {
 	port                    string
 	host                    string
 	bindAddress             string
@@ -30,7 +30,7 @@ type configuration struct {
 	regexpKeyPatternExposed *regexp.Regexp
 }
 
-func (c *configuration) loadFromEnv() error {
+func (c *service) loadConfigFromEnv() error {
 	c.port = os.Getenv("REDISEEN_PORT")
 	c.host = os.Getenv("REDISEEN_HOST")
 	c.redisURI = os.Getenv("REDISEEN_REDIS_URI")
@@ -117,7 +117,7 @@ func (c *configuration) loadFromEnv() error {
 }
 
 //Check if db given by user is forbidden from being exposed
-func (c *configuration) dbCheck(db int) bool {
+func (c *service) dbCheck(db int) bool {
 	if c.dbExposed == "*" {
 		return true
 	}
@@ -129,14 +129,14 @@ func (c *configuration) dbCheck(db int) bool {
 	return true
 }
 
-func (c *configuration) apiKeyMatch(req *http.Request) bool {
+func (c *service) apiKeyMatch(req *http.Request) bool {
 	if req.Header.Get("X-API-KEY") == c.apiKey {
 		return true
 	}
 	return false
 }
 
-func (c *configuration) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-Type", "application/json")
 
 	var js []byte
