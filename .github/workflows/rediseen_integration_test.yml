@@ -56,7 +56,7 @@ jobs:
 
             echo Calling: $1
             echo Checking Field: $2
-            echo Expecting Field: $3
+            echo Expecting Value: $3
 
             OUTPUT=$(curl -s $1)
             echo $OUTPUT

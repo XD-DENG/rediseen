@@ -73,7 +73,9 @@ func main() {
 	case "start":
 		log.Println("[INFO] Daemon mode:", *daemon)
 
-		err := configCheck()
+		var s service
+
+		err := s.loadConfigFromEnv()
 		if err != nil {
 			fmt.Println("[ERROR] " + err.Error())
 			return
@@ -101,11 +103,10 @@ func main() {
 			os.Exit(0)
 		}
 
-		http.HandleFunc("/", service)
+		http.Handle("/", &s)
 
-		addr := generateAddr()
-		log.Printf("[INFO] Serving at %s", addr)
-		serve := http.ListenAndServe(addr, nil)
+		log.Printf("[INFO] Serving at %s", s.bindAddress)
+		serve := http.ListenAndServe(s.bindAddress, nil)
 		if serve != nil {
 			log.Println("[ERROR] Failed to launch. Details: ", serve.Error())
 		}
