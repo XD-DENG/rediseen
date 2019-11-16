@@ -53,10 +53,15 @@ func (c *service) loadConfigFromEnv() error {
 	}
 
 	var err error
-	c.regexpKeyPatternExposed, err = regexp.Compile(c.keyPatternExposed)
+
+	if c.redisURI == "" {
+		return errors.New("No valid Redis URI is provided (via environment variable REDISEEN_REDIS_URI)")
+	}
+
+	_, err = redis.ParseURL(c.redisURI)
 	if err != nil {
-		return fmt.Errorf("REDISEEN_KEY_PATTERN_EXPOSED can not be "+
-			"compiled as regular expression. Details: %s\n", err.Error())
+		return fmt.Errorf("Redis URI provided (via environment variable REDISEEN_REDIS_URI)"+
+			"is not valid (details: %s)", err.Error())
 	}
 
 	if c.dbExposed == "" {
@@ -79,14 +84,10 @@ func (c *service) loadConfigFromEnv() error {
 		log.Println("[WARNING] API is NOT secured with X-API-KEY")
 	}
 
-	if c.redisURI == "" {
-		return errors.New("No valid Redis URI is provided (via environment variable REDISEEN_REDIS_URI)")
-	}
-
-	_, err = redis.ParseURL(c.redisURI)
+	c.regexpKeyPatternExposed, err = regexp.Compile(c.keyPatternExposed)
 	if err != nil {
-		return fmt.Errorf("Redis URI provided (via environment variable REDISEEN_REDIS_URI)"+
-			"is not valid (details: %s)", err.Error())
+		return fmt.Errorf("REDISEEN_KEY_PATTERN_EXPOSED can not be "+
+			"compiled as regular expression. Details: %s\n", err.Error())
 	}
 
 	if c.keyPatternExposeAll {
