@@ -34,7 +34,7 @@ jobs:
         REDISEEN_REDIS_URI: redis://:@localhost:6400
         REDISEEN_TEST_MODE: true
         REDISEEN_DB_EXPOSED: 0-5
-      run: go test -v -cover .
+      run: go test -v -cover rediseen
 
     - name: Build
       run: |

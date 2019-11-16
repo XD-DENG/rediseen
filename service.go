@@ -139,6 +139,8 @@ func (c *service) apiKeyMatch(req *http.Request) bool {
 func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-Type", "application/json")
 
+	log.Printf("Request '%s' (method: %s)\n", req.URL.Path, req.Method)
+
 	var js []byte
 
 	if c.authEnforced {
@@ -146,6 +148,7 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 			res.WriteHeader(http.StatusUnauthorized)
 			js, _ = json.Marshal(types.ErrorType{Error: "unauthorized"})
 			res.Write(js)
+			log.Println("Unauthorized request")
 			return
 		}
 	}
@@ -154,11 +157,11 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		res.WriteHeader(http.StatusMethodNotAllowed)
 		js, _ = json.Marshal(types.ErrorType{Error: fmt.Sprintf("Method %s is not allowed", req.Method)})
 		res.Write(js)
+		log.Println("Method not allowed")
 		return
 	}
 
 	// Process URL Path into detailed information, like DB and Key
-	log.Printf("Request Path: '%s'\n", req.URL.Path)
 	arguments := strings.Split(req.URL.Path, "/")
 	countArguments := len(arguments)
 

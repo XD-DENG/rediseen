@@ -41,8 +41,9 @@ func ClientPing() error {
 	return nil
 }
 
-// Given a Redis client (in which logical DB is specified),
-// List keys whose names match with REDISEEN_KEY_PATTERN_EXPOSED, together with their types.
+// ListKeysByDb lists keys whose names match with REDISEEN_KEY_PATTERN_EXPOSED,
+// together with their typesGiven a Redis client (in which logical DB is specified),
+// given a Redis client (in which logical DB is specified).
 // Only up to 1000 keys will be returned.
 // In the response, we also give `count` and `total`.
 // `count`<=1000, while `total` is the actual total number of keys whose names match with REDISEEN_KEY_PATTERN_EXPOSED
@@ -70,7 +71,7 @@ func ListKeysByDb(client *redis.Client, res http.ResponseWriter, regexpKeyPatter
 	res.Write(js)
 }
 
-// Handle requests to different Redis Data Types, and return values correspondingly
+// Get handles requests to different Redis Data Types, and return values correspondingly
 func Get(client *redis.Client, res http.ResponseWriter, key string, indexOrField string) {
 
 	var js []byte

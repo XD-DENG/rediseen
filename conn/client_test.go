@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func Test_service_non_existent_key(t *testing.T) {
+func Test_ClientPing(t *testing.T) {
 
 	mr, _ := miniredis.Run()
 	defer mr.Close()

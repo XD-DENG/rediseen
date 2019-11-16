@@ -11,7 +11,7 @@ RUN go build rediseen
 # Unit Test
 RUN REDISEEN_REDIS_URI=redis://:@localhost:6400 REDISEEN_KEY_PATTERN_EXPOSED="^key:[.]*" \
     REDISEEN_TEST_MODE=true REDISEEN_DB_EXPOSED=0-5 \
-    go test -cover .
+    go test -cover rediseen
 
 
 # For smaller image size
