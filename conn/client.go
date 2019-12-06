@@ -15,8 +15,10 @@ import (
 const strNotImplemented = "not implemented"
 const strWrongTypeForIndexField = "wrong type for index/field"
 
+type ExtendedClient redis.Client
+
 // Client prepares a Redis client. Only Redis DB is needed, as all other information will be provided via configuration
-func Client(db int) *redis.Client {
+func Client(db int) *ExtendedClient {
 	parsedUri, _ := redis.ParseURL(os.Getenv("REDISEEN_REDIS_URI"))
 
 	client := redis.NewClient(&redis.Options{
@@ -48,7 +50,7 @@ func ClientPing() error {
 // In the response, we also give `count` and `total`.
 // `count`<=1000, while `total` is the actual total number of keys whose names match with REDISEEN_KEY_PATTERN_EXPOSED
 // Results are written into a http.ResponseWriter directly.
-func ListKeysByDb(client *redis.Client, res http.ResponseWriter, regexpKeyPatternExposed *regexp.Regexp) {
+func (client *ExtendedClient) ListKeysByDb(res http.ResponseWriter, regexpKeyPatternExposed *regexp.Regexp) {
 	keys, _ := client.Keys("*").Result()
 
 	var results []types.KeyInfoType
@@ -72,7 +74,7 @@ func ListKeysByDb(client *redis.Client, res http.ResponseWriter, regexpKeyPatter
 }
 
 // Get handles requests to different Redis Data Types, and return values correspondingly
-func Get(client *redis.Client, res http.ResponseWriter, key string, indexOrField string) {
+func (client *ExtendedClient) Get(res http.ResponseWriter, key string, indexOrField string) {
 
 	var js []byte
 	var index int64
