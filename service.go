@@ -187,8 +187,9 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	client := conn.Client(db)
-	defer client.Close()
+	var client conn.ExtendedClient
+	client.Init(db)
+	defer client.RedisClient.Close()
 
 	if !c.dbCheck(db) {
 		res.WriteHeader(http.StatusForbidden)
@@ -217,7 +218,7 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	}
 
 	// Check if key exists, meanwhile check Redis connection
-	keyExists, err := client.Exists(key).Result()
+	keyExists, err := client.RedisClient.Exists(key).Result()
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		js, _ = json.Marshal(types.ErrorType{Error: err.Error()})

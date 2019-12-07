@@ -15,27 +15,29 @@ import (
 const strNotImplemented = "not implemented"
 const strWrongTypeForIndexField = "wrong type for index/field"
 
-type ExtendedClient redis.Client
+type ExtendedClient struct {
+	RedisClient *redis.Client
+}
 
 // Client prepares a Redis client. Only Redis DB is needed, as all other information will be provided via configuration
-func Client(db int) *ExtendedClient {
+func (client *ExtendedClient) Init(db int) {
 	parsedUri, _ := redis.ParseURL(os.Getenv("REDISEEN_REDIS_URI"))
 
-	client := redis.NewClient(&redis.Options{
+	client.RedisClient = redis.NewClient(&redis.Options{
 		Addr:     parsedUri.Addr,
 		Password: parsedUri.Password,
 		DB:       db,
 	})
-
-	return client
 }
 
 // ClientPing checks the user-specified `REDISEEN_REDIS_URI` (using default db 0)
 func ClientPing() error {
-	client := Client(0)
-	defer client.Close()
 
-	pingResult, err := client.Ping().Result()
+	var client ExtendedClient
+	client.Init(0)
+	defer client.RedisClient.Close()
+
+	pingResult, err := client.RedisClient.Ping().Result()
 	if pingResult != "PONG" {
 		return err
 	}
@@ -51,13 +53,13 @@ func ClientPing() error {
 // `count`<=1000, while `total` is the actual total number of keys whose names match with REDISEEN_KEY_PATTERN_EXPOSED
 // Results are written into a http.ResponseWriter directly.
 func (client *ExtendedClient) ListKeysByDb(res http.ResponseWriter, regexpKeyPatternExposed *regexp.Regexp) {
-	keys, _ := client.Keys("*").Result()
+	keys, _ := client.RedisClient.Keys("*").Result()
 
 	var results []types.KeyInfoType
 
 	for _, k := range keys {
 		if regexpKeyPatternExposed.MatchString(k) {
-			results = append(results, types.KeyInfoType{Key: k, Type: client.Type(k).Val()})
+			results = append(results, types.KeyInfoType{Key: k, Type: client.RedisClient.Type(k).Val()})
 		}
 	}
 
@@ -81,21 +83,21 @@ func (client *ExtendedClient) Get(res http.ResponseWriter, key string, indexOrFi
 	var field string
 	var value interface{}
 
-	keyType, err := client.Type(key).Result()
+	keyType, err := client.RedisClient.Type(key).Result()
 
 	if indexOrField == "" {
 		switch keyType {
 		case "string":
-			value, err = client.Get(key).Result()
+			value, err = client.RedisClient.Get(key).Result()
 		case "list":
-			value, err = client.LRange(key, 0, -1).Result()
+			value, err = client.RedisClient.LRange(key, 0, -1).Result()
 		case "set":
-			value, err = client.SMembers(key).Result()
+			value, err = client.RedisClient.SMembers(key).Result()
 		case "hash":
-			value, err = client.HGetAll(key).Result()
+			value, err = client.RedisClient.HGetAll(key).Result()
 		case "zset":
 			//TODO: a simple implementation given methods on sorted set can be very complicated
-			value, err = client.ZRange(key, 0, -1).Result()
+			value, err = client.RedisClient.ZRange(key, 0, -1).Result()
 		default:
 			err = errors.New(strNotImplemented)
 		}
@@ -111,20 +113,20 @@ func (client *ExtendedClient) Get(res http.ResponseWriter, key string, indexOrFi
 			if index == 0 && indexOrField != "0" {
 				err = errors.New(strWrongTypeForIndexField)
 			} else {
-				value, err = client.GetRange(key, index, index).Result()
+				value, err = client.RedisClient.GetRange(key, index, index).Result()
 			}
 		case "list":
 			if index == 0 && indexOrField != "0" {
 				err = errors.New(strWrongTypeForIndexField)
 			} else {
-				value, err = client.LIndex(key, index).Result()
+				value, err = client.RedisClient.LIndex(key, index).Result()
 			}
 		case "set":
-			value, err = client.SIsMember(key, field).Result()
+			value, err = client.RedisClient.SIsMember(key, field).Result()
 		case "hash":
-			value, err = client.HGet(key, field).Result()
+			value, err = client.RedisClient.HGet(key, field).Result()
 		case "zset":
-			value, err = client.ZRank(key, field).Result()
+			value, err = client.RedisClient.ZRank(key, field).Result()
 		default:
 			err = errors.New(strNotImplemented)
 		}
