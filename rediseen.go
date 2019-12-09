@@ -14,7 +14,7 @@ import (
 )
 
 var daemon = flag.Bool("d", false, "Run in daemon mode")
-var pidFile = flag.String("pidfile", path.Join(os.TempDir(), "rediseen.pid"), "where PID is stored for daemon mode")
+var pidFile = flag.String("pidfile", path.Join(os.TempDir(), "rediseen.pid"), "Where PID is stored for daemon mode")
 
 func savePID(pid int, fileForPid string) error {
 	f, err := os.Create(fileForPid)
@@ -41,7 +41,7 @@ func stopDaemon(fileForPid string) error {
 
 		err = os.Remove(fileForPid)
 		if err != nil {
-			return fmt.Errorf("unable to remmove PID file (error: %s)", err.Error())
+			return fmt.Errorf("unable to remove PID file (error: %s)", err.Error())
 		}
 
 		process, err := os.FindProcess(pid)
@@ -82,7 +82,7 @@ func main() {
 		}
 
 		if *daemon {
-			// check if daemon already running.
+			// check if daemon is already running
 			if _, err := os.Stat(*pidFile); err == nil {
 				fmt.Println(fmt.Sprintf("[ERROR] Already running or file %s exist.", *pidFile))
 				os.Exit(1)
