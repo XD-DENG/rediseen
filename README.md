@@ -92,7 +92,9 @@ GET /info
     },
     ...
 }
+```
 
+```bash
 GET /info/server
 
 {
