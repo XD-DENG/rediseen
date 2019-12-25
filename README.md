@@ -253,9 +253,11 @@ A sample response follows below
 
 It returns (part of) the results from Redis `INFO` command as a nice-formatted JSON object.
 
-#### 2.4.5 `/info/<info section>`
+#### 2.4.5 `/info/<info_section>`
 
 It returns (part of) the results from Redis `INFO <SECTION>` command as a nice-formatted JSON object.
+
+Currently `info_section` supports values `server`, `clients`, `replication`, `cpu`, and `cluster`.
 
 
 ## 3. Authentication
