@@ -168,7 +168,7 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if strings.HasSuffix(req.URL.Path, "/") || countArguments < 2 || countArguments > 4 {
 		res.WriteHeader(http.StatusBadRequest)
-		js, _ = json.Marshal(types.ErrorType{Error: "Usage: /info, /<db>, /<db>/<key>, /<db>/<key>/<index>, or /<db>/<key>/<field>"})
+		js, _ = json.Marshal(types.ErrorType{Error: "Usage: /info, /info/<info_section>, /<db>, /<db>/<key>, /<db>/<key>/<index>, or /<db>/<key>/<field>"})
 		res.Write(js)
 		return
 	}
@@ -209,7 +209,7 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 				js, _ = json.Marshal(info.Cluster)
 			default:
 				res.WriteHeader(http.StatusBadRequest)
-				js, _ = json.Marshal(types.ErrorType{Error: fmt.Sprintf("invalid section `%s` is given", section)})
+				js, _ = json.Marshal(types.ErrorType{Error: fmt.Sprintf("invalid section `%s` is given. Check /info for supported sections.", section)})
 			}
 		}
 		res.Write(js)
