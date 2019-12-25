@@ -183,15 +183,14 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		var client conn.ExtendedClient
 		client.Init(0)
 		defer client.RedisClient.Close()
-		info, err := client.TransformRedisInfoToJson()
+		info, err := client.RedisInfo()
 		if err != nil {
 			res.WriteHeader(http.StatusInternalServerError)
 			js, _ = json.Marshal(types.ErrorType{Error: "Exception while getting INFO" + err.Error()})
-			res.Write(js)
 		} else {
-			js, _ := json.Marshal(info)
-			res.Write(js)
+			js, _ = json.Marshal(info)
 		}
+		res.Write(js)
 		return
 	}
 

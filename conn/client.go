@@ -147,10 +147,7 @@ func (client *ExtendedClient) Retrieve(res http.ResponseWriter, key string, inde
 	res.Write(js)
 }
 
-func (client *ExtendedClient) TransformRedisInfoToJson() (types.Info, error) {
-
-	var result types.Info
-
+func (client *ExtendedClient) RedisInfo() (types.Info, error) {
 	infoResult, err := client.RedisClient.Info().Result()
 	if err != nil {
 		return types.Info{}, err
@@ -158,16 +155,14 @@ func (client *ExtendedClient) TransformRedisInfoToJson() (types.Info, error) {
 
 	mapResult := make(map[string]string)
 	for _, kv := range strings.Split(infoResult, "\n") {
-		if len(kv) == 0 || string(kv[0]) == "#" || string(kv[0]) == "" {
+		values := strings.Split(kv, ":")
+		if len(values) != 2 {
 			continue
-		} else {
-			values := strings.Split(kv, ":")
-			if len(values) < 2 {
-				continue
-			}
-			mapResult[values[0]] = strings.TrimSpace(values[1])
 		}
+		mapResult[values[0]] = strings.TrimSpace(values[1])
 	}
+
+	var result types.Info
 
 	result.Server = types.InfoServer{
 		RedisVersion:    mapResult["redis_version"],
