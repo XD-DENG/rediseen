@@ -81,6 +81,8 @@ func main() {
 			return
 		}
 
+		log.Printf("[INFO] Serving at %s", s.bindAddress)
+
 		if *daemon {
 			// check if daemon is already running
 			if _, err := os.Stat(*pidFile); err == nil {
@@ -105,7 +107,6 @@ func main() {
 
 		http.Handle("/", &s)
 
-		log.Printf("[INFO] Serving at %s", s.bindAddress)
 		serve := http.ListenAndServe(s.bindAddress, nil)
 		if serve != nil {
 			log.Println("[ERROR] Failed to launch. Details: ", serve.Error())

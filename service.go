@@ -168,7 +168,7 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if strings.HasSuffix(req.URL.Path, "/") || countArguments < 2 || countArguments > 4 {
 		res.WriteHeader(http.StatusBadRequest)
-		js, _ = json.Marshal(types.ErrorType{Error: "Usage: /db, /db/key, /db/key/index, or /db/key/field"})
+		js, _ = json.Marshal(types.ErrorType{Error: "Usage: /<db>, /<db>/<key>, /<db>/<key>/<index>, or /<db>/<key>/<field>"})
 		res.Write(js)
 		return
 	}
@@ -187,8 +187,9 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	client := conn.Client(db)
-	defer client.Close()
+	var client conn.ExtendedClient
+	client.Init(db)
+	defer client.RedisClient.Close()
 
 	if !c.dbCheck(db) {
 		res.WriteHeader(http.StatusForbidden)
@@ -199,7 +200,7 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if countArguments == 2 {
 		// request type-1: /db
-		conn.ListKeysByDb(client, res, c.regexpKeyPatternExposed)
+		client.ListKeys(res, c.regexpKeyPatternExposed)
 		return
 	} else if countArguments == 3 {
 		// request type-2: /db/key
@@ -217,7 +218,7 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	}
 
 	// Check if key exists, meanwhile check Redis connection
-	keyExists, err := client.Exists(key).Result()
+	keyExists, err := client.RedisClient.Exists(key).Result()
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		js, _ = json.Marshal(types.ErrorType{Error: err.Error()})
@@ -245,7 +246,7 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	}
 
 	log.Println(logMsg.String())
-	conn.Get(client, res, key, index)
+	client.Retrieve(res, key, index)
 }
 
 // validate if the string given as DB(s) to expose is legal.
