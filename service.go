@@ -179,6 +179,23 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	rawDb = arguments[1]
 
+	if rawDb == "info" {
+		var client conn.ExtendedClient
+		client.Init(0)
+		defer client.RedisClient.Close()
+		info, err := client.RedisClient.Info().Result()
+		if err != nil {
+			res.WriteHeader(http.StatusInternalServerError)
+			js, _ = json.Marshal(types.ErrorType{Error: "Exception while getting INFO" + err.Error()})
+			res.Write(js)
+		} else {
+			res.Header().Set("Content-Type", "text/html")
+			js, _ := json.Marshal(info)
+			res.Write(js)
+		}
+		return
+	}
+
 	db, err := strconv.Atoi(rawDb)
 	if err != nil {
 		res.WriteHeader(http.StatusBadRequest)
