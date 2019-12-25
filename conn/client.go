@@ -45,14 +45,14 @@ func ClientPing() error {
 	return nil
 }
 
-// ListKeysByDb lists keys whose names match with REDISEEN_KEY_PATTERN_EXPOSED,
-// together with their typesGiven a Redis client (in which logical DB is specified),
-// given a Redis client (in which logical DB is specified).
+// ListKeys lists keys whose names match with REDISEEN_KEY_PATTERN_EXPOSED,
+// together with their types,
+// given a Redis client (in which logical DB is already specified).
 // Only up to 1000 keys will be returned.
 // In the response, we also give `count` and `total`.
 // `count`<=1000, while `total` is the actual total number of keys whose names match with REDISEEN_KEY_PATTERN_EXPOSED
 // Results are written into a http.ResponseWriter directly.
-func (client *ExtendedClient) ListKeysByDb(res http.ResponseWriter, regexpKeyPatternExposed *regexp.Regexp) {
+func (client *ExtendedClient) ListKeys(res http.ResponseWriter, regexpKeyPatternExposed *regexp.Regexp) {
 	keys, _ := client.RedisClient.Keys("*").Result()
 
 	var results []types.KeyInfoType
@@ -75,8 +75,8 @@ func (client *ExtendedClient) ListKeysByDb(res http.ResponseWriter, regexpKeyPat
 	res.Write(js)
 }
 
-// Get handles requests to different Redis Data Types, and return values correspondingly
-func (client *ExtendedClient) Get(res http.ResponseWriter, key string, indexOrField string) {
+// Retrieve handles requests to different Redis Data Types, and return values correspondingly
+func (client *ExtendedClient) Retrieve(res http.ResponseWriter, key string, indexOrField string) {
 
 	var js []byte
 	var index int64
