@@ -12,7 +12,7 @@ Start a REST-like API service for your Redis database, without writing a single 
 
 - Allows clients to query records in Redis database via HTTP conveniently
 - Allows you to specify which logical DB(s) to expose, and what key patterns to expose
-- Expose results of redis `INFO` command in nice way, so **you can use `Rediseen` as a connector between your Redis DB and monitoring dashboard** as well.
+- Expose results of redis `INFO` command in nice format, so **you can use `Rediseen` as a connector between your Redis DB and monitoring dashboard** as well.
 - Supports API Key authentication
 
 (Inspired by [sandman2](https://github.com/jeffknupp/sandman2), and built on shoulder of [go-redis/redis
@@ -251,11 +251,11 @@ A sample response follows below
 
 #### 2.4.4 `/info`
 
-It returns (part of) the results from Redis `INFO` command as a nice-formatted JSON object.
+It returns (part of) the results from Redis `INFO` command as a nicely-formatted JSON object.
 
 #### 2.4.5 `/info/<info_section>`
 
-It returns (part of) the results from Redis `INFO <SECTION>` command as a nice-formatted JSON object.
+It returns (part of) the results from Redis `INFO <SECTION>` command as a nicely-formatted JSON object.
 
 Currently `info_section` supports values `server`, `clients`, `replication`, `cpu`, and `cluster`.
 
