@@ -43,7 +43,7 @@ type InfoServer struct {
 	ConfigFile      string `json:"config_file"`
 }
 
-type InfoClient struct {
+type InfoClients struct {
 	ConnectedClients string `json:"connected_clients"`
 	BlockedClients   string `json:"blocked_clients"`
 }
@@ -62,9 +62,14 @@ type InfoCpu struct {
 	UsedCpuUserChildren string `json:"used_cpu_user_children"`
 }
 
+type InfoCluster struct {
+	ClusterEnabled string `json:"cluster_enabled"`
+}
+
 type Info struct {
 	Server      InfoServer
-	Client      InfoClient
+	Clients     InfoClients
 	Replication InfoReplication
 	Cpu         InfoCpu
+	Cluster     InfoCluster
 }

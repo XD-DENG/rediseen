@@ -147,8 +147,14 @@ func (client *ExtendedClient) Retrieve(res http.ResponseWriter, key string, inde
 	res.Write(js)
 }
 
-func (client *ExtendedClient) RedisInfo() (types.Info, error) {
-	infoResult, err := client.RedisClient.Info().Result()
+func (client *ExtendedClient) RedisInfo(section string) (types.Info, error) {
+	var infoResult string
+	var err error
+	if section == "" {
+		infoResult, err = client.RedisClient.Info().Result()
+	} else {
+		infoResult, err = client.RedisClient.Info(section).Result()
+	}
 	if err != nil {
 		return types.Info{}, err
 	}
@@ -183,7 +189,7 @@ func (client *ExtendedClient) RedisInfo() (types.Info, error) {
 		ConfigFile:      mapResult["config_file"],
 	}
 
-	result.Client = types.InfoClient{
+	result.Clients = types.InfoClients{
 		ConnectedClients: mapResult["connected_clients"],
 		BlockedClients:   mapResult["blocked_clients"],
 	}
@@ -201,6 +207,8 @@ func (client *ExtendedClient) RedisInfo() (types.Info, error) {
 		UsedCpuSysChildren:  mapResult["used_cpu_sys_children"],
 		UsedCpuUserChildren: mapResult["used_cpu_user_children"],
 	}
+
+	result.Cluster = types.InfoCluster{ClusterEnabled: mapResult["cluster_enabled"]}
 
 	return result, nil
 }

@@ -180,10 +180,14 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	rawDb = arguments[1]
 
 	if rawDb == "info" {
+		var section string
+		if countArguments == 3 {
+			section = arguments[2]
+		}
 		var client conn.ExtendedClient
 		client.Init(0)
 		defer client.RedisClient.Close()
-		info, err := client.RedisInfo()
+		info, err := client.RedisInfo(section)
 		if err != nil {
 			res.WriteHeader(http.StatusInternalServerError)
 			js, _ = json.Marshal(types.ErrorType{Error: "Exception while getting INFO" + err.Error()})
