@@ -74,8 +74,8 @@ jobs:
 
         ./rediseen -d start
 
-        check_by_jq_field http://localhost:9000 error "Usage: /<db>, /<db>/<key>, /<db>/<key>/<index>, or /<db>/<key>/<field>"
-        check_by_jq_field http://localhost:9000/0/key:1/1/1 error "Usage: /<db>, /<db>/<key>, /<db>/<key>/<index>, or /<db>/<key>/<field>"
+        check_by_jq_field http://localhost:9000 error "Usage: /info, /<db>, /<db>/<key>, /<db>/<key>/<index>, or /<db>/<key>/<field>"
+        check_by_jq_field http://localhost:9000/0/key:1/1/1 error "Usage: /info, /<db>, /<db>/<key>, /<db>/<key>/<index>, or /<db>/<key>/<field>"
         check_by_jq_field http://localhost:9000/0 count "0"
         check_by_jq_field http://localhost:9000/0 total "0"
         check_by_jq_field http://localhost:9000/0/key:1 error "Key provided does not exist."

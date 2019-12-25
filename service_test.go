@@ -415,7 +415,7 @@ func Test_service_wrong_usage(t *testing.T) {
 	defer s.Close()
 
 	expectedCode := 400
-	expectedError := "Usage: /<db>, /<db>/<key>, /<db>/<key>/<index>, or /<db>/<key>/<field>"
+	expectedError := "Usage: /info, /<db>, /<db>/<key>, /<db>/<key>/<index>, or /<db>/<key>/<field>"
 	casesToTest := []string{"/0/", "/0/key:1/", "/0/key:1/1/", "/0/key:1/1/1", "/0/key:1/1/1/", "/0/key:1/1/1/1"}
 	var res *http.Response
 

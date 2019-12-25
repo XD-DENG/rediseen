@@ -168,7 +168,7 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if strings.HasSuffix(req.URL.Path, "/") || countArguments < 2 || countArguments > 4 {
 		res.WriteHeader(http.StatusBadRequest)
-		js, _ = json.Marshal(types.ErrorType{Error: "Usage: /<db>, /<db>/<key>, /<db>/<key>/<index>, or /<db>/<key>/<field>"})
+		js, _ = json.Marshal(types.ErrorType{Error: "Usage: /info, /<db>, /<db>/<key>, /<db>/<key>/<index>, or /<db>/<key>/<field>"})
 		res.Write(js)
 		return
 	}
@@ -183,13 +183,12 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		var client conn.ExtendedClient
 		client.Init(0)
 		defer client.RedisClient.Close()
-		info, err := client.RedisClient.Info().Result()
+		info, err := client.TransformRedisInfoToJson()
 		if err != nil {
 			res.WriteHeader(http.StatusInternalServerError)
 			js, _ = json.Marshal(types.ErrorType{Error: "Exception while getting INFO" + err.Error()})
 			res.Write(js)
 		} else {
-			res.Header().Set("Content-Type", "text/html")
 			js, _ := json.Marshal(info)
 			res.Write(js)
 		}
