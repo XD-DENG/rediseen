@@ -10,6 +10,11 @@
 
 Start a REST-like API service for your Redis database, without writing a single line of code.
 
+- Allows clients to query records in Redis database via HTTP conveniently
+- Allows you to specify which logical DB(s) to expose, and what key patterns to expose
+- Expose results of redis `INFO` command in nice way, so you can use `Rediseen` as a connector between your Redis DB and monitoring dashboard as well.
+- Supports API Key authentication
+
 (Inspired by [sandman2](https://github.com/jeffknupp/sandman2), and built on shoulder of [go-redis/redis
 ](https://github.com/go-redis/redis))
 
@@ -39,7 +44,8 @@ export REDISEEN_KEY_PATTERN_EXPOSED="^key:([0-9a-z]+)"
 rediseen start
 ```
 
-Now you should be able to query against your Redis database, like `http://localhost:8000/0` or `http://localhost:8000/0/key:1`
+Now you should be able to query against your Redis database, like `http://localhost:8000/0`, `http://localhost:8000/0/key:1`
+or `http://localhost:8000/info`
 (say you have keys `key:1` (string) and `key:2` (hash) set in your logical DB `0`). Sample responses follow below
 
 ```bash
@@ -67,6 +73,29 @@ GET /0/key:1
 {
     "type": "string",
     "value": "rediseen"
+}
+```
+
+```bash
+GET /info
+
+{
+    Server: {
+        redis_version: "5.0.6",
+        ...
+    },
+    Clients: {
+        ...
+    },
+    Replication: {
+        ...
+    },
+    CPU: {
+        ...
+    },
+    Cluster: {
+        ...
+    }
 }
 ```
 
