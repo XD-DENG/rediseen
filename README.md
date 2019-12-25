@@ -12,7 +12,7 @@ Start a REST-like API service for your Redis database, without writing a single 
 
 - Allows clients to query records in Redis database via HTTP conveniently
 - Allows you to specify which logical DB(s) to expose, and what key patterns to expose
-- Expose results of redis `INFO` command in nice way, so you can use `Rediseen` as a connector between your Redis DB and monitoring dashboard as well.
+- Expose results of redis `INFO` command in nice way, so **you can use `Rediseen` as a connector between your Redis DB and monitoring dashboard** as well.
 - Supports API Key authentication
 
 (Inspired by [sandman2](https://github.com/jeffknupp/sandman2), and built on shoulder of [go-redis/redis
@@ -44,8 +44,8 @@ export REDISEEN_KEY_PATTERN_EXPOSED="^key:([0-9a-z]+)"
 rediseen start
 ```
 
-Now you should be able to query against your Redis database, like `http://localhost:8000/0`, `http://localhost:8000/0/key:1`
-or `http://localhost:8000/info`
+Now you should be able to query against your Redis database, like `http://localhost:8000/0`, `http://localhost:8000/0/key:1`,
+`http://localhost:8000/info` or `http://localhost:8000/info/server`
 (say you have keys `key:1` (string) and `key:2` (hash) set in your logical DB `0`). Sample responses follow below
 
 ```bash
@@ -90,12 +90,14 @@ GET /info
     Replication: {
         ...
     },
-    CPU: {
-        ...
-    },
-    Cluster: {
-        ...
-    }
+    ...
+}
+
+GET /info/server
+
+{
+    redis_version: "5.0.6",
+    ...
 }
 ```
 
@@ -244,6 +246,14 @@ A sample response follows below
 | SET    | `/<redis DB>/<key>/<member>` | if `<member>` is member of the set |
 | HASH   | `/<redis DB>/<key>/<field>` | value of hash `<field>` in the hash |
 | ZSET   | `/<redis DB>/<key>/<memeber>` | index of `<member>` in the sorted set |
+
+#### 2.4.4 `/info`
+
+It returns (part of) the results from Redis `INFO` command as a nice-formatted JSON object.
+
+#### 2.4.5 `/info/<info section>`
+
+It returns (part of) the results from Redis `INFO <SECTION>` command as a nice-formatted JSON object.
 
 
 ## 3. Authentication
