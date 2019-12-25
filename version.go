@@ -1,3 +1,3 @@
 package main
 
-const rediseenVersion = "1.4.2-dev"
+const rediseenVersion = "2.0.0"
