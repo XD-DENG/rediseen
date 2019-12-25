@@ -168,7 +168,7 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if strings.HasSuffix(req.URL.Path, "/") || countArguments < 2 || countArguments > 4 {
 		res.WriteHeader(http.StatusBadRequest)
-		js, _ = json.Marshal(types.ErrorType{Error: "Usage: /db, /db/key, /db/key/index, or /db/key/field"})
+		js, _ = json.Marshal(types.ErrorType{Error: "Usage: /<db>, /<db>/<key>, /<db>/<key>/<index>, or /<db>/<key>/<field>"})
 		res.Write(js)
 		return
 	}
