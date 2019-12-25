@@ -182,7 +182,7 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	if rawDb == "info" {
 		var section string
 		if countArguments == 3 {
-			section = arguments[2]
+			section = strings.ToLower(arguments[2])
 		}
 
 		var client conn.ExtendedClient
@@ -208,7 +208,8 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 			case "cluster":
 				js, _ = json.Marshal(info.Cluster)
 			default:
-				js, _ = json.Marshal(types.ErrorType{Error: "invalid `section` is given"})
+				res.WriteHeader(http.StatusBadRequest)
+				js, _ = json.Marshal(types.ErrorType{Error: fmt.Sprintf("invalid section `%s` is given", section)})
 			}
 		}
 		res.Write(js)
