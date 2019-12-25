@@ -48,6 +48,24 @@ jobs:
       run: |
         sudo apt-get install redis-tools
         sudo apt-get install jq
+
+        check_by_status_code () {
+          # $1: URL to Curl
+          # $2: expected status code
+
+          echo Calling: $1
+          echo Expecting status code: $2
+
+          RESULT=$(curl -s -o /dev/null -w "%{http_code}" $1)
+          echo $RESULT
+          if [ "$RESULT" == "$2" ]; then
+              echo OK
+          else
+              echo "You're on fire"
+              exit 1
+          fi
+          echo
+        }
         
         check_by_jq_field () {
             # $1: URL to Curl
@@ -68,7 +86,7 @@ jobs:
                 exit 1
             fi
             echo
-        } 
+        }
 
         go build -v .
 
@@ -115,12 +133,12 @@ jobs:
         echo "del key:3" | redis-cli -p ${{ job.services.redis.ports['6379'] }}
         check_by_jq_field http://localhost:9000/0/key:3 error "Key provided does not exist."
 
-        curl -s http://localhost:9000/info
-        curl -s http://localhost:9000/info/server
-        curl -s http://localhost:9000/info/clients
-        curl -s http://localhost:9000/info/cluster
-        curl -s http://localhost:9000/info/cpu
-        curl -s http://localhost:9000/info/invalidSection
+        check_by_status_code http://localhost:9000/info 200
+        check_by_status_code http://localhost:9000/info/server 200
+        check_by_status_code http://localhost:9000/info/clients 200
+        check_by_status_code http://localhost:9000/info/cluster 200
+        check_by_status_code http://localhost:9000/info/cpu 200
+        check_by_status_code http://localhost:9000/info/invalidSection 400
         
         ./rediseen stop
 
@@ -130,5 +148,8 @@ jobs:
         ./rediseen -d start
         check_by_jq_field http://localhost:9000/0 error "unauthorized"
         check_by_jq_field http://localhost:9000/info error "unauthorized"
+
+        check_by_status_code http://localhost:9000/0 401
+        check_by_status_code http://localhost:9000/info 401
         ./rediseen stop
 
