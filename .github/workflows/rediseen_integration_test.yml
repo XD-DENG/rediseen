@@ -129,5 +129,6 @@ jobs:
 
         ./rediseen -d start
         check_by_jq_field http://localhost:9000/0 error "unauthorized"
+        check_by_jq_field http://localhost:9000/info error "unauthorized"
         ./rediseen stop
 
