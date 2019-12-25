@@ -116,10 +116,11 @@ jobs:
         check_by_jq_field http://localhost:9000/0/key:3 error "Key provided does not exist."
 
         curl -s http://localhost:9000/info
-        curl -s http://localhost:9000/server
-        curl -s http://localhost:9000/clients
-        curl -s http://localhost:9000/cluster
-        curl -s http://localhost:9000/cpu
+        curl -s http://localhost:9000/info/server
+        curl -s http://localhost:9000/info/clients
+        curl -s http://localhost:9000/info/cluster
+        curl -s http://localhost:9000/info/cpu
+        curl -s http://localhost:9000/info/invalidSection
         
         ./rediseen stop
 
