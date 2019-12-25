@@ -1276,7 +1276,7 @@ func Test_api_key_authentication(t *testing.T) {
 	mr.Set("key:1", "hello")
 
 	os.Setenv("REDISEEN_API_KEY", "nopass")
-	defer os.Setenv("REDISEEN_REDIS_URI", "")
+	defer os.Setenv("REDISEEN_API_KEY", "")
 
 	var testService service
 	testService.loadConfigFromEnv()

@@ -192,7 +192,7 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		info, err := client.RedisInfo(section)
 		if err != nil {
 			res.WriteHeader(http.StatusInternalServerError)
-			js, _ = json.Marshal(types.ErrorType{Error: "Exception while getting INFO" + err.Error()})
+			js, _ = json.Marshal(types.ErrorType{Error: "Exception while getting Redis Info. Details: " + err.Error()})
 		} else {
 			switch section {
 			case "":
