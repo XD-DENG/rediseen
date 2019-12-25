@@ -201,7 +201,7 @@ func (client *ExtendedClient) RedisInfo(section string) (types.Info, error) {
 		MasterReplId2:   mapResult["master_replid2"],
 	}
 
-	result.Cpu = types.InfoCpu{
+	result.CPU = types.InfoCpu{
 		UsedCpuSys:          mapResult["used_cpu_sys"],
 		UsedCpuUser:         mapResult["used_cpu_user"],
 		UsedCpuSysChildren:  mapResult["used_cpu_sys_children"],

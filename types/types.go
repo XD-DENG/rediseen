@@ -70,6 +70,6 @@ type Info struct {
 	Server      InfoServer
 	Clients     InfoClients
 	Replication InfoReplication
-	Cpu         InfoCpu
+	CPU         InfoCpu
 	Cluster     InfoCluster
 }

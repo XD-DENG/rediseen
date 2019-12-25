@@ -184,15 +184,32 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		if countArguments == 3 {
 			section = arguments[2]
 		}
+
 		var client conn.ExtendedClient
 		client.Init(0)
 		defer client.RedisClient.Close()
+
 		info, err := client.RedisInfo(section)
 		if err != nil {
 			res.WriteHeader(http.StatusInternalServerError)
 			js, _ = json.Marshal(types.ErrorType{Error: "Exception while getting INFO" + err.Error()})
 		} else {
-			js, _ = json.Marshal(info)
+			switch section {
+			case "":
+				js, _ = json.Marshal(info)
+			case "server":
+				js, _ = json.Marshal(info.Server)
+			case "clients":
+				js, _ = json.Marshal(info.Clients)
+			case "replication":
+				js, _ = json.Marshal(info.Replication)
+			case "cpu":
+				js, _ = json.Marshal(info.CPU)
+			case "cluster":
+				js, _ = json.Marshal(info.Cluster)
+			default:
+				js, _ = json.Marshal(types.ErrorType{Error: "invalid `section` is given"})
+			}
 		}
 		res.Write(js)
 		return
