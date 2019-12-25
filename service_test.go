@@ -415,7 +415,7 @@ func Test_service_wrong_usage(t *testing.T) {
 	defer s.Close()
 
 	expectedCode := 400
-	expectedError := "Usage: /<db>, /<db>/<key>, /<db>/<key>/<index>, or /<db>/<key>/<field>"
+	expectedError := "Usage: /info, /info/<info_section>, /<db>, /<db>/<key>, /<db>/<key>/<index>, or /<db>/<key>/<field>"
 	casesToTest := []string{"/0/", "/0/key:1/", "/0/key:1/1/", "/0/key:1/1/1", "/0/key:1/1/1/", "/0/key:1/1/1/1"}
 	var res *http.Response
 
@@ -1276,7 +1276,7 @@ func Test_api_key_authentication(t *testing.T) {
 	mr.Set("key:1", "hello")
 
 	os.Setenv("REDISEEN_API_KEY", "nopass")
-	defer os.Setenv("REDISEEN_REDIS_URI", "")
+	defer os.Setenv("REDISEEN_API_KEY", "")
 
 	var testService service
 	testService.loadConfigFromEnv()

@@ -168,7 +168,7 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if strings.HasSuffix(req.URL.Path, "/") || countArguments < 2 || countArguments > 4 {
 		res.WriteHeader(http.StatusBadRequest)
-		js, _ = json.Marshal(types.ErrorType{Error: "Usage: /<db>, /<db>/<key>, /<db>/<key>/<index>, or /<db>/<key>/<field>"})
+		js, _ = json.Marshal(types.ErrorType{Error: "Usage: /info, /info/<info_section>, /<db>, /<db>/<key>, /<db>/<key>/<index>, or /<db>/<key>/<field>"})
 		res.Write(js)
 		return
 	}
@@ -178,6 +178,43 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	var index string
 
 	rawDb = arguments[1]
+
+	if rawDb == "info" {
+		var section string
+		if countArguments == 3 {
+			section = strings.ToLower(arguments[2])
+		}
+
+		var client conn.ExtendedClient
+		client.Init(0)
+		defer client.RedisClient.Close()
+
+		info, err := client.RedisInfo(section)
+		if err != nil {
+			res.WriteHeader(http.StatusInternalServerError)
+			js, _ = json.Marshal(types.ErrorType{Error: "Exception while getting Redis Info. Details: " + err.Error()})
+		} else {
+			switch section {
+			case "":
+				js, _ = json.Marshal(info)
+			case "server":
+				js, _ = json.Marshal(info.Server)
+			case "clients":
+				js, _ = json.Marshal(info.Clients)
+			case "replication":
+				js, _ = json.Marshal(info.Replication)
+			case "cpu":
+				js, _ = json.Marshal(info.CPU)
+			case "cluster":
+				js, _ = json.Marshal(info.Cluster)
+			default:
+				res.WriteHeader(http.StatusBadRequest)
+				js, _ = json.Marshal(types.ErrorType{Error: fmt.Sprintf("invalid section `%s` is given. Check /info for supported sections.", section)})
+			}
+		}
+		res.Write(js)
+		return
+	}
 
 	db, err := strconv.Atoi(rawDb)
 	if err != nil {

@@ -146,3 +146,69 @@ func (client *ExtendedClient) Retrieve(res http.ResponseWriter, key string, inde
 	}
 	res.Write(js)
 }
+
+func (client *ExtendedClient) RedisInfo(section string) (types.Info, error) {
+	var infoResult string
+	var err error
+	if section == "" {
+		infoResult, err = client.RedisClient.Info().Result()
+	} else {
+		infoResult, err = client.RedisClient.Info(section).Result()
+	}
+	if err != nil {
+		return types.Info{}, err
+	}
+
+	mapResult := make(map[string]string)
+	for _, kv := range strings.Split(infoResult, "\n") {
+		values := strings.Split(kv, ":")
+		if len(values) != 2 {
+			continue
+		}
+		mapResult[values[0]] = strings.TrimSpace(values[1])
+	}
+
+	var result types.Info
+
+	result.Server = types.InfoServer{
+		RedisVersion:    mapResult["redis_version"],
+		RedisBuildId:    mapResult["redis_build_id"],
+		RedisMode:       mapResult["redis_mode"],
+		Os:              mapResult["os"],
+		ArchBits:        mapResult["arch_bits"],
+		GccVersion:      mapResult["gcc_version"],
+		ProcessId:       mapResult["process_id"],
+		RunId:           mapResult["run_id"],
+		TcpPort:         mapResult["tcp_port"],
+		UptimeInSeconds: mapResult["uptime_in_seconds"],
+		UptimeInDays:    mapResult["uptime_in_days"],
+		Hz:              mapResult["hz"],
+		ConfiguredHz:    mapResult["configured_hz"],
+		LruClock:        mapResult["lru_clock"],
+		Executable:      mapResult["executable"],
+		ConfigFile:      mapResult["config_file"],
+	}
+
+	result.Clients = types.InfoClients{
+		ConnectedClients: mapResult["connected_clients"],
+		BlockedClients:   mapResult["blocked_clients"],
+	}
+
+	result.Replication = types.InfoReplication{
+		Role:            mapResult["role"],
+		ConnectedSlaves: mapResult["connected_slaves"],
+		MasterReplId:    mapResult["master_replid"],
+		MasterReplId2:   mapResult["master_replid2"],
+	}
+
+	result.CPU = types.InfoCpu{
+		UsedCpuSys:          mapResult["used_cpu_sys"],
+		UsedCpuUser:         mapResult["used_cpu_user"],
+		UsedCpuSysChildren:  mapResult["used_cpu_sys_children"],
+		UsedCpuUserChildren: mapResult["used_cpu_user_children"],
+	}
+
+	result.Cluster = types.InfoCluster{ClusterEnabled: mapResult["cluster_enabled"]}
+
+	return result, nil
+}
