@@ -98,8 +98,10 @@ GET /info
 GET /info/server
 
 {
-    redis_version: "5.0.6",
-    ...
+    Server: {
+        redis_version: "5.0.6",
+        ...
+    }
 }
 ```
 
@@ -251,13 +253,13 @@ A sample response follows below
 
 #### 2.4.4 `/info`
 
-It returns (part of) the results from [Redis `INFO` command](https://redis.io/commands/info) as a nicely-formatted JSON object.
+It returns ALL results from [Redis `INFO` command](https://redis.io/commands/info) as a nicely-formatted JSON object.
 
 #### 2.4.5 `/info/<info_section>`
 
-It returns (part of) the results from [Redis `INFO <SECTION>` command](https://redis.io/commands/info) as a nicely-formatted JSON object.
+It returns results from [Redis `INFO <SECTION>` command](https://redis.io/commands/info) as a nicely-formatted JSON object.
 
-Currently `info_section` supports values `server`, `clients`, `replication`, `cpu`, and `cluster`.
+Supported `info_section` values can be checked by querying `/info`. They vary according to your Redis version.
 
 
 ## 3. Authentication
