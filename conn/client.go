@@ -16,11 +16,13 @@ import (
 const strNotImplemented = "not implemented"
 const strWrongTypeForIndexField = "wrong type for index/field"
 
+// ExtendedClient is a struct type which helps extend Redis Client
 type ExtendedClient struct {
 	RedisClient *redis.Client
 }
 
-// Client prepares a Redis client. Only Redis DB is needed, as all other information will be provided via configuration
+// Init initiates and prepares a Redis client.
+// Only Redis DB is needed as argument, since all other information will be provided via configuration
 func (client *ExtendedClient) Init(db int) {
 	parsedUri, _ := redis.ParseURL(os.Getenv("REDISEEN_REDIS_URI"))
 
