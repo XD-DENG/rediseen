@@ -189,28 +189,10 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		client.Init(0)
 		defer client.RedisClient.Close()
 
-		info, err := client.RedisInfo(section)
+		js, err := client.RedisInfo(section)
 		if err != nil {
 			res.WriteHeader(http.StatusInternalServerError)
 			js, _ = json.Marshal(types.ErrorType{Error: "Exception while getting Redis Info. Details: " + err.Error()})
-		} else {
-			switch section {
-			case "":
-				js, _ = json.Marshal(info)
-			case "server":
-				js, _ = json.Marshal(info.Server)
-			case "clients":
-				js, _ = json.Marshal(info.Clients)
-			case "replication":
-				js, _ = json.Marshal(info.Replication)
-			case "cpu":
-				js, _ = json.Marshal(info.CPU)
-			case "cluster":
-				js, _ = json.Marshal(info.Cluster)
-			default:
-				res.WriteHeader(http.StatusBadRequest)
-				js, _ = json.Marshal(types.ErrorType{Error: fmt.Sprintf("invalid section `%s` is given. Check /info for supported sections.", section)})
-			}
 		}
 		res.Write(js)
 		return

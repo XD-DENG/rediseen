@@ -3,6 +3,7 @@ package conn
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/go-redis/redis"
 	"net/http"
 	"os"
@@ -147,68 +148,35 @@ func (client *ExtendedClient) Retrieve(res http.ResponseWriter, key string, inde
 	res.Write(js)
 }
 
-func (client *ExtendedClient) RedisInfo(section string) (types.Info, error) {
+func (client *ExtendedClient) RedisInfo(section string) ([]byte, error) {
 	var infoResult string
 	var err error
 	if section == "" {
-		infoResult, err = client.RedisClient.Info().Result()
+		infoResult, err = client.RedisClient.Info("all").Result()
 	} else {
 		infoResult, err = client.RedisClient.Info(section).Result()
+		if infoResult == "" {
+			return []byte{}, fmt.Errorf("invalid section `%s` is given. Check /info for supported sections", section)
+		}
 	}
 	if err != nil {
-		return types.Info{}, err
+		return []byte{}, err
 	}
 
-	mapResult := make(map[string]string)
+	mapResult := make(map[string]map[string]string)
+	var sectionName string
 	for _, kv := range strings.Split(infoResult, "\n") {
+		if len(kv) > 0 && string(kv[0]) == "#" {
+			sectionName = strings.Trim(kv, "\r# ")
+			mapResult[sectionName] = make(map[string]string)
+		}
 		values := strings.Split(kv, ":")
 		if len(values) != 2 {
 			continue
 		}
-		mapResult[values[0]] = strings.TrimSpace(values[1])
+		mapResult[sectionName][values[0]] = strings.TrimSpace(values[1])
 	}
 
-	var result types.Info
-
-	result.Server = types.InfoServer{
-		RedisVersion:    mapResult["redis_version"],
-		RedisBuildId:    mapResult["redis_build_id"],
-		RedisMode:       mapResult["redis_mode"],
-		Os:              mapResult["os"],
-		ArchBits:        mapResult["arch_bits"],
-		GccVersion:      mapResult["gcc_version"],
-		ProcessId:       mapResult["process_id"],
-		RunId:           mapResult["run_id"],
-		TcpPort:         mapResult["tcp_port"],
-		UptimeInSeconds: mapResult["uptime_in_seconds"],
-		UptimeInDays:    mapResult["uptime_in_days"],
-		Hz:              mapResult["hz"],
-		ConfiguredHz:    mapResult["configured_hz"],
-		LruClock:        mapResult["lru_clock"],
-		Executable:      mapResult["executable"],
-		ConfigFile:      mapResult["config_file"],
-	}
-
-	result.Clients = types.InfoClients{
-		ConnectedClients: mapResult["connected_clients"],
-		BlockedClients:   mapResult["blocked_clients"],
-	}
-
-	result.Replication = types.InfoReplication{
-		Role:            mapResult["role"],
-		ConnectedSlaves: mapResult["connected_slaves"],
-		MasterReplId:    mapResult["master_replid"],
-		MasterReplId2:   mapResult["master_replid2"],
-	}
-
-	result.CPU = types.InfoCpu{
-		UsedCpuSys:          mapResult["used_cpu_sys"],
-		UsedCpuUser:         mapResult["used_cpu_user"],
-		UsedCpuSysChildren:  mapResult["used_cpu_sys_children"],
-		UsedCpuUserChildren: mapResult["used_cpu_user_children"],
-	}
-
-	result.Cluster = types.InfoCluster{ClusterEnabled: mapResult["cluster_enabled"]}
-
-	return result, nil
+	jsonResult, _ := json.Marshal(mapResult)
+	return jsonResult, nil
 }
