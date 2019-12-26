@@ -148,6 +148,7 @@ func (client *ExtendedClient) Retrieve(res http.ResponseWriter, key string, inde
 	res.Write(js)
 }
 
+// RedisInfo takes the results of Redis INFO command, then return the result as JSON ([]byte format from json.Marshal)
 func (client *ExtendedClient) RedisInfo(section string) ([]byte, error) {
 	var infoResult string
 	var err error
