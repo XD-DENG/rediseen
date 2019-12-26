@@ -511,6 +511,72 @@ func Test_service_non_existent_key(t *testing.T) {
 	compareAndShout(t, expectedError, result.Error)
 }
 
+func Test_service_validate_case_sensitive_1(t *testing.T) {
+
+	mr, _ := miniredis.Run()
+	defer mr.Close()
+
+	mr.Set("KEY:1", "fake content")
+
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
+	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
+
+	var testService service
+	testService.loadConfigFromEnv()
+	s := httptest.NewServer(http.Handler(&testService))
+	defer s.Close()
+
+	res, _ := http.Get(s.URL + "/0/key:1")
+
+	expectedCode := 404
+	compareAndShout(t, expectedCode, res.StatusCode)
+
+	resultStr, _ := ioutil.ReadAll(res.Body)
+	res.Body.Close()
+
+	var result types.ErrorType
+	json.Unmarshal([]byte(resultStr), &result)
+
+	expectedError := "Key provided does not exist."
+	compareAndShout(t, expectedError, result.Error)
+}
+
+func Test_service_validate_case_sensitive_2(t *testing.T) {
+
+	mr, _ := miniredis.Run()
+	defer mr.Close()
+
+	mr.Set("key", "fake content")
+
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
+	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
+
+	originalKeyPatternExposed := os.Getenv("REDISEEN_KEY_PATTERN_EXPOSED")
+	os.Setenv("REDISEEN_KEY_PATTERN_EXPOSED", "KEY")
+	defer os.Setenv("REDISEEN_KEY_PATTERN_EXPOSED", originalKeyPatternExposed)
+
+	var testService service
+	testService.loadConfigFromEnv()
+	s := httptest.NewServer(http.Handler(&testService))
+	defer s.Close()
+
+	res, _ := http.Get(s.URL + "/0/KEY")
+
+	expectedCode := 404
+	compareAndShout(t, expectedCode, res.StatusCode)
+
+	resultStr, _ := ioutil.ReadAll(res.Body)
+	res.Body.Close()
+
+	var result types.ErrorType
+	json.Unmarshal([]byte(resultStr), &result)
+
+	expectedError := "Key provided does not exist."
+	compareAndShout(t, expectedError, result.Error)
+}
+
 // Check listing-keys feature
 // Taking keys which are NOT exposed into consideration as well (they should NOT be counted or returned)
 func Test_service_list_keys_by_db_1(t *testing.T) {

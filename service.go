@@ -173,23 +173,30 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	var rawDb string
-	var key string
-	var index string
+	var pathPart1 string // pathPart1 is either logical DB index OR "info"
+	var pathPart2 string // pathPart2 is either key name in Redis database OR section name for Redis INFO command
+	var pathPart3 string // pathPart3 is either index or field when clients submit queries like /<db>/<key>/<index> or /<db>/<key>/<field>
 
-	rawDb = arguments[1]
-
-	if rawDb == "info" {
-		var section string
-		if countArguments == 3 {
-			section = strings.ToLower(arguments[2])
+	pathPart1 = arguments[1]
+	if countArguments == 3 {
+		pathPart2 = arguments[2]
+		// When clients query "/<DB>/<key>", <key> is case-sensitive
+		// When clients query "/info/<section>", <section> is case-insensitive
+		if pathPart1 == "info" {
+			pathPart2 = strings.ToLower(pathPart2)
 		}
+	}
+	if countArguments == 4 {
+		pathPart2, pathPart3 = parseKeyAndIndex(strings.Join(arguments[2:], "/"))
+	}
+
+	if pathPart1 == "info" {
 
 		var client conn.ExtendedClient
 		client.Init(0)
 		defer client.RedisClient.Close()
 
-		js, err := client.RedisInfo(section)
+		js, err := client.RedisInfo(pathPart2)
 		if err != nil {
 			if strings.Contains(err.Error(), "invalid section") {
 				res.WriteHeader(http.StatusBadRequest)
@@ -202,7 +209,7 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	db, err := strconv.Atoi(rawDb)
+	db, err := strconv.Atoi(pathPart1)
 	if err != nil {
 		res.WriteHeader(http.StatusBadRequest)
 		js, _ = json.Marshal(types.ErrorType{Error: "Provide an integer for DB"})
@@ -225,15 +232,9 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		// request type-1: /db
 		client.ListKeys(res, c.regexpKeyPatternExposed)
 		return
-	} else if countArguments == 3 {
-		// request type-2: /db/key
-		key = arguments[2]
-	} else {
-		// request type-3: /db/key/index, or /db/key/field
-		key, index = parseKeyAndIndex(strings.Join(arguments[2:], "/"))
 	}
 
-	if !c.regexpKeyPatternExposed.MatchString(key) {
+	if !c.regexpKeyPatternExposed.MatchString(pathPart2) {
 		res.WriteHeader(http.StatusForbidden)
 		js, _ = json.Marshal(types.ErrorType{Error: "Key pattern is forbidden from access"})
 		res.Write(js)
@@ -241,7 +242,7 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	}
 
 	// Check if key exists, meanwhile check Redis connection
-	keyExists, err := client.RedisClient.Exists(key).Result()
+	keyExists, err := client.RedisClient.Exists(pathPart2).Result()
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		js, _ = json.Marshal(types.ErrorType{Error: err.Error()})
@@ -260,16 +261,16 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	logMsg.WriteString("Submit query for: db ")
 	logMsg.WriteString(strconv.Itoa(db))
 	logMsg.WriteString(", key `")
-	logMsg.WriteString(key)
+	logMsg.WriteString(pathPart2)
 	logMsg.WriteString("`")
-	if index != "" {
+	if pathPart3 != "" {
 		logMsg.WriteString(", index/field `")
-		logMsg.WriteString(index)
+		logMsg.WriteString(pathPart3)
 		logMsg.WriteString("`")
 	}
 
 	log.Println(logMsg.String())
-	client.Retrieve(res, key, index)
+	client.Retrieve(res, pathPart2, pathPart3)
 }
 
 // validate if the string given as DB(s) to expose is legal.

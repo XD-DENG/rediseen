@@ -41,7 +41,7 @@ jobs:
     - name: Integration Test
       env:
         REDISEEN_PORT: 9000
-        REDISEEN_KEY_PATTERN_EXPOSED: "^key:[.]*"
+        REDISEEN_KEY_PATTERN_EXPOSED: "^key:[.]*|^KEY:[.]*"
         REDISEEN_KEY_PATTERN_EXPOSE_ALL: false
         REDISEEN_REDIS_URI: redis://:@localhost:${{ job.services.redis.ports['6379'] }}
         REDISEEN_DB_EXPOSED: 0-5
@@ -108,6 +108,9 @@ jobs:
         check_by_jq_field http://localhost:9000/0/key:1/2 value "d"
         check_by_jq_field http://localhost:9000/0/key:1/2 type "string"
 
+        # Redis Key is case-sensitive
+        check_by_jq_field http://localhost:9000/0/KEY:1 error "Key provided does not exist."
+
         echo "hset key:2 year 2019" | redis-cli -p ${{ job.services.redis.ports['6379'] }}
         echo "hset key:2 project rediseen" | redis-cli -p ${{ job.services.redis.ports['6379'] }}
         check_by_jq_field http://localhost:9000/0/key:2 type "hash"
@@ -138,10 +141,13 @@ jobs:
         check_by_status_code http://localhost:9000/info/clients 200
         check_by_status_code http://localhost:9000/info/memory 200
         check_by_status_code http://localhost:9000/info/cpu 200
+
+        # Redis INFO section is case-insensitive
         check_by_status_code http://localhost:9000/info/SERVER 200
         check_by_status_code http://localhost:9000/info/CLIENTS 200
         check_by_status_code http://localhost:9000/info/MEMORY 200
         check_by_status_code http://localhost:9000/info/CPU 200
+
         check_by_status_code http://localhost:9000/info/invalidSection 400
         
         ./rediseen stop
