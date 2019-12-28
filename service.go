@@ -141,7 +141,7 @@ func (c *service) apiKeyMatch(req *http.Request) bool {
 func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-Type", "application/json")
 
-	log.Printf("Request '%s' (method: %s)\n", req.URL.Path, req.Method)
+	log.Printf("%s %s '%s' %s\n", req.Method, req.RemoteAddr, req.URL.Path, req.UserAgent())
 
 	var js []byte
 
