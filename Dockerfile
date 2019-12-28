@@ -20,7 +20,9 @@ FROM alpine:3.9
 WORKDIR /app
 COPY --from=builder /app/rediseen ./rediseen
 
+# To allow the service to be accessible outside the container
 ENV REDISEEN_HOST=0.0.0.0
+
 EXPOSE 8000
 
 ENV PATH=$PATH:${pwd}
