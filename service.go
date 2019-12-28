@@ -167,6 +167,14 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	arguments := strings.Split(req.URL.Path, "/")
 	countArguments := len(arguments)
 
+	if req.URL.Path == "/" {
+		res.Header().Set("Content-Type", "text/plain")
+		res.Write([]byte(strHeader))
+		res.Write([]byte("\n\n"))
+		res.Write([]byte("Available Endpoints:\n - /info\n - /info/<info_section>\n - /<db>\n - /<db>/<key>\n - /<db>/<key>/<index>\n - /<db>/<key>/<field>"))
+		return
+	}
+
 	if strings.HasSuffix(req.URL.Path, "/") || countArguments < 2 || countArguments > 4 {
 		res.WriteHeader(http.StatusBadRequest)
 		buffer := &bytes.Buffer{}
