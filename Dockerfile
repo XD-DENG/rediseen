@@ -20,7 +20,9 @@ FROM alpine:3.9
 WORKDIR /app
 COPY --from=builder /app/rediseen ./rediseen
 
-# To allow the service to be accessible outside the container
+# To allow the service to be accessible outside the container.
+# Whether the service should be accessible from only localhost or ALL interfaces will
+#   be decided when the container is started, rather than being decided by REDISEEN_HOST.
 ENV REDISEEN_HOST=0.0.0.0
 
 EXPOSE 8000

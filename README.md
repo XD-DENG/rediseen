@@ -121,8 +121,8 @@ docker run \
 Please note:
 - If you want `Rediseen` to be accessible only from the Docker host, use `-p 127.0.0.1:8000:8000` instead
     (configuration item `REDISEEN_HOST` would not help when you run `Rediseen` with Docker). 
-- `redis_host` in `REDISEEN_REDIS_URI` should not be something like "localhost" or "127.0.0.1" even
-    if you are running Redis on the same host, because using "localhost" here would only refer to the specific docker
+- `redis_host` in `REDISEEN_REDIS_URI` above should be a specific host address, rather than something like "localhost" or "127.0.0.1" even
+    if you are running Redis on the same Docker host, because using "localhost"/"127.0.0.1" here would only refer to the specific docker
     container on which Rediseen is running.
 - You can choose the image tag among `latest` (latest release version), `nightly` (latest code in master branch), `unstable` (latest dev branch),
     and release tags (like `2.1.0`. Check [Docker Hub/xddeng/rediseen](https://hub.docker.com/r/xddeng/rediseen/tags)
