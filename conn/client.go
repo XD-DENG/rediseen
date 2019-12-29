@@ -168,16 +168,19 @@ func (client *ExtendedClient) RedisInfo(section string) ([]byte, error) {
 
 	mapResult := make(map[string]map[string]string)
 	var sectionName string
-	for _, kv := range strings.Split(infoResult, "\n") {
-		if len(kv) > 0 && string(kv[0]) == "#" {
-			sectionName = strings.Trim(kv, "\r# ")
+	for _, row := range strings.Split(infoResult, "\n") {
+		if len(row) > 0 && string(row[0]) == "#" {
+			// this row is the line for section name
+			sectionName = strings.Trim(row, "\r# ")
 			mapResult[sectionName] = make(map[string]string)
+		} else {
+			// this row is the line for detailed key-value pair
+			values := strings.Split(row, ":")
+			if len(values) != 2 {
+				continue
+			}
+			mapResult[sectionName][values[0]] = strings.TrimSpace(values[1])
 		}
-		values := strings.Split(kv, ":")
-		if len(values) != 2 {
-			continue
-		}
-		mapResult[sectionName][values[0]] = strings.TrimSpace(values[1])
 	}
 
 	jsonResult, _ := json.Marshal(mapResult)
