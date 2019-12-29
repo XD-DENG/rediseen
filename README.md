@@ -24,6 +24,18 @@ Start a REST-like API service for your Redis database, without writing a single 
     </a>
 </p>
 
+- [1. Quick Start](#1-quick-start)
+  - [1.1 Quick Start with Homebrew](#11-quick-start-with-homebrew)
+  - [1.2 Quick Start with Docker](#12-quick-start-with-docker)
+- [2. Usage](#2-usage)
+  - [2.1 How to Install](#21-how-to-install)
+  - [2.2 How to Configure](#22-how-to-configure)
+  - [2.3 How to Start the Service](#23-how-to-start-the-service)
+  - [2.4 How to Consume the Service](#24-how-to-consume-the-service)
+- [3. Authentication](#3-authentication)
+- [4. License](#4-license)
+- [5. Reference](#5-reference)
+
 
 ## 1. Quick Start
 
