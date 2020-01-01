@@ -92,6 +92,8 @@ jobs:
 
         ./rediseen -d start
 
+        sleep 3
+
         # Test incorrect usage
         check_by_jq_field http://localhost:9000/wrong_usage/ error "Usage: /info, /info/<info_section>, /<db>, /<db>/<key>, /<db>/<key>/<index>, or /<db>/<key>/<field>"
         check_by_status_code http://localhost:9000/wrong_usage/ 400
@@ -162,6 +164,9 @@ jobs:
         export REDISEEN_API_KEY=RandomKey
 
         ./rediseen -d start
+
+        sleep 3
+
         check_by_jq_field http://localhost:9000/0 error "unauthorized"
         check_by_jq_field http://localhost:9000/info error "unauthorized"
 
