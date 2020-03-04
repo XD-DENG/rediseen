@@ -131,14 +131,65 @@ docker run \
 ```
 
 Please note:
-- If you want `Rediseen` to be accessible only from the Docker host, use `-p 127.0.0.1:8000:8000` instead
+- If you want `Rediseen` to be accessible only from the Docker host, use `-p 127.0.0.1:8000:8000` instead of `-p 8000:8000`
     (configuration item `REDISEEN_HOST` would not help when you run `Rediseen` with Docker). 
-- `redis_host` in `REDISEEN_REDIS_URI` above should be a specific host address, rather than something like "localhost" or "127.0.0.1" even
-    if you are running Redis on the same Docker host, because using "localhost"/"127.0.0.1" here would only refer to the specific docker
-    container on which Rediseen is running.
+- `REDISEEN_REDIS_URI` above should contain a specific host address. If you are running Redis database using Docker
+    too, you can consider using Docker's `link` or `network` feature to ensure connectivity between Rediseen and your Redis database (refer to the
+    example below).
 - You can choose the image tag among `latest` (latest release version), `nightly` (latest code in master branch), `unstable` (latest dev branch),
     and release tags (like `2.1.0`. Check [Docker Hub/xddeng/rediseen](https://hub.docker.com/r/xddeng/rediseen/tags)
     for full tag list)
+    
+A full example using Docker follows below
+
+```bash
+docker network create test-net
+
+docker run -d --network=test-net --name=redis-server redis
+
+docker run \
+    -d --network=test-net \
+    -e REDISEEN_REDIS_URI="redis://:@redis-server:6379" \
+    -e REDISEEN_DB_EXPOSED=0 \
+    -e REDISEEN_KEY_PATTERN_EXPOSED="^key:([0-9a-z]+)" \
+    -p 8000:8000 \
+    xddeng/rediseen:latest
+
+curl -s http://localhost:8000/0
+```
+
+Result is like 
+
+```
+{
+  "count": 0,
+  "total": 0,
+  "keys": null
+}
+```
+
+Then you can execute
+
+```bash
+docker exec -i redis-server redis-cli set key:0 100
+
+curl -s http://localhost:8000/0
+```
+
+and you can expect output below
+
+```
+{
+  "count": 1,
+  "total": 1,
+  "keys": [
+    {
+      "key": "key:0",
+      "type": "string"
+    }
+  ]
+}
+```
 
 
 ## 2. Usage
