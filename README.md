@@ -186,6 +186,14 @@ and you can expect output below
 }
 ```
 
+## Documentation
+
+- [Documentation](docs/documentation.md)
+  - [Installation](docs/documentation.md#installation)
+  - [Configuration](docs/documentation.md#configuration)
+  - [How to Start the Service](docs/documentation.md#how-to-start-the-service)
+  - [How to Consume the Service](docs/documentation.md#how-to-consume-the-service)
+  - [API Authentication](docs/documentation.md#api-authentication)
 
 ## License
 
