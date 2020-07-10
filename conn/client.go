@@ -61,14 +61,17 @@ func (client *ExtendedClient) ListKeys(res http.ResponseWriter, regexpKeyPattern
 
 	var results []types.KeyInfoType
 
+	pipe := client.RedisClient.Pipeline()
+
 	for i, k := range keys {
 		if i == listKeyLimit {
 			break
 		}
 		if regexpKeyPatternExposed.MatchString(k) {
-			results = append(results, types.KeyInfoType{Key: k, Type: client.RedisClient.Type(k).Val()})
+			results = append(results, types.KeyInfoType{Key: k, Type: pipe.Type(k).Val()})
 		}
 	}
+	pipe.Exec()
 
 	var count int
 
