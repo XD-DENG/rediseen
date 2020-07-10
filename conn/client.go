@@ -61,15 +61,24 @@ func ClientPing() error {
 func (client *ExtendedClient) ListKeys(regexpKeyPatternExposed *regexp.Regexp) []byte {
 	keys, _ := client.RedisClient.Keys(ctx, "*").Result()
 
-	var results []types.KeyInfoType
+	pipe := client.RedisClient.Pipeline()
 
+	var results []types.KeyInfoType
 	for i, k := range keys {
 		if i == listKeyLimit {
 			break
 		}
 		if regexpKeyPatternExposed.MatchString(k) {
-			results = append(results, types.KeyInfoType{Key: k, Type: client.RedisClient.Type(ctx, k).Val()})
+			pipe.Type(ctx, k)
+			results = append(results, types.KeyInfoType{Key: k})
 		}
+	}
+
+	pipeResult, _ := pipe.Exec(ctx)
+
+	for i, cmder := range pipeResult {
+		cmd := cmder.(*redis.StatusCmd)
+		results[i].Type = cmd.Val()
 	}
 
 	var count int
