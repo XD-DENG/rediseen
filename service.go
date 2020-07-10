@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -30,6 +31,8 @@ type service struct {
 	testMode                bool
 	regexpKeyPatternExposed *regexp.Regexp
 }
+
+var ctx = context.Background()
 
 func (c *service) loadConfigFromEnv() error {
 	c.port = os.Getenv("REDISEEN_PORT")
@@ -254,7 +257,7 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	}
 
 	// Check if key exists, meanwhile check Redis connection
-	keyExists, err := client.RedisClient.Exists(pathPart2).Result()
+	keyExists, err := client.RedisClient.Exists(ctx, pathPart2).Result()
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		js, _ = json.Marshal(types.ErrorType{Error: err.Error()})

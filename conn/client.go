@@ -1,10 +1,11 @@
 package conn
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v8"
 	"net/http"
 	"os"
 	"rediseen/types"
@@ -21,6 +22,8 @@ const listKeyLimit = 1000
 type ExtendedClient struct {
 	RedisClient *redis.Client
 }
+
+var ctx = context.Background()
 
 // Init initiates and prepares a Redis client.
 // Only Redis DB is needed as argument, since all other information will be provided via configuration
@@ -41,7 +44,7 @@ func ClientPing() error {
 	client.Init(0)
 	defer client.RedisClient.Close()
 
-	pingResult, err := client.RedisClient.Ping().Result()
+	pingResult, err := client.RedisClient.Ping(ctx).Result()
 	if pingResult != "PONG" {
 		return err
 	}
@@ -57,21 +60,29 @@ func ClientPing() error {
 // `count`<=1000, while `total` is the actual total number of keys whose names match with REDISEEN_KEY_PATTERN_EXPOSED
 // Results are written into a http.ResponseWriter directly.
 func (client *ExtendedClient) ListKeys(res http.ResponseWriter, regexpKeyPatternExposed *regexp.Regexp) {
-	keys, _ := client.RedisClient.Keys("*").Result()
+	keys, _ := client.RedisClient.Keys(ctx, "*").Result()
 
 	var results []types.KeyInfoType
 
 	pipe := client.RedisClient.Pipeline()
 
+	var typeResult []redis.Cmder
 	for i, k := range keys {
 		if i == listKeyLimit {
 			break
 		}
 		if regexpKeyPatternExposed.MatchString(k) {
-			results = append(results, types.KeyInfoType{Key: k, Type: pipe.Type(k).Val()})
+			typeResult = append(typeResult, pipe.Type(ctx, k))
+			results = append(results, types.KeyInfoType{Key: k, Type: ""})
 		}
 	}
-	pipe.Exec()
+
+	pipe.Exec(ctx)
+
+	for i, k := range typeResult {
+		result := strings.Split(k.String(), " ")
+		results[i].Type = result[len(result)-1]
+	}
 
 	var count int
 
@@ -93,21 +104,21 @@ func (client *ExtendedClient) Retrieve(res http.ResponseWriter, key string, inde
 	var field string
 	var value interface{}
 
-	keyType, err := client.RedisClient.Type(key).Result()
+	keyType, err := client.RedisClient.Type(ctx, key).Result()
 
 	if indexOrField == "" {
 		switch keyType {
 		case "string":
-			value, err = client.RedisClient.Get(key).Result()
+			value, err = client.RedisClient.Get(ctx, key).Result()
 		case "list":
-			value, err = client.RedisClient.LRange(key, 0, -1).Result()
+			value, err = client.RedisClient.LRange(ctx, key, 0, -1).Result()
 		case "set":
-			value, err = client.RedisClient.SMembers(key).Result()
+			value, err = client.RedisClient.SMembers(ctx, key).Result()
 		case "hash":
-			value, err = client.RedisClient.HGetAll(key).Result()
+			value, err = client.RedisClient.HGetAll(ctx, key).Result()
 		case "zset":
 			//TODO: a simple implementation given methods on sorted set can be very complicated
-			value, err = client.RedisClient.ZRange(key, 0, -1).Result()
+			value, err = client.RedisClient.ZRange(ctx, key, 0, -1).Result()
 		default:
 			err = errors.New(strNotImplemented)
 		}
@@ -123,20 +134,20 @@ func (client *ExtendedClient) Retrieve(res http.ResponseWriter, key string, inde
 			if index == 0 && indexOrField != "0" {
 				err = errors.New(strWrongTypeForIndexField)
 			} else {
-				value, err = client.RedisClient.GetRange(key, index, index).Result()
+				value, err = client.RedisClient.GetRange(ctx, key, index, index).Result()
 			}
 		case "list":
 			if index == 0 && indexOrField != "0" {
 				err = errors.New(strWrongTypeForIndexField)
 			} else {
-				value, err = client.RedisClient.LIndex(key, index).Result()
+				value, err = client.RedisClient.LIndex(ctx, key, index).Result()
 			}
 		case "set":
-			value, err = client.RedisClient.SIsMember(key, field).Result()
+			value, err = client.RedisClient.SIsMember(ctx, key, field).Result()
 		case "hash":
-			value, err = client.RedisClient.HGet(key, field).Result()
+			value, err = client.RedisClient.HGet(ctx, key, field).Result()
 		case "zset":
-			value, err = client.RedisClient.ZRank(key, field).Result()
+			value, err = client.RedisClient.ZRank(ctx, key, field).Result()
 		default:
 			err = errors.New(strNotImplemented)
 		}
@@ -162,9 +173,9 @@ func (client *ExtendedClient) RedisInfo(section string) ([]byte, error) {
 	var infoResult string
 	var err error
 	if section == "" {
-		infoResult, err = client.RedisClient.Info("all").Result()
+		infoResult, err = client.RedisClient.Info(ctx, "all").Result()
 	} else {
-		infoResult, err = client.RedisClient.Info(section).Result()
+		infoResult, err = client.RedisClient.Info(ctx, section).Result()
 		if infoResult == "" {
 			return []byte{}, fmt.Errorf("invalid section `%s` is given. Check /info for supported sections", section)
 		}
