@@ -16,7 +16,7 @@ RUN REDISEEN_REDIS_URI=redis://:@localhost:6400 REDISEEN_KEY_PATTERN_EXPOSED="^k
 
 # For smaller image size
 # see https://medium.com/@gdiener/how-to-build-a-smaller-docker-image-76779e18d48a
-FROM alpine:3.9
+FROM alpine:3.12
 WORKDIR /app
 COPY --from=builder /app/rediseen ./rediseen
 
