@@ -245,7 +245,7 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if countArguments == 2 {
 		// request type-1: /db
-		client.ListKeys(res, c.regexpKeyPatternExposed)
+		res.Write(client.ListKeys(c.regexpKeyPatternExposed))
 		return
 	}
 
@@ -285,7 +285,11 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	}
 
 	log.Println(logMsg.String())
-	client.Retrieve(res, pathPart2, pathPart3)
+	js, errorCode := client.Retrieve(pathPart2, pathPart3)
+	if errorCode != 0 {
+		res.WriteHeader(errorCode)
+	}
+	res.Write(js)
 }
 
 // validate if the string given as DB(s) to expose is legal.

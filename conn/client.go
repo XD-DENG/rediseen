@@ -58,8 +58,7 @@ func ClientPing() error {
 // Only up to 1000 keys will be returned.
 // In the response, we also give `count` and `total`.
 // `count`<=1000, while `total` is the actual total number of keys whose names match with REDISEEN_KEY_PATTERN_EXPOSED
-// Results are written into a http.ResponseWriter directly.
-func (client *ExtendedClient) ListKeys(res http.ResponseWriter, regexpKeyPatternExposed *regexp.Regexp) {
+func (client *ExtendedClient) ListKeys(regexpKeyPatternExposed *regexp.Regexp) []byte {
 	keys, _ := client.RedisClient.Keys(ctx, "*").Result()
 
 	var results []types.KeyInfoType
@@ -82,11 +81,11 @@ func (client *ExtendedClient) ListKeys(res http.ResponseWriter, regexpKeyPattern
 	}
 
 	js, _ := json.Marshal(types.KeyListType{Keys: results, Total: len(keys), Count: count})
-	res.Write(js)
+	return js
 }
 
 // Retrieve handles requests to different Redis Data Types, and return values correspondingly
-func (client *ExtendedClient) Retrieve(res http.ResponseWriter, key string, indexOrField string) {
+func (client *ExtendedClient) Retrieve(key string, indexOrField string) ([]byte, int) {
 
 	var js []byte
 	var index int64
@@ -142,19 +141,21 @@ func (client *ExtendedClient) Retrieve(res http.ResponseWriter, key string, inde
 		}
 	}
 
+	var errorCode int
 	if err != nil {
 		if strings.Contains(err.Error(), strNotImplemented) {
-			res.WriteHeader(http.StatusNotImplemented)
+			errorCode = http.StatusNotImplemented
 		} else if strings.Contains(err.Error(), strWrongTypeForIndexField) {
-			res.WriteHeader(http.StatusBadRequest)
+			errorCode = http.StatusBadRequest
 		} else {
-			res.WriteHeader(http.StatusNotFound)
+			errorCode = http.StatusNotFound
 		}
 		js, _ = json.Marshal(types.ErrorType{Error: err.Error()})
 	} else {
 		js, _ = json.Marshal(types.ResponseType{ValueType: keyType, Value: value})
 	}
-	res.Write(js)
+
+	return js, errorCode
 }
 
 // RedisInfo takes the results of Redis INFO command, then return the result as JSON ([]byte format from json.Marshal)
