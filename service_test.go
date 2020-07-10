@@ -636,7 +636,6 @@ func Test_service_list_keys_by_db_1(t *testing.T) {
 // `Total` should be the total number, BUT only up to 1000 keys should be returned.
 // `Count` should be up to 1000 as well
 func Test_service_list_keys_by_db_2(t *testing.T) {
-
 	mr, _ := miniredis.Run()
 	defer mr.Close()
 
@@ -666,6 +665,83 @@ func Test_service_list_keys_by_db_2(t *testing.T) {
 	json.Unmarshal([]byte(resultStr), &result)
 
 	compareAndShout(t, 1000, len(result.Keys))
+	for i := 0; i < 1000; i++ {
+		compareAndShout(t, "string", result.Keys[i].Type)
+	}
+	compareAndShout(t, 1000, result.Count)
+	compareAndShout(t, n, result.Total)
+}
+
+func Test_service_list_keys_by_db_key_type_list(t *testing.T) {
+	mr, _ := miniredis.Run()
+	defer mr.Close()
+
+	n := 2000
+	for i := 0; i < 2000; i++ {
+		mr.Lpush(fmt.Sprintf("key:%v", i), string(i))
+	}
+
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
+	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
+
+	var testService service
+	testService.loadConfigFromEnv()
+	s := httptest.NewServer(http.Handler(&testService))
+	defer s.Close()
+
+	res, _ := http.Get(s.URL + "/0")
+
+	expectedCode := 200
+	compareAndShout(t, expectedCode, res.StatusCode)
+
+	resultStr, _ := ioutil.ReadAll(res.Body)
+	res.Body.Close()
+
+	var result types.KeyListType
+	json.Unmarshal([]byte(resultStr), &result)
+
+	compareAndShout(t, 1000, len(result.Keys))
+	for i := 0; i < 1000; i++ {
+		compareAndShout(t, "list", result.Keys[i].Type)
+	}
+	compareAndShout(t, 1000, result.Count)
+	compareAndShout(t, n, result.Total)
+}
+
+func Test_service_list_keys_by_db_key_type_hash(t *testing.T) {
+	mr, _ := miniredis.Run()
+	defer mr.Close()
+
+	n := 2000
+	for i := 0; i < 2000; i++ {
+		mr.HSet(fmt.Sprintf("key:%v", i), string(i), string(i))
+	}
+
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
+	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
+
+	var testService service
+	testService.loadConfigFromEnv()
+	s := httptest.NewServer(http.Handler(&testService))
+	defer s.Close()
+
+	res, _ := http.Get(s.URL + "/0")
+
+	expectedCode := 200
+	compareAndShout(t, expectedCode, res.StatusCode)
+
+	resultStr, _ := ioutil.ReadAll(res.Body)
+	res.Body.Close()
+
+	var result types.KeyListType
+	json.Unmarshal([]byte(resultStr), &result)
+
+	compareAndShout(t, 1000, len(result.Keys))
+	for i := 0; i < 1000; i++ {
+		compareAndShout(t, "hash", result.Keys[i].Type)
+	}
 	compareAndShout(t, 1000, result.Count)
 	compareAndShout(t, n, result.Total)
 }
