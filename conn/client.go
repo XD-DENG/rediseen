@@ -162,12 +162,11 @@ func (client *ExtendedClient) RedisInfo(section string) ([]byte, error) {
 	var infoResult string
 	var err error
 	if section == "" {
-		infoResult, err = client.RedisClient.Info(ctx, "all").Result()
-	} else {
-		infoResult, err = client.RedisClient.Info(ctx, section).Result()
-		if infoResult == "" {
-			return []byte{}, fmt.Errorf("invalid section `%s` is given. Check /info for supported sections", section)
-		}
+		section = "all"
+	}
+	infoResult, err = client.RedisClient.Info(ctx, section).Result()
+	if infoResult == "" {
+		return []byte{}, fmt.Errorf("invalid section `%s` is given. Check /info for supported sections", section)
 	}
 	if err != nil {
 		return []byte{}, err
