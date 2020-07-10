@@ -665,6 +665,7 @@ func Test_service_list_keys_by_db_2(t *testing.T) {
 	var result types.KeyListType
 	json.Unmarshal([]byte(resultStr), &result)
 
+	compareAndShout(t, 1000, len(result.Keys))
 	compareAndShout(t, 1000, result.Count)
 	compareAndShout(t, n, result.Total)
 }

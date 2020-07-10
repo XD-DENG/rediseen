@@ -15,6 +15,7 @@ import (
 
 const strNotImplemented = "not implemented"
 const strWrongTypeForIndexField = "wrong type for index/field"
+const listKeyLimit = 1000
 
 // ExtendedClient is a struct type which helps extend Redis Client
 type ExtendedClient struct {
@@ -60,7 +61,10 @@ func (client *ExtendedClient) ListKeys(res http.ResponseWriter, regexpKeyPattern
 
 	var results []types.KeyInfoType
 
-	for _, k := range keys {
+	for i, k := range keys {
+		if i == listKeyLimit {
+			break
+		}
 		if regexpKeyPatternExposed.MatchString(k) {
 			results = append(results, types.KeyInfoType{Key: k, Type: client.RedisClient.Type(k).Val()})
 		}
@@ -68,13 +72,13 @@ func (client *ExtendedClient) ListKeys(res http.ResponseWriter, regexpKeyPattern
 
 	var count int
 
-	if len(results) >= 1000 {
-		count = 1000
+	if len(results) >= listKeyLimit {
+		count = listKeyLimit
 	} else {
 		count = len(results)
 	}
 
-	js, _ := json.Marshal(types.KeyListType{Keys: results, Total: len(results), Count: count})
+	js, _ := json.Marshal(types.KeyListType{Keys: results, Total: len(keys), Count: count})
 	res.Write(js)
 }
 
