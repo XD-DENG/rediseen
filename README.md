@@ -131,9 +131,12 @@ Please note:
 - `REDISEEN_REDIS_URI` above should be a specific host address. If you are running Redis database using Docker
     too, you can consider using Docker's `link` or `network` feature to ensure connectivity between Rediseen and your Redis database
     (refer to the complete example below).
-- You can choose the image tag among `latest` (latest release version), `nightly` (latest code in master branch), `unstable` (latest dev branch),
-    and release tags (like `2.1.0`. Check [Docker Hub/xddeng/rediseen](https://hub.docker.com/r/xddeng/rediseen/tags)
-    for full tag list)
+- You can choose the image tag among:
+  - `latest` (latest release version)
+  - `nightly` (latest code in master branch)
+  - `unstable` (latest dev branch)
+  - release tags (like `2.1.2`. Check [Docker Hub/xddeng/rediseen](https://hub.docker.com/r/xddeng/rediseen/tags)
+    for full list)
     
 A **complete example** using Docker follows below
 
