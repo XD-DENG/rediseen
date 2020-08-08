@@ -87,7 +87,8 @@ func main() {
 			if daemonMode {
 				// check if daemon is already running
 				if _, err := os.Stat(pidFile); err == nil {
-					fmt.Println(fmt.Sprintf("[ERROR] Already running or file %s exist.", pidFile))
+					fmt.Println(fmt.Sprintf("[ERROR] Resideen is already running, or file %s exists", pidFile) +
+						" (delete the file only if you are sure there is no running Rediseen instance).")
 					os.Exit(1)
 				}
 
