@@ -15,8 +15,8 @@ Start a REST-like API service for your Redis database, without writing a single 
 - Expose results of [Redis `INFO` command](https://redis.io/commands/info) in nice format, so **you can use `Rediseen` as a connector between your Redis DB and monitoring dashboard** as well.
 - Supports API Key authentication
 
-(Inspired by [sandman2](https://github.com/jeffknupp/sandman2), and built on shoulder of [go-redis/redis
-](https://github.com/go-redis/redis))
+(Inspired by [sandman2](https://github.com/jeffknupp/sandman2); Built on shoulder of [go-redis/redis
+](https://github.com/go-redis/redis); CLI implemented with [Cobra](https://github.com/spf13/cobra#flags))
 
 <p align="center"> 
     <a href="https://youtu.be/SpHNnPIT0HM">
