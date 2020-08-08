@@ -16,7 +16,7 @@ Start a REST-like API service for your Redis database, without writing a single 
 - Supports API Key authentication
 
 (Inspired by [sandman2](https://github.com/jeffknupp/sandman2); Built on shoulder of [go-redis/redis
-](https://github.com/go-redis/redis); CLI implemented with [Cobra](https://github.com/spf13/cobra#flags))
+](https://github.com/go-redis/redis); CLI implemented with [Cobra](https://github.com/spf13/cobra))
 
 <p align="center"> 
     <a href="https://youtu.be/SpHNnPIT0HM">
