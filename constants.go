@@ -3,10 +3,7 @@ package main
 const defaultHost = "localhost"
 const defaultPort = "8000"
 
-const strUsage = "Usage: rediseen [-d] [start/stop/help/version]"
-
-const strHelpDoc = "\n" + strUsage + "\n\nFlag:\n-d: run in background\n\n" +
-	"Configuration Items (via environment variables):\n" +
+const strHelpDoc = "\nConfiguration Items (via environment variables):\n" +
 	"- REDISEEN_REDIS_URI: URI of your Redis database, e.g. `redis://:@localhost:6379`\n" +
 	"- REDISEEN_HOST: (optional) host of the service. Default port is 'localhost'\n" +
 	"- REDISEEN_PORT: (optional) port of the service. Default port is 8000\n" +
