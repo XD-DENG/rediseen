@@ -88,7 +88,7 @@ jobs:
 
         go build -v .
 
-        ./rediseen -d start
+        ./rediseen start -d
 
         sleep 3
 
@@ -161,7 +161,7 @@ jobs:
 
         export REDISEEN_API_KEY=RandomKey
 
-        ./rediseen -d start
+        ./rediseen start -d
 
         sleep 3
 
