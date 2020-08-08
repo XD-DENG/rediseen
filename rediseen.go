@@ -91,7 +91,7 @@ func main() {
 					os.Exit(1)
 				}
 
-				cmd := exec.Command(os.Args[0], args...)
+				cmd := exec.Command(os.Args[0], "start")
 				err = cmd.Start()
 				if err != nil {
 					fmt.Println("[ERROR] " + err.Error())
