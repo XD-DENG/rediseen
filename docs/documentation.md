@@ -77,7 +77,7 @@ If you would like to run the service in daemon mode, apply flag `-d`.
 
 ```bash
 # run service in daemon mode
-rediseen start -d
+rediseen start -d  # run "rediseen -d start" for versions <= 2.1.2
 
 # stop service running in daemon mode
 rediseen stop
@@ -164,7 +164,7 @@ export REDISEEN_KEY_PATTERN_EXPOSED="^key:([0-9a-z]+)"
 export REDISEEN_API_KEY="demo_key" # Set REDISEEN_API_KEY to enforce API Key Authentication
 
 # Start the service and run in background
-rediseen start -d
+rediseen start -d  # run "rediseen -d start" for versions <= 2.1.2
 
 # REJECTED: No X-API-KEY is given in HTTP header
 curl -s http://localhost:8000/0 | jq
