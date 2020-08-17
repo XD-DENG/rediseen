@@ -13,15 +13,24 @@ import (
 	"strconv"
 )
 
-func getPidFilePath() string {
+func getPidFileDir() string {
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
 		panic(err)
 	}
-	return path.Join(userHomeDir, "rediseen.pid")
+	return path.Join(userHomeDir, ".rediseen")
+}
+
+func getPidFilePath() string {
+	return path.Join(getPidFileDir(), "rediseen.pid")
 }
 
 func savePID(pid int, fileForPid string) error {
+	pidFileDir := getPidFileDir()
+	if _, err := os.Stat(pidFileDir); os.IsNotExist(err) {
+		os.Mkdir(pidFileDir, 0766)
+	}
+
 	f, err := os.Create(fileForPid)
 	if err != nil {
 		return fmt.Errorf("unable to create PID file: %s", err.Error())
