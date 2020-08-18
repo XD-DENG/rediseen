@@ -6,6 +6,7 @@
 [![codecov](https://codecov.io/gh/XD-DENG/rediseen/branch/master/graph/badge.svg)](https://codecov.io/gh/XD-DENG/rediseen)
 [![License](https://img.shields.io/:license-apache2-green.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 [![Go Report Card](https://goreportcard.com/badge/github.com/xd-deng/rediseen)](https://goreportcard.com/report/github.com/xd-deng/rediseen)
+[![Docker Pull](http://img.shields.io/docker/pulls/xddeng/rediseen.svg)](https://hub.docker.com/r/xddeng/rediseen)
 
 
 Start a REST-like API service for your Redis database, without writing a single line of code.
