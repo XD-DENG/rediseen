@@ -136,7 +136,7 @@ Please note:
   - `latest` (latest release version)
   - `nightly` (latest code in master branch)
   - `unstable` (latest dev branch)
-  - release tags (like `2.1.2`. Check [Docker Hub/xddeng/rediseen](https://hub.docker.com/r/xddeng/rediseen/tags)
+  - release tags (like `2.2.0`. Check [Docker Hub/xddeng/rediseen](https://hub.docker.com/r/xddeng/rediseen/tags)
     for full list)
     
 A **complete example** using Docker follows below
