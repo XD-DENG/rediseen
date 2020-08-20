@@ -6,7 +6,7 @@ COPY . /app
 RUN apk add --no-cache git gcc
 RUN apk add libc-dev
 
-RUN go build rediseen
+RUN go build github.com/xd-deng/rediseen
 
 # Unit Test
 RUN REDISEEN_REDIS_URI=redis://:@localhost:6400 REDISEEN_KEY_PATTERN_EXPOSED="^key:[.]*" \

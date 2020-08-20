@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/alicebob/miniredis"
+	"github.com/xd-deng/rediseen/types"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"rediseen/types"
 	"strings"
 	"testing"
 )

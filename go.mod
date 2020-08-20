@@ -1,4 +1,4 @@
-module rediseen
+module github.com/xd-deng/rediseen
 
 go 1.13
 
