@@ -641,7 +641,7 @@ func Test_service_list_keys_by_db_2(t *testing.T) {
 
 	n := 2000
 	for i := 0; i < 2000; i++ {
-		mr.Set(fmt.Sprintf("key:%v", i), string(i))
+		mr.Set(fmt.Sprintf("key:%v", i), string(rune(i)))
 	}
 
 	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
@@ -678,7 +678,7 @@ func Test_service_list_keys_by_db_key_type_list(t *testing.T) {
 
 	n := 2000
 	for i := 0; i < n; i++ {
-		mr.Lpush(fmt.Sprintf("key:%v", i), string(i))
+		mr.Lpush(fmt.Sprintf("key:%v", i), string(rune(i)))
 	}
 
 	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
@@ -715,7 +715,7 @@ func Test_service_list_keys_by_db_key_type_hash(t *testing.T) {
 
 	n := 500
 	for i := 0; i < n; i++ {
-		mr.HSet(fmt.Sprintf("key:%v", i), string(i), string(i))
+		mr.HSet(fmt.Sprintf("key:%v", i), string((i)), string((i)))
 	}
 
 	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
