@@ -715,7 +715,7 @@ func Test_service_list_keys_by_db_key_type_hash(t *testing.T) {
 
 	n := 500
 	for i := 0; i < n; i++ {
-		mr.HSet(fmt.Sprintf("key:%v", i), string((i)), string((i)))
+		mr.HSet(fmt.Sprintf("key:%v", i), string(rune(i)), string(rune(i)))
 	}
 
 	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
