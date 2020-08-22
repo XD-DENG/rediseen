@@ -10,6 +10,7 @@ import (
 	"github.com/xd-deng/rediseen/conn"
 	"github.com/xd-deng/rediseen/types"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"regexp"
@@ -50,7 +51,7 @@ func (c *service) loadConfigFromEnv() error {
 	if c.port == "" {
 		c.port = defaultPort
 	}
-	c.bindAddress = c.host + ":" + c.port
+	c.bindAddress = net.JoinHostPort(c.host, c.port)
 
 	if c.apiKey != "" {
 		c.authEnforced = true
