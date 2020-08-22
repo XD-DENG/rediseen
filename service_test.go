@@ -1511,3 +1511,33 @@ func Test_api_key_authentication(t *testing.T) {
 	expectedCode = 401
 	compareAndShout(t, expectedCode, res.StatusCode)
 }
+
+func Test_service_root(t *testing.T) {
+
+	mr, _ := miniredis.Run()
+	defer mr.Close()
+
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
+	os.Setenv("REDISEEN_REDIS_URI", fmt.Sprintf("redis://:@%s", mr.Addr()))
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
+
+	var testService service
+	testService.loadConfigFromEnv()
+	s := httptest.NewServer(http.Handler(&testService))
+	defer s.Close()
+
+	client := &http.Client{}
+	req, _ := http.NewRequest("GET", s.URL+"/", nil)
+	res, _ := client.Do(req)
+
+	expectedCode := 200
+	compareAndShout(t, expectedCode, res.StatusCode)
+
+	resultStr, _ := ioutil.ReadAll(res.Body)
+	res.Body.Close()
+
+	expectedPartialContent := "Available Endpoints:"
+	if !strings.Contains(string(resultStr), expectedPartialContent) {
+		t.Error("Expected partial content not found:\n", expectedPartialContent)
+	}
+}
