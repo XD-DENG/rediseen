@@ -26,6 +26,7 @@ Start a REST-like API service for your Redis database, without writing a single 
 </p>
 
 - [Quick Start](#quick-start)
+  - [Quick Start with `go get`](#quick-start-with-go-get)
   - [Quick Start with Homebrew](#quick-start-with-homebrew)
   - [Quick Start with Docker](#quick-start-with-docker)
 - [Documentation](docs/documentation.md)
@@ -42,12 +43,17 @@ Start a REST-like API service for your Redis database, without writing a single 
 
 Let's assume that your Redis database URI is `redis://:@localhost:6379`, and you want to expose keys with prefix `key:` in logical database `0`.
 
-### Quick Start with Homebrew
+### Quick Start with `go get`
+
+If you have Go (1.11+) installed, you can install `Rediseen` easily by running
 
 ```bash
-# Install using Homebrew
-brew install XD-DENG/rediseen/rediseen
+go get github.com/xd-deng/rediseen
+``` 
 
+If your `GOPATH` is added to `PATH`, you should be able to run command `rediseen` now.
+
+```bash
 # Configuration
 export REDISEEN_REDIS_URI="redis://:@localhost:6379"
 export REDISEEN_DB_EXPOSED=0
@@ -116,6 +122,17 @@ GET /info/server
 ```
 
 For more details, please refer to the rest of the [documentation](docs/documentation.md).
+
+
+### Quick Start with Homebrew
+
+```bash
+# Install using Homebrew
+brew install XD-DENG/rediseen/rediseen
+```
+
+Then you can configure and start the service as described above.
+
 
 ### Quick Start with Docker
 

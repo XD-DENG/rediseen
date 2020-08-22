@@ -8,7 +8,17 @@
 
 ## Installation 
 
-You can choose to install `Rediseen` by using `Homebrew`, building from source, or using Docker.
+You can choose to install `Rediseen` by using `go get`, `Homebrew`, building from source, or using Docker.
+
+### Install Using `go get`
+
+If you have Go (1.11+) installed, you can install `Rediseen` easily by running
+
+```bash
+go get github.com/xd-deng/rediseen
+``` 
+
+If your `GOPATH` is added to `PATH`, you should be able to run command `rediseen` now.
 
 ### Install Using `Homebrew`
 
