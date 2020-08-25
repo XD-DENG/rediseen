@@ -79,7 +79,7 @@ func Test_Main(t *testing.T) {
 	main()
 
 	// commands "rediseen version", "rediseen help", "rediseen stop", "rediseen wrong_command"
-	for _, command := range []string{"version", "help", "stop", "wrong_command"} {
+	for _, command := range []string{"version", "help", "configdoc", "stop", "wrong_command"} {
 		os.Args = []string{"", command}
 		main()
 	}

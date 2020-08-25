@@ -10,8 +10,14 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macOS-latest]
+        os: [ubuntu-latest]
         goversion: [1.12, 1.13, 1.14, 1.15]
+
+    services:
+      redis:
+        image: redis:latest
+        ports:
+          - 6379/tcp
 
     steps:
     - name: Set up Go
@@ -38,6 +44,7 @@ jobs:
         REDISEEN_REDIS_URI: redis://:@localhost:6400
         REDISEEN_TEST_MODE: true
         REDISEEN_DB_EXPOSED: 0-5
+        REAL_REDIS_URI: redis://:@localhost:${{ job.services.redis.ports['6379'] }}
       run: go test -v -cover github.com/xd-deng/rediseen
 
     - name: Build

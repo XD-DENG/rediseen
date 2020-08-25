@@ -1541,3 +1541,103 @@ func Test_service_root(t *testing.T) {
 		t.Error("Expected partial content not found:\n", expectedPartialContent)
 	}
 }
+
+func Test_service_info(t *testing.T) {
+
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
+	realRedis, realRedisFound := os.LookupEnv("REAL_REDIS_URI")
+	if !realRedisFound {
+		t.Skip("skipping test when there is no real Redis instance")
+	}
+	os.Setenv("REDISEEN_REDIS_URI", realRedis)
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
+
+	var testService service
+	testService.loadConfigFromEnv()
+	s := httptest.NewServer(http.Handler(&testService))
+	defer s.Close()
+
+	res, _ := http.Get(s.URL + "/info")
+
+	expectedCode := 200
+	compareAndShout(t, expectedCode, res.StatusCode)
+}
+
+func Test_service_info_by_section(t *testing.T) {
+
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
+	realRedis, realRedisFound := os.LookupEnv("REAL_REDIS_URI")
+	if !realRedisFound {
+		t.Skip("skipping test when there is no real Redis instance")
+	}
+	os.Setenv("REDISEEN_REDIS_URI", realRedis)
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
+
+	var testService service
+	testService.loadConfigFromEnv()
+	s := httptest.NewServer(http.Handler(&testService))
+	defer s.Close()
+
+	res, _ := http.Get(s.URL + "/info/cpu")
+
+	expectedCode := 200
+	compareAndShout(t, expectedCode, res.StatusCode)
+}
+
+func Test_service_info_by_section_uppercase(t *testing.T) {
+
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
+	realRedis, realRedisFound := os.LookupEnv("REAL_REDIS_URI")
+	if !realRedisFound {
+		t.Skip("skipping test when there is no real Redis instance")
+	}
+	os.Setenv("REDISEEN_REDIS_URI", realRedis)
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
+
+	var testService service
+	testService.loadConfigFromEnv()
+	s := httptest.NewServer(http.Handler(&testService))
+	defer s.Close()
+
+	res, _ := http.Get(s.URL + "/info/CPU")
+
+	expectedCode := 200
+	compareAndShout(t, expectedCode, res.StatusCode)
+}
+
+func Test_service_info_invalid_section(t *testing.T) {
+
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
+	realRedis, realRedisFound := os.LookupEnv("REAL_REDIS_URI")
+	if !realRedisFound {
+		t.Skip("skipping test when there is no real Redis instance")
+	}
+	os.Setenv("REDISEEN_REDIS_URI", realRedis)
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
+
+	var testService service
+	testService.loadConfigFromEnv()
+	s := httptest.NewServer(http.Handler(&testService))
+	defer s.Close()
+
+	res, _ := http.Get(s.URL + "/info/abc")
+
+	expectedCode := 400
+	compareAndShout(t, expectedCode, res.StatusCode)
+
+	resultStr, _ := ioutil.ReadAll(res.Body)
+	res.Body.Close()
+
+	var result types.ErrorType
+	json.Unmarshal([]byte(resultStr), &result)
+
+	expectedError := "Exception while getting Redis Info"
+	if !strings.Contains(result.Error, expectedError) {
+		t.Error("Expecting to contain \n", expectedError, "\ngot\n", result.Error)
+	}
+
+	expectedError = "invalid section"
+	if !strings.Contains(result.Error, expectedError) {
+		t.Error("Expecting to contain \n", expectedError, "\ngot\n", result.Error)
+	}
+}
