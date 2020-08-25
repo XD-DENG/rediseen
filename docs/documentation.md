@@ -5,6 +5,7 @@
 - [How to Start the Service](#how-to-start-the-service)
 - [How to Consume the Service](#how-to-consume-the-service)
 - [API Authentication](#api-authentication)
+- [Handle Special Character in Keys](#handle-special-character-in-keys)
 
 ## Installation 
 
@@ -159,7 +160,7 @@ Supported `info_section` values can be checked by querying `/info`. They vary ac
 
 ## API Authentication
 
-API Key authentication is supported.
+Rediseen supports API Key authentication.
 
 To enable authentication, simply set environment variable `REDISEEN_API_KEY` and the value would be the key.
 Once it's set, client will have to add the API key as `X-API-KEY` in their HTTP header in order to access anything
@@ -201,3 +202,9 @@ curl -s -H "X-API-KEY: demo_key" http://localhost:8000/0 | jq
   ]
 }
 ```
+
+## Handle Special Character in Keys
+
+If you have special character in your keys, like "`key/3`", `Rediseen` will not be able to handle request like
+`http://localhost:8000/0/key/3` properly. Instead, you can form your request by surrounding your key with backticks.
+So the request should be `` http://localhost:8000/0/`key/3` ``.  
