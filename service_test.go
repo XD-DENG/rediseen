@@ -1559,14 +1559,19 @@ func Test_service_info(t *testing.T) {
 
 	res, _ := http.Get(s.URL + "/info")
 
+	expectedCode := 200
+	compareAndShout(t, expectedCode, res.StatusCode)
+
 	resultStr, _ := ioutil.ReadAll(res.Body)
 	res.Body.Close()
 
 	var result map[string]map[string]string
 	json.Unmarshal(resultStr, &result)
 
-	expectedCode := 200
-	compareAndShout(t, expectedCode, res.StatusCode)
+	// multiple sections should be present
+	if len(result) <= 1 {
+		t.Error("/info endpoint is not working correctly")
+	}
 
 	for _, x := range []string{"CPU", "Clients", "Cluster", "Memory", "Server"} {
 		_, found := result[x]
@@ -1593,14 +1598,19 @@ func Test_service_info_by_section(t *testing.T) {
 
 	res, _ := http.Get(s.URL + "/info/cpu")
 
+	expectedCode := 200
+	compareAndShout(t, expectedCode, res.StatusCode)
+
 	resultStr, _ := ioutil.ReadAll(res.Body)
 	res.Body.Close()
 
 	var result map[string]map[string]string
 	json.Unmarshal(resultStr, &result)
 
-	expectedCode := 200
-	compareAndShout(t, expectedCode, res.StatusCode)
+	// only single section should be present
+	if len(result) != 1 {
+		t.Error("/info endpoint is not working correctly")
+	}
 
 	for _, x := range []string{"used_cpu_sys", "used_cpu_user", "used_cpu_sys_children", "used_cpu_user_children"} {
 		_, found := result["CPU"][x]
@@ -1635,6 +1645,11 @@ func Test_service_info_by_section_uppercase(t *testing.T) {
 
 	var result map[string]map[string]string
 	json.Unmarshal(resultStr, &result)
+
+	// only single section should be present
+	if len(result) != 1 {
+		t.Error("/info endpoint is not working correctly")
+	}
 
 	for _, x := range []string{"redis_version", "os", "redis_mode", "process_id"} {
 		_, found := result["Server"][x]
