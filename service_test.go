@@ -430,7 +430,7 @@ func Test_service_wrong_usage(t *testing.T) {
 		res.Body.Close()
 
 		var result types.ErrorType
-		json.Unmarshal([]byte(resultStr), &result)
+		json.Unmarshal(resultStr, &result)
 
 		compareAndShout(t, expectedError, result.Error)
 	}
@@ -452,7 +452,7 @@ func Test_service_non_integer_db_provided(t *testing.T) {
 	res.Body.Close()
 
 	var result types.ErrorType
-	json.Unmarshal([]byte(resultStr), &result)
+	json.Unmarshal(resultStr, &result)
 
 	expectedError := "Provide an integer for DB"
 	compareAndShout(t, expectedError, result.Error)
@@ -474,7 +474,7 @@ func Test_service_redis_conn_refused(t *testing.T) {
 	res.Body.Close()
 
 	var result types.ErrorType
-	json.Unmarshal([]byte(resultStr), &result)
+	json.Unmarshal(resultStr, &result)
 
 	expectedError := "connection refused"
 	if !strings.Contains(result.Error, expectedError) {
@@ -505,7 +505,7 @@ func Test_service_non_existent_key(t *testing.T) {
 	res.Body.Close()
 
 	var result types.ErrorType
-	json.Unmarshal([]byte(resultStr), &result)
+	json.Unmarshal(resultStr, &result)
 
 	expectedError := "Key provided does not exist."
 	compareAndShout(t, expectedError, result.Error)
@@ -536,7 +536,7 @@ func Test_service_validate_case_sensitive_1(t *testing.T) {
 	res.Body.Close()
 
 	var result types.ErrorType
-	json.Unmarshal([]byte(resultStr), &result)
+	json.Unmarshal(resultStr, &result)
 
 	expectedError := "Key provided does not exist."
 	compareAndShout(t, expectedError, result.Error)
@@ -571,7 +571,7 @@ func Test_service_validate_case_sensitive_2(t *testing.T) {
 	res.Body.Close()
 
 	var result types.ErrorType
-	json.Unmarshal([]byte(resultStr), &result)
+	json.Unmarshal(resultStr, &result)
 
 	expectedError := "Key provided does not exist."
 	compareAndShout(t, expectedError, result.Error)
@@ -622,7 +622,7 @@ func Test_service_list_keys_by_db_1(t *testing.T) {
 	res.Body.Close()
 
 	var result types.KeyListType
-	json.Unmarshal([]byte(resultStr), &result)
+	json.Unmarshal(resultStr, &result)
 
 	compareAndShout(t, len(testSlice1)+len(testSlice2)+len(testSlice3), len(result.Keys))
 	compareAndShout(t, len(testSlice1)+len(testSlice2)+len(testSlice3), result.Count)
@@ -662,7 +662,7 @@ func Test_service_list_keys_by_db_2(t *testing.T) {
 	res.Body.Close()
 
 	var result types.KeyListType
-	json.Unmarshal([]byte(resultStr), &result)
+	json.Unmarshal(resultStr, &result)
 
 	compareAndShout(t, 1000, len(result.Keys))
 	for i := 0; i < 1000; i++ {
@@ -699,7 +699,7 @@ func Test_service_list_keys_by_db_key_type_list(t *testing.T) {
 	res.Body.Close()
 
 	var result types.KeyListType
-	json.Unmarshal([]byte(resultStr), &result)
+	json.Unmarshal(resultStr, &result)
 
 	compareAndShout(t, 1000, len(result.Keys))
 	for i := 0; i < 1000; i++ {
@@ -736,7 +736,7 @@ func Test_service_list_keys_by_db_key_type_hash(t *testing.T) {
 	res.Body.Close()
 
 	var result types.KeyListType
-	json.Unmarshal([]byte(resultStr), &result)
+	json.Unmarshal(resultStr, &result)
 
 	compareAndShout(t, n, len(result.Keys))
 	for i := 0; i < n; i++ {
@@ -774,7 +774,7 @@ func Test_service_list_keys_by_db_key_type_mixed(t *testing.T) {
 	res.Body.Close()
 
 	var result types.KeyListType
-	json.Unmarshal([]byte(resultStr), &result)
+	json.Unmarshal(resultStr, &result)
 
 	for _, k := range result.Keys {
 		switch k.Key {
@@ -821,7 +821,7 @@ func Test_service_string_type(t *testing.T) {
 	res.Body.Close()
 
 	var result types.ResponseType
-	json.Unmarshal([]byte(resultStr), &result)
+	json.Unmarshal(resultStr, &result)
 
 	compareAndShout(t, "string", result.ValueType)
 	compareAndShout(t, "hi", result.Value)
@@ -852,7 +852,7 @@ func Test_service_string_check_by_index(t *testing.T) {
 	res.Body.Close()
 
 	var result types.ResponseType
-	json.Unmarshal([]byte(resultStr), &result)
+	json.Unmarshal(resultStr, &result)
 
 	compareAndShout(t, "string", result.ValueType)
 	compareAndShout(t, "D", result.Value)
@@ -865,7 +865,7 @@ func Test_service_string_check_by_index(t *testing.T) {
 	resultStr, _ = ioutil.ReadAll(res.Body)
 	res.Body.Close()
 
-	json.Unmarshal([]byte(resultStr), &result)
+	json.Unmarshal(resultStr, &result)
 
 	compareAndShout(t, "string", result.ValueType)
 	compareAndShout(t, "l", result.Value)
@@ -878,7 +878,7 @@ func Test_service_string_check_by_index(t *testing.T) {
 	resultStr, _ = ioutil.ReadAll(res.Body)
 	res.Body.Close()
 
-	json.Unmarshal([]byte(resultStr), &result)
+	json.Unmarshal(resultStr, &result)
 
 	compareAndShout(t, "string", result.ValueType)
 	compareAndShout(t, "o", result.Value)
@@ -891,7 +891,7 @@ func Test_service_string_check_by_index(t *testing.T) {
 	resultStr, _ = ioutil.ReadAll(res.Body)
 	res.Body.Close()
 
-	json.Unmarshal([]byte(resultStr), &result)
+	json.Unmarshal(resultStr, &result)
 
 	compareAndShout(t, "string", result.ValueType)
 	compareAndShout(t, "p", result.Value)
@@ -921,7 +921,7 @@ func Test_service_string_check_by_index_wrong_index(t *testing.T) {
 	res.Body.Close()
 
 	var result types.ErrorType
-	json.Unmarshal([]byte(resultStr), &result)
+	json.Unmarshal(resultStr, &result)
 
 	expectedError := "wrong type for index/field"
 	compareAndShout(t, expectedError, result.Error)
@@ -952,7 +952,7 @@ func Test_service_string_type_with_slash_in_key(t *testing.T) {
 	res.Body.Close()
 
 	var result types.ResponseType
-	json.Unmarshal([]byte(resultStr), &result)
+	json.Unmarshal(resultStr, &result)
 
 	compareAndShout(t, "string", result.ValueType)
 	compareAndShout(t, "hi", result.Value)
@@ -983,7 +983,7 @@ func Test_service_string_type_with_slash_and_backtick_in_key(t *testing.T) {
 	res.Body.Close()
 
 	var result types.ResponseType
-	json.Unmarshal([]byte(resultStr), &result)
+	json.Unmarshal(resultStr, &result)
 
 	compareAndShout(t, "string", result.ValueType)
 	compareAndShout(t, "hi", result.Value)
@@ -1014,7 +1014,7 @@ func Test_service_list_keys_for_db_with_access(t *testing.T) {
 		res.Body.Close()
 
 		var result types.KeyListType
-		json.Unmarshal([]byte(resultStr), &result)
+		json.Unmarshal(resultStr, &result)
 
 		compareAndShout(t, 0, result.Count)
 		compareAndShout(t, 0, result.Total)
@@ -1046,7 +1046,7 @@ func Test_service_list_keys_for_db_without_access(t *testing.T) {
 		res.Body.Close()
 
 		var result types.ErrorType
-		json.Unmarshal([]byte(resultStr), &result)
+		json.Unmarshal(resultStr, &result)
 
 		expectedError := fmt.Sprintf("DB %v is not exposed", db)
 		compareAndShout(t, expectedError, result.Error)
@@ -1078,7 +1078,7 @@ func Test_service_string_type_db_no_access(t *testing.T) {
 		res.Body.Close()
 
 		var result types.ErrorType
-		json.Unmarshal([]byte(resultStr), &result)
+		json.Unmarshal(resultStr, &result)
 
 		expectedError := fmt.Sprintf("DB %v is not exposed", db)
 		compareAndShout(t, expectedError, result.Error)
@@ -1111,7 +1111,7 @@ func Test_service_string_type_key_no_access(t *testing.T) {
 	res.Body.Close()
 
 	var result types.ErrorType
-	json.Unmarshal([]byte(resultStr), &result)
+	json.Unmarshal(resultStr, &result)
 
 	expectedError := "Key pattern is forbidden from access"
 	compareAndShout(t, expectedError, result.Error)
@@ -1420,7 +1420,7 @@ func Test_service_delete_not_allowed(t *testing.T) {
 	res.Body.Close()
 
 	var result types.ErrorType
-	json.Unmarshal([]byte(resultStr), &result)
+	json.Unmarshal(resultStr, &result)
 
 	expectedError := "Method DELETE is not allowed"
 	compareAndShout(t, expectedError, result.Error)
@@ -1455,7 +1455,7 @@ func Test_service_delete_not_allowed_no_access(t *testing.T) {
 	res.Body.Close()
 
 	var result types.ErrorType
-	json.Unmarshal([]byte(resultStr), &result)
+	json.Unmarshal(resultStr, &result)
 
 	expectedError := "Method DELETE is not allowed"
 	compareAndShout(t, expectedError, result.Error)
@@ -1487,7 +1487,7 @@ func Test_api_key_authentication(t *testing.T) {
 	res.Body.Close()
 
 	var result types.ErrorType
-	json.Unmarshal([]byte(resultStr), &result)
+	json.Unmarshal(resultStr, &result)
 
 	compareAndShout(t, "unauthorized", result.Error)
 
@@ -1559,8 +1559,21 @@ func Test_service_info(t *testing.T) {
 
 	res, _ := http.Get(s.URL + "/info")
 
+	resultStr, _ := ioutil.ReadAll(res.Body)
+	res.Body.Close()
+
+	var result map[string]map[string]string
+	json.Unmarshal(resultStr, &result)
+
 	expectedCode := 200
 	compareAndShout(t, expectedCode, res.StatusCode)
+
+	for _, x := range []string{"CPU", "Clients", "Cluster", "Memory", "Server"} {
+		_, found := result[x]
+		if !found {
+			t.Error("/info endpoint is not working correctly")
+		}
+	}
 }
 
 func Test_service_info_by_section(t *testing.T) {
@@ -1580,8 +1593,21 @@ func Test_service_info_by_section(t *testing.T) {
 
 	res, _ := http.Get(s.URL + "/info/cpu")
 
+	resultStr, _ := ioutil.ReadAll(res.Body)
+	res.Body.Close()
+
+	var result map[string]map[string]string
+	json.Unmarshal(resultStr, &result)
+
 	expectedCode := 200
 	compareAndShout(t, expectedCode, res.StatusCode)
+
+	for _, x := range []string{"used_cpu_sys", "used_cpu_user", "used_cpu_sys_children", "used_cpu_user_children"} {
+		_, found := result["CPU"][x]
+		if !found {
+			t.Error("/info endpoint is not working correctly")
+		}
+	}
 }
 
 func Test_service_info_by_section_uppercase(t *testing.T) {
@@ -1599,10 +1625,23 @@ func Test_service_info_by_section_uppercase(t *testing.T) {
 	s := httptest.NewServer(http.Handler(&testService))
 	defer s.Close()
 
-	res, _ := http.Get(s.URL + "/info/CPU")
+	res, _ := http.Get(s.URL + "/info/SERVER")
 
 	expectedCode := 200
 	compareAndShout(t, expectedCode, res.StatusCode)
+
+	resultStr, _ := ioutil.ReadAll(res.Body)
+	res.Body.Close()
+
+	var result map[string]map[string]string
+	json.Unmarshal(resultStr, &result)
+
+	for _, x := range []string{"redis_version", "os", "redis_mode", "process_id"} {
+		_, found := result["Server"][x]
+		if !found {
+			t.Error("/info endpoint is not working correctly")
+		}
+	}
 }
 
 func Test_service_info_invalid_section(t *testing.T) {
@@ -1629,7 +1668,7 @@ func Test_service_info_invalid_section(t *testing.T) {
 	res.Body.Close()
 
 	var result types.ErrorType
-	json.Unmarshal([]byte(resultStr), &result)
+	json.Unmarshal(resultStr, &result)
 
 	expectedError := "Exception while getting Redis Info"
 	if !strings.Contains(result.Error, expectedError) {
