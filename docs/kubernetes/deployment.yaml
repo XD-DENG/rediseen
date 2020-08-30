@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rediseen-deployment
+  labels:
+    app: rediseen
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: rediseen
+  template:
+    metadata:
+      labels:
+        app: rediseen
+    spec:
+      containers:
+        - name: rediseen
+          image: xddeng/rediseen:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: REDISEEN_REDIS_URI
+              valueFrom:
+                secretKeyRef:
+                  name: rediseen-secret
+                  key: REDISEEN_REDIS_URI
+            - name: REDISEEN_DB_EXPOSED
+              valueFrom:
+                configMapKeyRef:
+                  name: rediseen-configmap
+                  key: REDISEEN_DB_EXPOSED
+            - name: REDISEEN_KEY_PATTERN_EXPOSED
+              valueFrom:
+                configMapKeyRef:
+                  name: rediseen-configmap
+                  key: REDISEEN_KEY_PATTERN_EXPOSED

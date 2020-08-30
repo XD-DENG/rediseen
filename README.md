@@ -35,6 +35,7 @@ Start a REST-like API service for your Redis database, without writing a single 
   - [How to Start the Service](docs/documentation.md#how-to-start-the-service)
   - [How to Consume the Service](docs/documentation.md#how-to-consume-the-service)
   - [API Authentication](docs/documentation.md#api-authentication)
+  - [Run Rediseen on Kubernetes](docs/documentation.md#run-rediseen-on-kubernetes)
   - [Handle Special Character in Keys](docs/documentation.md#handle-special-character-in-keys)
 - [License](#license)
 - [Reference](#reference)
@@ -216,6 +217,7 @@ and you can expect output below
   - [How to Start the Service](docs/documentation.md#how-to-start-the-service)
   - [How to Consume the Service](docs/documentation.md#how-to-consume-the-service)
   - [API Authentication](docs/documentation.md#api-authentication)
+  - [Run Rediseen on Kubernetes](docs/documentation.md#run-rediseen-on-kubernetes)
   - [Handle Special Character in Keys](docs/documentation.md#handle-special-character-in-keys)
 
 ## License

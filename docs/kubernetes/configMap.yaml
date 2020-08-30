@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rediseen-configmap
+data:
+  REDISEEN_DB_EXPOSED: "0"
+  REDISEEN_KEY_PATTERN_EXPOSED: "^key:([0-9a-z]+)"

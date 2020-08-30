@@ -5,6 +5,7 @@
 - [How to Start the Service](#how-to-start-the-service)
 - [How to Consume the Service](#how-to-consume-the-service)
 - [API Authentication](#api-authentication)
+- [Run Rediseen on Kubernetes](#run-rediseen-on-kubernetes)
 - [Handle Special Character in Keys](#handle-special-character-in-keys)
 
 ## Installation 
@@ -201,6 +202,39 @@ curl -s -H "X-API-KEY: demo_key" http://localhost:8000/0 | jq
     }
   ]
 }
+```
+
+## Run `Rediseen` on Kubernetes
+
+Reference YAML files can be found at directory `docs/kubernetes`.
+
+Run commands below in order,
+
+```bash
+kubectl apply -f configMap.yaml
+kubectl apply -f secret.yaml
+kubectl apply -f deployment.yaml
+kubectl apply -f service.yaml
+```
+
+You should see outputs below,
+
+```
+configmap/rediseen-configmap created
+secret/rediseen-secret created
+deployment.apps/rediseen-deployment created
+service/rediseen-service created
+```
+
+Note:
+- Please remember to update the credential in `secret.yaml`
+- Based on your setting-up, you may choose different service type in `service.yaml` (`NodePort` is used in the sample here)
+
+If you are using `minikube` (with service type `NodePort`), now you can access `Rediseen` service by running
+command
+
+```bash
+minikube service rediseen-service
 ```
 
 ## Handle Special Character in Keys
