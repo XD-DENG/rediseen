@@ -46,7 +46,6 @@ jobs:
         REDISEEN_DB_EXPOSED: 0-5
       run: |
         sudo apt-get install redis-tools
-        sudo apt-get install jq
 
         check_by_status_code () {
           # $1: URL to Curl
