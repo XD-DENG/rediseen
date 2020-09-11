@@ -19,19 +19,8 @@ spec:
           image: xddeng/rediseen:latest
           ports:
             - containerPort: 8000
-          env:
-            - name: REDISEEN_REDIS_URI
-              valueFrom:
-                secretKeyRef:
-                  name: rediseen-secret
-                  key: REDISEEN_REDIS_URI
-            - name: REDISEEN_DB_EXPOSED
-              valueFrom:
-                configMapKeyRef:
-                  name: rediseen-configmap
-                  key: REDISEEN_DB_EXPOSED
-            - name: REDISEEN_KEY_PATTERN_EXPOSED
-              valueFrom:
-                configMapKeyRef:
-                  name: rediseen-configmap
-                  key: REDISEEN_KEY_PATTERN_EXPOSED
+          envFrom:
+            - secretRef:
+                name: rediseen-secret
+            - configMapRef:
+                name: rediseen-configmap
