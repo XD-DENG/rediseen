@@ -206,13 +206,22 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		pathPart2, pathPart3 = parseKeyAndIndex(strings.Join(arguments[2:], "/"))
 	}
 
+	if pathPart1 == "metrics" {
+		var client conn.ExtendedClient
+		client.Init(0)
+		defer client.RedisClient.Close()
+		res.Header().Set("Content-Type", "text/plain")
+		infoMetrics, _ := client.RedisInfo("CPU", "prometheus")
+		res.Write(infoMetrics)
+		return
+	}
 	if pathPart1 == "info" {
 
 		var client conn.ExtendedClient
 		client.Init(0)
 		defer client.RedisClient.Close()
 
-		js, err := client.RedisInfo(pathPart2)
+		js, err := client.RedisInfo(pathPart2, "json")
 		if err != nil {
 			if strings.Contains(err.Error(), "invalid section") {
 				res.WriteHeader(http.StatusBadRequest)
