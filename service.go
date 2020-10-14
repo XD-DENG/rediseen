@@ -210,8 +210,10 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		var client conn.ExtendedClient
 		client.Init(0)
 		defer client.RedisClient.Close()
+
 		res.Header().Set("Content-Type", "text/plain")
-		infoMetrics, _ := client.RedisInfo("CPU", "prometheus")
+		infoMetrics, _ := client.RedisInfo("all", "prometheus")
+
 		res.Write(infoMetrics)
 		return
 	}
