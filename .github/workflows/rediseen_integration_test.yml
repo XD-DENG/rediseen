@@ -93,13 +93,13 @@ jobs:
         sleep 3
 
         # Test incorrect usage
-        check_by_jq_field http://localhost:9000/wrong_usage/ error "Usage: /info, /info/<info_section>, /<db>, /<db>/<key>, /<db>/<key>/<index>, or /<db>/<key>/<field>"
+        check_by_jq_field http://localhost:9000/wrong_usage/ error "Usage: /info, /info/<info_section>, /metrics, /<db>, /<db>/<key>, /<db>/<key>/<index>, or /<db>/<key>/<field>"
         check_by_status_code http://localhost:9000/wrong_usage/ 400
 
         # Test index endpoint
         check_by_status_code http://localhost:9000 200
 
-        check_by_jq_field http://localhost:9000/0/key:1/1/1 error "Usage: /info, /info/<info_section>, /<db>, /<db>/<key>, /<db>/<key>/<index>, or /<db>/<key>/<field>"
+        check_by_jq_field http://localhost:9000/0/key:1/1/1 error "Usage: /info, /info/<info_section>, /metrics, /<db>, /<db>/<key>, /<db>/<key>/<index>, or /<db>/<key>/<field>"
         check_by_jq_field http://localhost:9000/0 count "0"
         check_by_jq_field http://localhost:9000/0 total "0"
         check_by_jq_field http://localhost:9000/0/key:1 error "Key provided does not exist."
@@ -155,6 +155,8 @@ jobs:
         check_by_status_code http://localhost:9000/info/CPU 200
 
         check_by_status_code http://localhost:9000/info/invalidSection 400
+
+        check_by_status_code http://localhost:9000/metrics 200
         
         ./rediseen stop
 
@@ -171,5 +173,6 @@ jobs:
         check_by_status_code http://localhost:9000/0 401
         check_by_status_code http://localhost:9000/info 401
         check_by_status_code http://localhost:9000/info/server 401
+        check_by_status_code http://localhost:9000/metrics 401
         ./rediseen stop
 
