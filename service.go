@@ -175,7 +175,7 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		res.Header().Set("Content-Type", "text/plain")
 		res.Write([]byte(strHeader))
 		res.Write([]byte("\n\n"))
-		res.Write([]byte("Available Endpoints:\n - /info\n - /info/<info_section>\n - /<db>\n - /<db>/<key>\n - /<db>/<key>/<index>\n - /<db>/<key>/<field>"))
+		res.Write([]byte("Available Endpoints:\n - /info\n - /info/<info_section>\n - /metrics (Prometheus-compatible)\n - /<db>\n - /<db>/<key>\n - /<db>/<key>/<index>\n - /<db>/<key>/<field>"))
 		return
 	}
 
@@ -184,7 +184,7 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		buffer := &bytes.Buffer{}
 		encoder := json.NewEncoder(buffer)
 		encoder.SetEscapeHTML(false)
-		encoder.Encode(types.ErrorType{Error: "Usage: /info, /info/<info_section>, /<db>, /<db>/<key>, /<db>/<key>/<index>, or /<db>/<key>/<field>"})
+		encoder.Encode(types.ErrorType{Error: "Usage: /info, /info/<info_section>, /metrics, /<db>, /<db>/<key>, /<db>/<key>/<index>, or /<db>/<key>/<field>"})
 		res.Write(buffer.Bytes())
 		return
 	}
@@ -206,13 +206,24 @@ func (c *service) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		pathPart2, pathPart3 = parseKeyAndIndex(strings.Join(arguments[2:], "/"))
 	}
 
-	if pathPart1 == "info" {
-
+	if pathPart1 == "metrics" {
 		var client conn.ExtendedClient
 		client.Init(0)
 		defer client.RedisClient.Close()
 
-		js, err := client.RedisInfo(pathPart2)
+		res.Header().Set("Content-Type", "text/plain")
+		infoMetrics, _ := client.RedisInfo("all", "prometheus")
+
+		res.Write(infoMetrics)
+		return
+	}
+
+	if pathPart1 == "info" {
+		var client conn.ExtendedClient
+		client.Init(0)
+		defer client.RedisClient.Close()
+
+		js, err := client.RedisInfo(pathPart2, "json")
 		if err != nil {
 			if strings.Contains(err.Error(), "invalid section") {
 				res.WriteHeader(http.StatusBadRequest)

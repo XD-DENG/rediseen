@@ -168,37 +168,95 @@ func (client *ExtendedClient) Retrieve(key string, indexOrField string) ([]byte,
 }
 
 // RedisInfo takes the results of Redis INFO command, then return the result as JSON ([]byte format from json.Marshal)
-func (client *ExtendedClient) RedisInfo(section string) ([]byte, error) {
+func (client *ExtendedClient) RedisInfo(section string, format string) ([]byte, error) {
 	var infoResult string
 	var err error
 	if section == "" {
 		section = "all"
 	}
 	infoResult, err = client.RedisClient.Info(ctx, section).Result()
-	if infoResult == "" {
-		return []byte{}, fmt.Errorf("invalid section `%s` is given. Check /info for supported sections", section)
-	}
-	if err != nil {
-		return []byte{}, err
-	}
 
-	mapResult := make(map[string]map[string]string)
-	var sectionName string
-	for _, row := range strings.Split(infoResult, "\n") {
-		if len(row) > 0 && string(row[0]) == "#" {
-			// this row is the line for section name
-			sectionName = strings.Trim(row, "\r# ")
-			mapResult[sectionName] = make(map[string]string)
-		} else {
-			// this row is the line for detailed key-value pair
-			values := strings.Split(row, ":")
-			if len(values) != 2 {
-				continue
+	switch format {
+	case "json":
+		if infoResult == "" {
+			return []byte{}, fmt.Errorf("invalid section `%s` is given. Check /info for supported sections", section)
+		}
+		if err != nil {
+			return []byte{}, err
+		}
+
+		mapResult := make(map[string]map[string]string)
+		var sectionName string
+		for _, row := range strings.Split(infoResult, "\n") {
+			if len(row) > 0 && string(row[0]) == "#" {
+				// this row is the line for section name
+				sectionName = strings.Trim(row, "\r# ")
+				mapResult[sectionName] = make(map[string]string)
+			} else {
+				// this row is the line for detailed key-value pair
+				values := strings.Split(row, ":")
+				if len(values) != 2 {
+					continue
+				}
+				mapResult[sectionName][values[0]] = strings.TrimSpace(values[1])
 			}
-			mapResult[sectionName][values[0]] = strings.TrimSpace(values[1])
+		}
+
+		jsonResult, _ := json.Marshal(mapResult)
+		return jsonResult, nil
+	case "prometheus":
+		lines := strings.Split(infoResult, "\n")
+		var filtered []string
+		for _, l := range lines {
+			processedLines := parseInfoLine(l)
+			for _, pl := range processedLines {
+				filtered = append(filtered, pl)
+			}
+		}
+		return []byte(strings.ReplaceAll(strings.Join(filtered, "\n"), ":", " ")), nil
+	case "raw":
+		return []byte(infoResult), nil
+	default:
+		return []byte(infoResult), nil
+	}
+}
+
+func validateFloatValue(v string) bool {
+	_, err := strconv.ParseFloat(v, 64)
+	if err == nil {
+		return true
+	} else {
+		return false
+	}
+}
+
+func parseInfoLine(v string) []string {
+	result := []string{}
+
+	v = strings.ReplaceAll(v, "\r", "")
+
+	if strings.HasPrefix(v, "#") {
+		// Include the comment lines
+		result = append(result, v)
+	} else {
+		if strings.Contains(v, ",") {
+			// For "commandstats" and "keyspace"
+			// They need special parsing
+			split := strings.Split(v, ":")
+
+			for _, mv := range strings.Split(split[1], ",") {
+				mv = strings.ReplaceAll(mv, "=", " ")
+				result = append(result, split[0]+"_"+mv)
+			}
+		} else {
+			// for other metric lines
+			// The check here will help exclude all lines with non-float value,
+			// including lines like "used_memory_human:846.21K"
+			if strings.Contains(v, ":") && validateFloatValue(strings.Split(v, ":")[1]) {
+				result = append(result, strings.ReplaceAll(v, ":", " "))
+			}
 		}
 	}
 
-	jsonResult, _ := json.Marshal(mapResult)
-	return jsonResult, nil
+	return result
 }

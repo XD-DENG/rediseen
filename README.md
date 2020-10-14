@@ -14,6 +14,7 @@ Start a REST-like API service for your Redis database, without writing a single 
 - Allows clients to query records in Redis database via HTTP conveniently
 - Allows you to specify which logical DB(s) to expose, and what key patterns to expose
 - Expose results of [Redis `INFO` command](https://redis.io/commands/info) in a nice format, so **you can use `Rediseen` as a connector between your Redis DB and monitoring dashboard** as well.
+  Endpoint `/info` provides Redis `INFO` command output in JSON format, and endpoint `/metrics` provides Prometheus-compatible format.
 - Supports API Key authentication
 
 (Inspired by [sandman2](https://github.com/jeffknupp/sandman2); Built on shoulder of [go-redis/redis
