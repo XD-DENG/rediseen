@@ -7,7 +7,7 @@
 - [API Authentication](#api-authentication)
 - [Run Rediseen on Kubernetes](#run-rediseen-on-kubernetes)
 - [Handle Special Character in Keys](#handle-special-character-in-keys)
-- [Use Rediseen as Redis INFO exporter for Prometheus](#use-rediseen-as-redis-info-exporter-for-prometheus)
+- [Use Rediseen as Redis INFO Exporter for Prometheus](#use-rediseen-as-redis-info-exporter-for-prometheus)
 
 ## Installation 
 
@@ -245,7 +245,7 @@ If you have special character in your keys, like "`key/3`", `Rediseen` will not 
 So the request should be `` http://localhost:8000/0/`key/3` ``.
 
 
-## Use Rediseen as Redis INFO exporter for Prometheus
+## Use Rediseen as Redis INFO Exporter for Prometheus
 
 Rediseen parses the output from Redis `INFO` command, and provide the result in Prometheus-compatible format at endpoint `/metrics`.
 
