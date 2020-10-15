@@ -7,6 +7,7 @@
 - [API Authentication](#api-authentication)
 - [Run Rediseen on Kubernetes](#run-rediseen-on-kubernetes)
 - [Handle Special Character in Keys](#handle-special-character-in-keys)
+- [Use Rediseen as Redis INFO exporter for Prometheus](#use-rediseen-as-redis-info-exporter-for-prometheus)
 
 ## Installation 
 
@@ -241,4 +242,24 @@ minikube service rediseen-service
 
 If you have special character in your keys, like "`key/3`", `Rediseen` will not be able to handle request like
 `http://localhost:8000/0/key/3` properly. Instead, you can form your request by surrounding your key with backticks.
-So the request should be `` http://localhost:8000/0/`key/3` ``.  
+So the request should be `` http://localhost:8000/0/`key/3` ``.
+
+
+## Use Rediseen as Redis INFO exporter for Prometheus
+
+Rediseen parses the output from Redis `INFO` command, and provide the result in Prometheus-compatible format at endpoint `/metrics`.
+
+- Literally all output from Redis `INFO` command are included, other than lines whose value cannot be parsed into
+  a float (for example "*used_memory_rss_human:4.56M*" or "*redis_version:5.0.7*").
+
+- Some lines may not make sense, for example "redis_git_sha1", whose value can be parsed into a float, but means nothing.
+  They are kept because Rediseen does not hard-code the list of metrics to include or exclude,
+  to ensure better complexity among different Redis versions.
+
+- There are some special lines in Redis `INFO` command output. For example,  section `keyspace` has lines
+  like `db0:keys=888,expires=0,avg_ttl=0`. These lines will be processed into format like
+  ```
+  db0_keys 888
+  db0_expires 0
+  db0_avg_ttl 0
+  ```

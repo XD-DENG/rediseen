@@ -225,9 +225,8 @@ func validateFloatValue(v string) bool {
 	_, err := strconv.ParseFloat(v, 64)
 	if err == nil {
 		return true
-	} else {
-		return false
 	}
+	return false
 }
 
 func parseInfoLine(v string) []string {
