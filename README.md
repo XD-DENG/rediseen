@@ -232,4 +232,5 @@ and you can expect output below
 ## Reference
 
 [1] https://swagger.io/docs/specification/authentication/api-keys/
+
 [2] Prometheus Exposition Formats, https://prometheus.io/docs/instrumenting/exposition_formats/

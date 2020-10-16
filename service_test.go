@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -1693,5 +1694,39 @@ func Test_service_info_invalid_section(t *testing.T) {
 	expectedError = "invalid section"
 	if !strings.Contains(result.Error, expectedError) {
 		t.Error("Expecting to contain \n", expectedError, "\ngot\n", result.Error)
+	}
+}
+
+func Test_service_metrics(t *testing.T) {
+
+	originalRedisURI := os.Getenv("REDISEEN_REDIS_URI")
+	realRedis, realRedisFound := os.LookupEnv("REAL_REDIS_URI")
+	if !realRedisFound {
+		t.Skip("skipping test when there is no real Redis instance")
+	}
+	os.Setenv("REDISEEN_REDIS_URI", realRedis)
+	defer os.Setenv("REDISEEN_REDIS_URI", originalRedisURI)
+
+	var testService service
+	testService.loadConfigFromEnv()
+	s := httptest.NewServer(http.Handler(&testService))
+	defer s.Close()
+
+	res, _ := http.Get(s.URL + "/metrics")
+
+	expectedCode := 200
+	compareAndShout(t, expectedCode, res.StatusCode)
+
+	resultBytes, _ := ioutil.ReadAll(res.Body)
+	res.Body.Close()
+
+	resultStr := string(resultBytes)
+
+	if strings.Split(resultStr, "\n")[0] != "# Server" {
+		t.Error("Content of /metrics seems wrong")
+	}
+
+	if _, err := strconv.ParseFloat(strings.Split(strings.Split(resultStr, "\n")[1], " ")[1], 64); err != nil {
+		t.Error("Content of /metrics seems wrong")
 	}
 }
