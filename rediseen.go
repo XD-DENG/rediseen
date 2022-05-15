@@ -3,14 +3,16 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/spf13/cobra"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"os/exec"
 	"path"
+	"runtime"
 	"strconv"
+
+	"github.com/spf13/cobra"
 )
 
 func getPidFileDir() string {
@@ -145,7 +147,7 @@ func main() {
 		Use:   "version",
 		Short: "Display the version of Rediseen",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println(rediseenVersion)
+			fmt.Printf("Rediseen Version:\t%s\nGo Runtime Version:\t%s\n", rediseenVersion, runtime.Version())
 		},
 	}
 
