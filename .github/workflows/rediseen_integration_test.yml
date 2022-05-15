@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        redisversion: [latest, 5.0.6, 4.0.14, 3.2.12, 2.8.23]
+        redisversion: [latest, 6.0.2, 5.0.6, 4.0.14, 3.2.12, 2.8.23]
         goversion: [1.12, 1.13, 1.14, 1.15, 1.16, 1.17, 1.18]
 
     services:
